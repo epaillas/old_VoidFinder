@@ -4,8 +4,8 @@ import os
 import glob
 import subprocess
 from astropy.io import fits
-from cosmology import Cosmology
-from galaxycat import GalaxyCatalogue
+from python_tools.cosmology import Cosmology
+from python_tools.galaxycat import GalaxyCatalogue
 from scipy.spatial import Delaunay
 import healpy as hp
 from scipy.io import FortranFile
