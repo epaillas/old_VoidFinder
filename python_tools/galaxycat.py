@@ -1,7 +1,7 @@
 import numpy as np
 import sys
 from astropy.io import fits
-from cosmology import Cosmology
+from python_tools.cosmology import Cosmology
 from scipy.io import FortranFile
 
 
