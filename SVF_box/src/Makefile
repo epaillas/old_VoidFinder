@@ -7,23 +7,23 @@ MLIBS = -lm
 
 #################
 
-EXES_3D = grow_spheres recentring overlapping vg_ccf_monopole
-EXES_2D = grow_spheres_2D recentring_2D overlapping_2D
+EXES_3D = grow_spheres.exe recentring.exe overlapping.exe vg_ccf_monopole.exe
+EXES_2D = grow_spheres_2D.exe recentring_2D.exe overlapping_2D.exe
 EXES = $(EXES_3D) $(EXES_2D)
 
 all: $(EXES)
 
-grow_spheres: grow_spheres.o
-	$(MPIFC) grow_spheres.o -o grow_spheres $(MLIBS)
+grow_spheres.exe: grow_spheres.o
+	$(MPIFC) grow_spheres.o -o grow_spheres.exe $(MLIBS)
 
-recentring: recentring.o
-	$(MPIFC) recentring.o -o recentring $(MLIBS)
+recentring.exe: recentring.o
+	$(MPIFC) recentring.o -o recentring.exe $(MLIBS)
 
-overlapping: overlapping.o
-	$(MPIFC) overlapping.o -o overlapping $(MLIBS)
+overlapping.exe: overlapping.o
+	$(MPIFC) overlapping.o -o overlapping.exe $(MLIBS)
 
-vg_ccf_monopole: vg_ccf_monopole.o
-	$(MPIFC) vg_ccf_monopole.o -o vg_ccf_monopole $(MLIBS)
+vg_ccf_monopole.exe: vg_ccf_monopole.o
+	$(MPIFC) vg_ccf_monopole.o -o vg_ccf_monopole.exe $(MLIBS)
 
 grow_spheres.o: grow_spheres.f90
 	$(MPIFC) -c grow_spheres.f90
@@ -38,14 +38,14 @@ vg_ccf_monopole.o: vg_ccf_monopole.f90
 	$(MPIFC) -c vg_ccf_monopole.f90
 
 
-grow_spheres_2D: grow_spheres_2D.o
-	$(MPIFC) grow_spheres_2D.o -o grow_spheres_2D $(MLIBS)
+grow_spheres_2D.exe: grow_spheres_2D.o
+	$(MPIFC) grow_spheres_2D.o -o grow_spheres_2D.exe $(MLIBS)
 
-recentring_2D: recentring_2D.o
-	$(MPIFC) recentring_2D.o -o recentring_2D $(MLIBS)
+recentring_2D.exe: recentring_2D.o
+	$(MPIFC) recentring_2D.o -o recentring_2D.exe $(MLIBS)
 
-overlapping_2D: overlapping_2D.o
-	$(MPIFC) overlapping_2D.o -o overlapping_2D $(MLIBS)
+overlapping_2D.exe: overlapping_2D.o
+	$(MPIFC) overlapping_2D.o -o overlapping_2D.exe $(MLIBS)
 
 grow_spheres_2D.o: grow_spheres_2D.f90
 	$(MPIFC) -c grow_spheres_2D.f90
