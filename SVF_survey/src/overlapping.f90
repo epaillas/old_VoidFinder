@@ -57,13 +57,13 @@ program overlapping
   integer, dimension(ngrid, ngrid, ngrid) :: lirst
   integer, dimension(:), allocatable :: ll
 
-  real :: overlap, px, py, pz, rvoid, ng, nden
+  real :: overlap, px, py, pz, rvoid, ng, nden, vfrac
   real :: disx, disy, disz, dis, rgrid, gridmin, gridmax
 
   integer, dimension(:), allocatable :: ng_arr, mark
 
   real, dimension(:,:), allocatable :: pos_arr
-  real, dimension(:), allocatable :: rvoid_arr, nden_arr
+  real, dimension(:), allocatable :: rvoid_arr, nden_arr, vfrac_arr
 
   character(len=500) :: input_voids, output_voids
   character(len=10) :: overlap_char, gridmin_char, gridmax_char
@@ -114,16 +114,19 @@ program overlapping
   10 rewind(10)
   write(*, *) 'Number of voids: ', nv
 
-  allocate(pos_arr(3, nv), rvoid_arr(nv), ng_arr(nv), nden_arr(nv), mark(nv))
+  allocate(pos_arr(3, nv), rvoid_arr(nv), ng_arr(nv),&
+  & nden_arr(nv), vfrac_arr(nv), mark(nv))
+
 
   do i = 1, nv
-    read(10, *) px, py, pz, rvoid, ng, nden
+    read(10, *) px, py, pz, rvoid, ng, nden, vfrac
     pos_arr(1, i) = px
     pos_arr(2, i) = py
     pos_arr(3, i) = pz
     rvoid_arr(i) = rvoid
     nden_arr(i) = nden
     ng_arr(i) = ng
+    vfrac_arr(i) = vfrac
   end do
   close(10)
 
@@ -190,8 +193,9 @@ program overlapping
   do i = 1, nv
     if(mark(i) .eq. 0) then
       count = count + 1
-      write(11, '(4F10.3, 1I10, 1F10.3)') &
-      & pos_arr(1,i), pos_arr(2,i), pos_arr(3,i), rvoid_arr(i), ng_arr(i), nden_arr(i)
+      write(11, '(4F10.3, 1I10, 2F10.3)') &
+      & pos_arr(1,i), pos_arr(2,i), pos_arr(3,i), rvoid_arr(i), ng_arr(i),&
+      & nden_arr(i), vfrac_arr(i)
     endif
   end do
 

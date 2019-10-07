@@ -19,6 +19,9 @@ class SphericalVoids:
                  verbose=False, handle=None, nside=128, delta_voids=0.2,
                  rvoidmax=100, ncores=1, steps=[1, 2, 3, 4]):
 
+        steps = [int(i) for i in steps.split(',')]
+        pos_cols = [int(i) for i in pos_cols.split(',')]
+
         # file names
         self.handle = handle
         self.tracer_file = tracer_file
@@ -29,6 +32,8 @@ class SphericalVoids:
         self.voids_file = self.handle + '.SVF'
         self.recentred_file = self.voids_file + '.recen'
         self.mask_file = mask_file
+        self.steps = steps
+        self.pos_cols = pos_cols
 
         # void parameters
         self.delta_voids = delta_voids
@@ -46,16 +51,13 @@ class SphericalVoids:
         self.h = h
         self.cosmo = Cosmology(omega_m=omega_m)
 
-        steps = [int(i) for i in steps.split(',')]
-        pos_cols = [int(i) for i in pos_cols.split(',')]
-        if self.is_box and self.box_size is None:
-            sys.exit('Simulation size not provided. Aborting...')
-
-        if (not self.is_box) & (self.mask_file is None) & (1 not in steps):
-            sys.exit('Mask file not provided, but step 1 not included in the run. Aborting...')
-
+        if 1 not in steps:
+            if self.mask_file is None:
+                sys.exit('Mask file not provided. Aborting...')
+            else:
+                self.mask = hp.read_map(self.mask_file, nest=False, verbose=False)
+        else:
         # load tracers and find void centres
-        if 1 in steps:
             self.tracers = GalaxyCatalogue(catalogue_file=tracer_file, is_box=is_box,
             box_size=box_size, randoms=False, boss_like=boss_like, omega_m=omega_m,
             h=h, bin_write=True, output_file=self.tracer_unf, pos_cols=pos_cols)
@@ -72,7 +74,6 @@ class SphericalVoids:
                 if self.mask_file is None:
                     print('No mask file provided. Generating a rough mask...')
                     self.mask = self.make_survey_mask()
-                    
                 else:
                     self.mask = hp.read_map(self.mask_file, nest=False, verbose=False)
                     
@@ -289,9 +290,9 @@ class SphericalVoids:
         
 
     def delaunay_triangulation(self):
-        '''
-        Make a Delaunay triangulation over
-        the cartesian positions of the tracers.
+        '''eBOSS_LRG_NGC_v4.SVF.recen
+        Make a Delaunay triangulation overeBOSS_LRG_NGC_v4.SVF.recen
+        the cartesian positions of the tracers.eBOSS_LRG_NGC_v4.SVF.recen
         Returns the vertices of tetrahedra.
         '''
         x = self.tracers.x
@@ -378,7 +379,7 @@ class SphericalVoids:
         voids = np.genfromtxt(self.recentred_file)
         return voids
 
-    def sort_spheres(self, fname='', radius_col=-3):
+    def sort_spheres(self, fname='', radius_col=3):
         '''
         Sort an input void catalogue in
         decreasing order of radius.
@@ -391,7 +392,11 @@ class SphericalVoids:
         voids = np.genfromtxt(fname)
         voids = voids[np.argsort(voids[:, radius_col])]
         voids = voids[::-1]
-        fmt = '%10.3f %10.3f %10.3f %10.3f %10i %10.3f'
+        
+        if voids.shape[1] == 7:
+            fmt = 4*'%10.3f' + '%10i' + 2*'%10.3f'
+        else:
+            fmt = 4*'%10.3f' + '%10i' + 1*'%10.3f'
         np.savetxt(fname, voids, fmt=fmt)
 
         return voids
@@ -421,72 +426,34 @@ class SphericalVoids:
         return voids
 
 
-
-    def plot_void_abundance(self, nbins=15, error=True, linestyle='-',
-                            linewidth=2.0, color='k'):
-        '''
-        Plot the distribution 
-        of void sizes.
-        '''
-        fig, ax = plt.subplots(1, figsize=(7,5))
-
-        if self.is_box:
-            norm = (self.box_size**3 * np.diff(np.log10(bin_edges)))
-        else:
-            norm = 1
-
-        minr = self.radius.min()
-        maxr = self.radius.max()
-        bins = np.logspace(np.log10(minr), np.log10(maxr), nbins)
-        hist, bin_edges = np.histogram(self.radius, bins=bins)
-        r = self.bin_centres(bin_edges)
-        n = hist / norm
-
-        if error:
-            err = np.sqrt(hist) / norm
-            errplus = n + err
-            errminus = n - err
-            ax.fill_between(r, errplus, errminus, color='#AAAAAA')
-
-        ax.plot(r, n, linestyle=linestyle, linewidth=linewidth, color=color)
-        ax.set_xlabel(r'$R_{\rm{eff}} \hspace{0.5} /\ \rm{h^{-1}Mpc}$',
-                      fontsize=17)
-        ax.set_ylabel(r'$\rm{dN}\ / \rm{d} log(R_{eff})\ [h^{3}Mpc^{-3}]$',
-                      fontsize=17)
-        ax.set_yscale('log', nonposy='clip')
-        ax.set_xlim(bins.min(), bins.max())
-        ax.tick_params(which='both', width=1.0, labelsize=17)
-        ax.tick_params(which='both', width=1.0, labelsize=17)
-
-        plt.show()
-
-    def bin_centres(self, bin_edges):
-        '''
-        Find the bin centres
-        for an input set of 
-        bin edges.
-        '''
-        return np.asarray([(bin_edges[i] + bin_edges[i + 1])/2
-        for i in range(len(bin_edges) - 1)])
-
     def filter_by_volume_fraction(self, fname='', threshold=0.95):
+        '''
+        Filters voids by their volume fraction
+        in the survey.
+        '''
+        print('Filtering voids by volume fraction...')
         if fname == '':
             fname = self.recentred_file
 
-        voids = voids = np.genfromtxt(fname)
+        voids = np.genfromtxt(fname)
         volfrac = self.get_void_volume_fraction(fname=fname)
+
+        voids = np.c_[voids, volfrac]
         voids = voids[volfrac > threshold]
+
+        fmt = '%10.3f %10.3f %10.3f %10.3f %10i %10.3f %10.3f'
+        np.savetxt(fname, voids, fmt=fmt)
         
         return voids
 
 
-    def get_void_volume_fraction(self, fname='', radius_col=-3):
+    def get_void_volume_fraction(self, fname='', pos_cols=[0,1,2],
+                                 radius_col=3):
         '''
         Compute the fraction of the void
         that is contained within the survey
         footprint.
         '''
-
         if fname == '':
             fname = self.recentred_file
 
@@ -501,12 +468,12 @@ class SphericalVoids:
             cosdec = np.random.uniform(-1, 1, npoints)
             dec = np.arccos(cosdec)
             _ = np.random.uniform(0, 1, npoints)
-            r = rvoid * _ ** (1/3)
+            r = void[radius_col] * _ ** (1/3)
 
             # shift points to the global coordinate system
-            x = r * np.sin(dec) * np.cos(ra) + void[0]
-            y = r * np.sin(dec) * np.sin(ra) + void[1]
-            z = r * np.cos(dec) + void[2]
+            x = r * np.sin(dec) * np.cos(ra) + void[pos_cols[0]]
+            y = r * np.sin(dec) * np.sin(ra) + void[pos_cols[1]]
+            z = r * np.cos(dec) + void[pos_cols[2]]
 
             # switch to sky coordinates
             dis = np.sqrt(x**2 + y**2 + z**2)
@@ -517,7 +484,7 @@ class SphericalVoids:
             # compute volume fraction
             nin = 0
             for i in range(npoints):
-                ind = hp.pixelfunc.ang2pix(nside, dec[i], ra[i], nest=False)
+                ind = hp.pixelfunc.ang2pix(self.nside, dec[i], ra[i], nest=False)
                 if self.mask[ind] == 1 and self.zmin < redshift[i] < self.zmax:
                     nin += 1
 
@@ -526,26 +493,4 @@ class SphericalVoids:
         volfrac = np.asarray(volfrac)
         return volfrac
 
-    def filter_by_volume_fraction(self, threshold=0.95):
-        '''
-        Filter a void catalogue
-        by the fraction of its volume
-        that is contained in the survey.
-        '''
-        if fname == '':
-            fname = self.recentred_file
-
-        voids = np.genfromtxt(fname)
-        voids = voids[np.argsort(voids[:, radius_col])]
-        voids = voids[::-1]
-        fmt = '%10.3f %10.3f %10.3f %10.3f %10i %10.3f'
-        np.savetxt(fname, voids, fmt=fmt)
-
-        ind = self.volfrac > threshold
-
-        self.x = voids[ind,0]
-        self.y = voids[ind,1]
-        self.z = voids[ind,2]
-        self.radius = voids[ind,3]
-
-
+    

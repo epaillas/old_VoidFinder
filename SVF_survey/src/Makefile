@@ -7,26 +7,26 @@ MLIBS = -lm
 
 #################
 
-EXES_3D = grow_spheres.exe recentring.exe overlapping.exe vg_ccf_r_mu.exe vg_ccf_sigma_pi.exe
+EXES_3D = grow_spheres recentring overlapping vg_ccf_r_mu vg_ccf_sigma_pi
 EXES_2D = 
 EXES = $(EXES_3D) $(EXES_2D)
 
 all: $(EXES)
 
-vg_ccf_r_mu.exe: vg_ccf_r_mu.o
-	$(FC) vg_ccf_r_mu.o -o vg_ccf_r_mu.exe
+vg_ccf_r_mu: vg_ccf_r_mu.o
+	$(FC) vg_ccf_r_mu.o -o vg_ccf_r_mu
 
-vg_ccf_sigma_pi.exe: vg_ccf_sigma_pi.o
-	$(FC) vg_ccf_sigma_pi.o -o vg_ccf_sigma_pi.exe
+vg_ccf_sigma_pi: vg_ccf_sigma_pi.o
+	$(FC) vg_ccf_sigma_pi.o -o vg_ccf_sigma_pi
 
-grow_spheres.exe: grow_spheres.o
-	$(MPIFC) grow_spheres.o -o grow_spheres.exe $(MLIBS)
+grow_spheres: grow_spheres.o
+	$(MPIFC) grow_spheres.o -o grow_spheres $(MLIBS)
 
-recentring.exe: recentring.o
-	$(MPIFC) recentring.o -o recentring.exe $(MLIBS)
+recentring: recentring.o
+	$(MPIFC) recentring.o -o recentring $(MLIBS)
 
-overlapping.exe: overlapping.o
-	$(MPIFC) overlapping.o -o overlapping.exe $(MLIBS)
+overlapping: overlapping.o
+	$(MPIFC) overlapping.o -o overlapping $(MLIBS)
 
 
 vg_ccf_r_mu.o: vg_ccf_r_mu.f90
