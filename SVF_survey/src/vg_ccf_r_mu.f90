@@ -88,27 +88,21 @@ if (id == 0) write(*, *) 'max_rvoid: ', trim(max_rvoid_char), ' Mpc'
 if (id == 0) write(*,*) ''
 
 ! Count the number of tracers
-open(10, file=input_tracers, status='old')
-ng = 0
-do
-  read(10, *, end=10)
-  ng = ng + 1
-end do
-10 rewind(10)
-if (id == 0) write(*,*) 'Number of tracers: ', ng
+open(10, file=input_tracers, status='old', form='unformatted')
+read(10) ng
+allocate(pos_data(3, ng))
+read(10) pos_data
+close(10)
+if (id == 0) write(*,*) 'ntracers: ', ng
 
-! Count the number of rands
-open(11, file=input_randoms, status='old')
-nr = 0
-do
-  read(11, *, end=11)
-  nr = nr + 1
-end do
-11 rewind(11)
-if (id == 0) write(*,*) 'Number of randoms: ', nr
+open(11, file=input_randoms, status='old', form='unformatted')
+read(11) nr
+allocate(pos_rand(3, nr))
+read(11) pos_rand
+close(11)
+if (id == 0) write(*,*) 'nrandoms: ', nr
 if (id == 0) write(*,*) 'nr/ng = ', nr * 1./ng
 
-! Count the number of centres
 open(12, file=input_centres, status='old')
 nc = 0
 do
@@ -116,29 +110,8 @@ do
   nc = nc + 1
 end do
 12 rewind(12)
-if (id == 0) write(*,*) 'Number of centres: ', nc
+if (id == 0) write(*,*) 'ncentres: ', nc
 
-! Memory allocation
-allocate(pos_data(3, ng))
-allocate(pos_rand(3, nr))
-
-! Read data catalogue positions
-do i = 1, ng
-  read(10, *) posx, posy, posz
-  pos_data(1, i) = posx
-  pos_data(2, i) = posy
-  pos_data(3, i) = posz
-end do
-close(10)
-
-! Read rand catalogue positions
-do i = 1, nr
-  read(11, *) posx, posy, posz
-  pos_rand(1, i) = posx
-  pos_rand(2, i) = posy
-  pos_rand(3, i) = posz
-end do
-close(11)
 
 ! Construct data catalogue linked list
 ngrid = 100
