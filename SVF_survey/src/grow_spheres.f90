@@ -145,8 +145,12 @@ program grow_spheres
   rgrid = (gridmax - gridmin) / ngrid
   rwidth = rvoidmax / nrbin
   ndif = int(rvoidmax / rgrid + 1)
-  if (id == 0) write(*,*) 'minpos: ', minval(pos_data(1, :))
-  if (id == 0) write(*,*) 'maxpos: ', maxval(pos_data(1, :))
+  if (id == 0) write(*,*) 'minposx: ', minval(pos_data(1, :))
+  if (id == 0) write(*,*) 'maxposx: ', maxval(pos_data(1, :))
+  if (id == 0) write(*,*) 'minposy: ', minval(pos_data(2, :))
+  if (id == 0) write(*,*) 'maxposy: ', maxval(pos_data(2, :))
+  if (id == 0) write(*,*) 'minposz: ', minval(pos_data(3, :))
+  if (id == 0) write(*,*) 'maxposz: ', maxval(pos_data(3, :))
   if (id == 0) write(*,*) 'rgrid: ', rgrid
   if (id == 0) write(*,*) 'ndif: ', ndif
   if (id == 0) write(*,*) 'rwidth: ', rwidth
