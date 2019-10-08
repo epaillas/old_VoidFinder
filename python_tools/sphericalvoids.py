@@ -13,10 +13,10 @@ import matplotlib.pyplot as plt
 
 class SphericalVoids:
 
-    def __init__(self, tracer_file, is_box=True, random_file=None,
+    def __init__(self, tracer_file, is_box=True, random_file='',
                  boss_like=False, pos_cols=[0, 1, 2], box_size=1024.0,
-                 omega_m=0.31, h=0.6777, mask_file=None, zmin=0.43, zmax=0.7,
-                 verbose=False, handle=None, nside=128, delta_voids=0.2,
+                 omega_m=0.31, h=0.6777, mask_file='', zmin=0.43, zmax=0.7,
+                 verbose=False, handle='', nside=128, delta_voids=0.2,
                  rvoidmax=100, ncores=1, steps=[1, 2, 3, 4]):
 
         steps = [int(i) for i in steps.split(',')]
@@ -52,7 +52,7 @@ class SphericalVoids:
         self.cosmo = Cosmology(omega_m=omega_m)
 
         if 1 not in steps:
-            if self.mask_file is None:
+            if self.mask_file == '':
                 sys.exit('Mask file not provided. Aborting...')
             else:
                 self.mask = hp.read_map(self.mask_file, nest=False, verbose=False)
@@ -63,7 +63,7 @@ class SphericalVoids:
             h=h, bin_write=True, output_file=self.tracer_unf, pos_cols=pos_cols)
             
             if self.is_box == False:
-                if random_file is None:
+                if random_file == '':
                     sys.exit('Random catalogue is missing. Aborting...')
                 else:
                     self.randoms = GalaxyCatalogue(catalogue_file=random_file, is_box=self.is_box, 
@@ -71,7 +71,7 @@ class SphericalVoids:
                                                 h=h, bin_write=True, output_file=self.random_unf,
                                                 pos_cols=pos_cols)
                     
-                if self.mask_file is None:
+                if self.mask_file == '':
                     print('No mask file provided. Generating a rough mask...')
                     self.mask = self.make_survey_mask()
                 else:
