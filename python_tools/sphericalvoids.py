@@ -14,10 +14,10 @@ import matplotlib.pyplot as plt
 class SphericalVoids:
 
     def __init__(self, tracer_file, is_box=True, random_file='',
-                 boss_like=False, pos_cols=[0, 1, 2], box_size=1024.0,
+                 boss_like=False, pos_cols='1,2,3', box_size=1024.0,
                  omega_m=0.31, h=0.6777, mask_file='', zmin=0.43, zmax=0.7,
                  verbose=False, handle='', nside=128, delta_voids=0.2,
-                 rvoidmax=100, ncores=1, steps=[1, 2, 3, 4]):
+                 rvoidmax=100, ncores=1, steps='1,2,3,4'):
 
         steps = [int(i) for i in steps.split(',')]
         pos_cols = [int(i) for i in pos_cols.split(',')]
@@ -393,10 +393,7 @@ class SphericalVoids:
         voids = voids[np.argsort(voids[:, radius_col])]
         voids = voids[::-1]
         
-        if voids.shape[1] == 7:
-            fmt = 4*'%10.3f' + '%10i' + 2*'%10.3f'
-        else:
-            fmt = 4*'%10.3f' + '%10i' + 1*'%10.3f'
+        fmt = 4*'%10.3f ' + '%10i ' + '%10.3f '
         np.savetxt(fname, voids, fmt=fmt)
 
         return voids
@@ -438,10 +435,10 @@ class SphericalVoids:
         voids = np.genfromtxt(fname)
         volfrac = self.get_void_volume_fraction(fname=fname)
 
-        voids = np.c_[voids, volfrac]
+        #voids = np.c_[voids, volfrac]
         voids = voids[volfrac > threshold]
 
-        fmt = '%10.3f %10.3f %10.3f %10.3f %10i %10.3f %10.3f'
+        fmt = 4*'%10.3f ' +  '%10i ' + '%10.3f '
         np.savetxt(fname, voids, fmt=fmt)
         
         return voids
