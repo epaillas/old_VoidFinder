@@ -13,14 +13,17 @@ from python_tools.sphericalvoids import SphericalVoids
 @click.option('--mask', type=str, default='', help='File containing HEALPix mask of survey footprint.')
 @click.option('--pos_cols', type=str, default='1,2,3', help='Indices of columns where tracer positions are stored.')
 @click.option('--rvoidmax', type=float, default=100, help='Maximum void radius to search.')
+@click.option('--zmin', type=float, default=0.43, help='Low redshift cut')
+@click.option('--zmax', type=float, default=0.7, help='High redshift cut')
+
 def run_spherical_voids(tracers, randoms, handle, is_box, ncores,
                         box_size, steps, boss_like, mask,
-                        pos_cols, rvoidmax):
+                        pos_cols, rvoidmax, zmin, zmax):
 
     voids = SphericalVoids(tracer_file=tracers, random_file=randoms, handle=handle,
                         is_box=is_box, box_size=box_size, steps=steps, ncores=ncores,
                         boss_like=boss_like, mask_file=mask, pos_cols=pos_cols,
-                        rvoidmax=rvoidmax)
+                        rvoidmax=rvoidmax, zmin=zmin, zmax=zmax)
 
 
 if __name__ == '__main__':
