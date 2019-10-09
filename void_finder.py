@@ -2,29 +2,29 @@ import click
 from python_tools.sphericalvoids import SphericalVoids
 
 @click.command()
-@click.option('--tracers', type=str, required=True, help='File containing tracers.')
-@click.option('--randoms', type=str, default='', help='File containing randoms.')
-@click.option('--handle', type=str, required=True, help='Basename for the output files')
-@click.option('--is_box', type=bool, default=True, help='Is the data from a simulation box? (True or False')
-@click.option('--boss_like', type=bool, default=False, help='Is the data from BOSS/eBOSS?')
+@click.option('--tracers', type=str, help='File containing tracers.')
+@click.option('--handle', type=str, help='Basename for the output files')
+@click.option('--is_box', type=bool, default=True, help='Is the data from a simulation box?')
 @click.option('--ncores', type=int, default=1, help='Number of cores to use for parallel tasks.')
-@click.option('--box_size', type=float, default=1024, help='Size of the simulation box (only used if is_box is True)')
 @click.option('--steps', type=str, default='1,2,3,4', help='Which steps are to be run. (e.g. 1,2,3).')
-@click.option('--mask', type=str, default='', help='File containing HEALPix mask of survey footprint.')
 @click.option('--pos_cols', type=str, default='0,1,2', help='Indices of columns where tracer positions are stored.')
 @click.option('--rvoidmax', type=float, default=100, help='Maximum void radius to search.')
-@click.option('--zmin', type=float, default=0.43, help='Low redshift cut')
-@click.option('--zmax', type=float, default=0.7, help='High redshift cut')
+@click.option('--box_size', type=float, default=1024, help='[Periodic box] Size of the simulation box')
+@click.option('--randoms', type=str, default='', help='[Survey] File containing randoms.')
+@click.option('--mask', type=str, default='', help='[Survey] File containing mask of survey footprint.')
+@click.option('--boss_like', type=bool, default=False, help='[Survey] Is the data from BOSS/eBOSS?')
+@click.option('--zmin', type=float, default=0.43, help='[Survey] Low redshift cut')
+@click.option('--zmax', type=float, default=0.7, help='[Survey] High redshift cut')
 
-def run_spherical_voids(tracers, randoms, handle, is_box, ncores,
-                        box_size, steps, boss_like, mask,
-                        pos_cols, rvoidmax, zmin, zmax):
-
+def run_spherical_voids(tracers, handle, is_box, ncores, steps, pos_cols,
+                        rvoidmax, box_size, randoms, mask, boss_like,
+                        zmin, zmax):
+    
     voids = SphericalVoids(tracer_file=tracers, random_file=randoms, handle=handle,
-                        is_box=is_box, box_size=box_size, steps=steps, ncores=ncores,
-                        boss_like=boss_like, mask_file=mask, pos_cols=pos_cols,
-                        rvoidmax=rvoidmax, zmin=zmin, zmax=zmax)
-
+                           is_box=is_box, box_size=box_size, steps=steps,
+                           ncores=ncores, boss_like=boss_like,
+                           mask_file=mask, pos_cols=pos_cols,
+                           rvoidmax=rvoidmax, zmin=zmin, zmax=zmax)
 
 if __name__ == '__main__':
     run_spherical_voids()
