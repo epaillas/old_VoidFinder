@@ -6,6 +6,14 @@ observational surveys, such as SDSS BOSS. In future realeases, multiple void
 finder algorithms will be implemented. The core of the algorithm is written
 in Fortran 90, and everything is wrapped under a Python API.
 
+To compile the files, type *make* under each void finder's directory. For example:
+
+```
+cd SVF_box
+make
+```
+
+
 To set everything up for void identification, copy and edit *example_script.sh*
 under your working directory. Here are the different options that need to be 
 tuned before running the code (which can also by accessed by running python
