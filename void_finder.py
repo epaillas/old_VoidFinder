@@ -11,7 +11,7 @@ from python_tools.sphericalvoids import SphericalVoids
 @click.option('--box_size', type=float, default=1024, help='Size of the simulation box (only used if is_box is True)')
 @click.option('--steps', type=str, default='1,2,3,4', help='Which steps are to be run. (e.g. 1,2,3).')
 @click.option('--mask', type=str, default='', help='File containing HEALPix mask of survey footprint.')
-@click.option('--pos_cols', type=str, default='1,2,3', help='Indices of columns where tracer positions are stored.')
+@click.option('--pos_cols', type=str, default='0,1,2', help='Indices of columns where tracer positions are stored.')
 @click.option('--rvoidmax', type=float, default=100, help='Maximum void radius to search.')
 @click.option('--zmin', type=float, default=0.43, help='Low redshift cut')
 @click.option('--zmax', type=float, default=0.7, help='High redshift cut')
