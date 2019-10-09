@@ -11,6 +11,8 @@ To compile the files, type *make* under each void finder's directory. For exampl
 ```
 cd SVF_box
 make
+cd ../SVF_survey
+make
 ```
 
 
