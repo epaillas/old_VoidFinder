@@ -6,7 +6,7 @@ contains
     implicit none
     integer :: i, ng, ipx, ipy, ipz
     integer, intent(in) :: ngrid
-    real, intent(in) :: gridmin, gridmax, rgrid
+    real*8, intent(in) :: gridmin, gridmax, rgrid
     real*8, dimension(:,:), intent(in) :: pos
     integer, dimension(:,:,:), intent(out) :: lirst
     integer, dimension(:), intent(out) :: ll
@@ -50,9 +50,9 @@ program grow_spheres
   use procedures
   implicit none
 
-  real :: delta, gridmin, gridmax, rgrid, nden
-  real :: px, py, pz, disx, disy, disz, dis
-  real :: rvoid, rwidth, rvoidmax
+  real*8 :: delta, gridmin, gridmax, rgrid, nden
+  real*8 :: px, py, pz, disx, disy, disz, dis
+  real*8 :: rvoid, rwidth, rvoidmax
 
   integer :: ng, nr, nv, nc, rind, ngv, nr_loc
   integer :: id, ierr, process_num, iargc, filenumber
@@ -64,7 +64,7 @@ program grow_spheres
   integer, dimension(:), allocatable :: ll_data, ll_rand
 
   real*8, dimension(:,:), allocatable  :: pos_data, pos_rand, centres
-  real, dimension(nrbin) :: rbin_data, rbin_rand, crbin_data, crbin_rand
+  real*8, dimension(nrbin) :: rbin_data, rbin_rand, crbin_data, crbin_rand
 
   character(len=500) :: input_tracers, input_randoms, input_centres, output_voids
   character(len=10) :: rvoidmax_char, delta_char, gridmin_char, gridmax_char
