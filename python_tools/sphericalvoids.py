@@ -325,8 +325,8 @@ class SphericalVoids:
                 str(self.delta_voids), str(self.rvoidmax), str(self.ngrid)]
         else:
             binpath = sys.path[0] + '/SVF_survey/bin/'
-            self.gridmin = -5000
-            self.gridmax = 5000
+            self.gridmin = -2000
+            self.gridmax = 2000
             cmd = ['mpirun', '-np', str(ncores), binpath + 'grow_spheres.exe',
                 self.tracer_unf, self.random_unf, self.centres_file, self.voids_file,
                 str(self.delta_voids), str(self.rvoidmax), str(self.gridmin),
