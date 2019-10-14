@@ -339,7 +339,7 @@ class SphericalVoids:
         if ncores > 1:
             files = glob.glob(self.voids_file + '.*')
             self.concat_files(input_files=files, output_file=self.voids_file)
-            subprocess.call(['rm'] + files)
+            #subprocess.call(['rm'] + files)
 
         voids = np.genfromtxt(self.voids_file)
         return voids
@@ -374,7 +374,7 @@ class SphericalVoids:
         if ncores > 1:
             files = glob.glob(self.recentred_file + '.*')
             self.concat_files(input_files=files, output_file=self.recentred_file)
-            subprocess.call(['rm'] + files)
+            #subprocess.call(['rm'] + files)
 
         voids = np.genfromtxt(self.recentred_file)
         return voids
