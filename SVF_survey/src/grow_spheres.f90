@@ -162,7 +162,7 @@ program grow_spheres
   call linked_list(ngrid, rgrid, gridmin, gridmax, ll_rand, lirst_rand, pos_rand)
 
   filenumber = id + 20
-  open(filenumber, file=output_voids, status='unknown')
+  open(filenumber, file=output_voids, status='replace')
 
   do i = 1, nc
 
