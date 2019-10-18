@@ -42,4 +42,3 @@ Upon configuring the file, simply run it as
 ```
 sh example_script.sh
 ```
-

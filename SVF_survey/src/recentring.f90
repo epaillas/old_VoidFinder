@@ -6,7 +6,7 @@ contains
     implicit none
     integer :: i, ng, ipx, ipy, ipz
     integer, intent(in) :: ngrid
-    real, intent(in) :: gridmin, gridmax, rgrid
+    real*8, intent(in) :: gridmin, gridmax, rgrid
     real*8, dimension(:,:), intent(in) :: pos
     integer, dimension(:,:,:), intent(out) :: lirst
     integer, dimension(:), intent(out) :: ll
@@ -50,13 +50,13 @@ program recentring
   use procedures
   implicit none
 
-  real :: delta, gridmin, gridmax, rgrid, nden
-  real :: px, py, pz, disx, disy, disz, dis
-  real :: pxr, pyr, pzr, rvoidr
-  real :: rvoid, rwidth, rvoidmax
-  real :: rnd, rnd_phi, rnd_theta, rnd_rvoid
-  real :: rnd_px, rnd_py, rnd_pz, rnd_ngv, rnd_nden
-  real :: pi = 4.*atan(1.)
+  real*8 :: delta, gridmin, gridmax, rgrid, nden
+  real*8 :: px, py, pz, disx, disy, disz, dis
+  real*8 :: pxr, pyr, pzr, rvoidr
+  real*8 :: rvoid, rwidth, rvoidmax
+  real*8 :: rnd, rnd_phi, rnd_theta, rnd_rvoid
+  real*8 :: rnd_px, rnd_py, rnd_pz, rnd_ngv, rnd_nden
+  real*8 :: pi = 4.*atan(1.)
 
   integer :: ng, nr, nv, nc, rind, ngv
   integer :: id, ierr, process_num, iargc, filenumber
@@ -68,7 +68,7 @@ program recentring
   integer, dimension(:), allocatable :: ll_data, ll_rand
 
   real*8, dimension(:,:), allocatable  :: pos_data, pos_rand
-  real, dimension(nrbin) :: rbin_data, rbin_rand, crbin_data, crbin_rand
+  real*8, dimension(nrbin) :: rbin_data, rbin_rand, crbin_data, crbin_rand
 
   character(len=500) :: input_tracers, input_randoms, input_centres, output_voids
   character(len=10) :: rvoidmax_char, delta_char, gridmin_char, gridmax_char

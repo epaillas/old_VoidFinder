@@ -30,7 +30,7 @@ class SphericalVoids:
         self.random_unf = self.handle + '.ran.unf'
         self.centres_file = self.handle + '.cen.unf'
         self.voids_file = self.handle + '.SVF'
-        self.recentred_file = self.voids_file + '.recen'
+        self.recentred_file = self.voids_file + '_recen'
         self.mask_file = mask_file
         self.steps = steps
         self.pos_cols = pos_cols
@@ -96,7 +96,7 @@ class SphericalVoids:
 
             # filter by void volume fraction
             if not self.is_box:
-                voids = self.filter_by_volume_fraction()
+                voids = self.filter_by_volume_fraction(threshold=0.9)
 
             voids = self.overlap_filter(overlap=0.0)
             voids = self.overlap_filter(overlap=0.2)

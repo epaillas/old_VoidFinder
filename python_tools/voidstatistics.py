@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 class VoidStatistics:
 
     def __init__(self, void_file, tracer_file, is_box=True, random_file=None,
-                 boss_like=False, pos_cols='1,2,3', box_size=1024.0,
+                 boss_like=False, pos_cols='0,1,2', box_size=1024.0,
                  omega_m=0.31, h=0.6777, verbose=False, handle=None,
                  ncores=1):
 
@@ -36,6 +36,23 @@ class VoidStatistics:
 
         pos_cols = [int(i) for i in pos_cols.split(',')]
 
+    def _get_mean_monopole(self, fname, rmin=0, rmax=100):
+        
+        # read original data
+        data= np.genfromtxt(fname, skip_header=1)
+        bins = np.genfromtxt(fname, skip_footer=len(data))
+
+        # subsample data by void radius
+        data = np.asarray([i for i in data if rmin <= i[0] <= rmax])
+
+        # get mean profile and save data
+        mean_profile = np.mean(data[:, 1:], axis=0)
+        cout = np.c_[bins, mean_profile]
+        fout = self.void_file + '.mean_VG_CCF_monopole'
+        fmt = 2*'%10.3f '
+        np.savetxt(fout, cout, fmt=fmt)
+
+    
     def VoidGalaxyCCF(self, kind='monopole'):
         if kind == 'monopole':
             self._2PCF_monopole()
@@ -52,14 +69,14 @@ class VoidStatistics:
         cross-correlation function (bins in
         distance).
         '''
-        fout = self.handle + '_vg_ccf_monopole.dat'
+        fout = self.void_file + '.VG_CCF_monopole'
         nbins = 30
         dmin = 0
         dmax = 3
 
         if self.is_box:
             binpath = sys.path[0] + '/SVF_box/bin/'
-            cmd = [binpath + 'vg_ccf_monopole',
+            cmd = [binpath + 'vg_ccf_monopole.exe',
                    self.tracer_file,
                    self.void_file,
                    fout,
@@ -72,9 +89,11 @@ class VoidStatistics:
             binpath = sys.path[0] + '/SVF_survey/bin/'
             sys.exit('Not implemented!')
 
-        logfile = self.handle + '_vg_ccf_monopole.log'
+        logfile = self.handle + '_VG_CCF_monopole.log'
         log = open(logfile, "w+")
         subprocess.call(cmd, stdout=log, stderr=log)
+
+        self._get_mean_monopole(fout)
 
     def _2PCF_r_mu(self):
         '''
@@ -145,22 +164,19 @@ class VoidStatistics:
         return np.asarray([(bin_edges[i] + bin_edges[i + 1])/2
         for i in range(len(bin_edges) - 1)])
 
-    def plot_void_abundance(self, nbins=15, error=True, linestyle='-',
-                            linewidth=2.0, color='k'):
-        '''
-        Plot the distribution 
-        of void sizes.
-        '''
+    def VoidAbundance(self):
+
+        fout = self.void_file + '.void_abundance'
 
         voids = np.genfromtxt(self.void_file)
         radius = voids[:,3]
 
         minr = radius.min()
         maxr = radius.max()
+        nbins = 10
         bins = np.logspace(np.log10(minr), np.log10(maxr), nbins)
         hist, bin_edges = np.histogram(radius, bins=bins)
-        r = self.bin_centres(bin_edges)
-
+       
         if self.is_box:
             norm = (self.box_size**3 * np.diff(np.log10(bin_edges)))
         else:
@@ -168,26 +184,12 @@ class VoidStatistics:
 
         n = hist / norm
 
-        fig, ax = plt.subplots(1, figsize=(7,5))
+        err = np.sqrt(hist) / norm
+        errplus = n + err
+        errminus = n - err
 
-        ax.plot(r, n, linestyle=linestyle, linewidth=linewidth, color=color)
-
-        if error:
-            err = np.sqrt(hist) / norm
-            errplus = n + err
-            errminus = n - err
-            ax.fill_between(r, errplus, errminus, color='#AAAAAA')
-
-        ax.set_xlabel(r'$R_{\rm{eff}} \hspace{0.5} /\ \rm{h^{-1}Mpc}$',
-                      fontsize=17)
-        ax.set_ylabel(r'$\rm{dN}\ / \rm{d} log(R_{eff})\ [h^{3}Mpc^{-3}]$',
-                      fontsize=17)
-        ax.set_yscale('log', nonposy='clip')
-        ax.set_xlim(bins.min(), bins.max())
-        ax.tick_params(which='both', width=1.0, labelsize=17)
-        ax.tick_params(which='both', width=1.0, labelsize=17)
-
-        plt.tight_layout()
-
-        fout = self.handle + '_void_abundance.png'
-        plt.savefig(fout, format='png')
+        bin_centres = self.bin_centres(bin_edges)
+        
+        cout = np.c_[bin_centres, n, errminus, errplus]
+        fmt = 4*'%10.10f '
+        np.savetxt(fout, cout)

@@ -4,12 +4,12 @@ contains
 
   subroutine linked_list(ngrid, rgrid, ll, lirst, pos_data)
     implicit none
-    integer*4 :: i, ng, ipx, ipy, ipz
+    integer :: i, ng, ipx, ipy, ipz
     real*8, intent(in) :: rgrid
-    integer*4, intent(in) :: ngrid
+    integer, intent(in) :: ngrid
     real*8, dimension(:,:), intent(in) :: pos_data
-    integer*4, dimension(:,:,:), intent(out) :: lirst
-    integer*4, dimension(:), intent(out) :: ll
+    integer, dimension(:,:,:), intent(out) :: lirst
+    integer, dimension(:), intent(out) :: ll
 
     ng = size(pos_data, dim=2)
     lirst = 0
@@ -60,14 +60,14 @@ PROGRAM recentering
   real*8 :: rnd_px, rnd_py, rnd_pz, rnd_ng, rnd_nden
   real*8 :: pi = 4.*atan(1.)
 
-  integer*4 :: ng, nc, nv, rind, stuck
-  integer*4 :: id, ierr, process_num, iargc, filenumber
-  integer*4 :: i, j, k, ii, ix, iy, iz, ix2, iy2, iz2
-  integer*4 :: ipx, ipy, ipz, ndif, ngrid
-  integer*4, parameter ::  nrbin = 1000, nrc = 128
+  integer :: ng, nc, nv, rind, stuck
+  integer :: id, ierr, process_num, iargc, filenumber
+  integer :: i, j, k, ii, ix, iy, iz, ix2, iy2, iz2
+  integer :: ipx, ipy, ipz, ndif, ngrid
+  integer, parameter ::  nrbin = 1000, nrc = 128
 
-  integer*4, dimension(:,:,:), allocatable :: lirst
-  integer*4, dimension(:), allocatable :: ll
+  integer, dimension(:,:,:), allocatable :: lirst
+  integer, dimension(:), allocatable :: ll
 
   real*8, allocatable, dimension(:,:)  :: pos_data
   real*8, dimension(nrbin) :: rbin, cum_rbin

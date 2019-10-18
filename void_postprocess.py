@@ -21,7 +21,7 @@ def postprocess_voids(voids, tracers, randoms, handle, is_box,
                         handle=handle, is_box=is_box, box_size=box_size,
                         ncores=ncores, boss_like=boss_like, pos_cols=pos_cols)
 
-    voids.plot_void_abundance()
+    voids.VoidAbundance()
     voids.VoidGalaxyCCF(kind='monopole')
 
 
