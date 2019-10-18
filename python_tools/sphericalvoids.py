@@ -325,8 +325,8 @@ class SphericalVoids:
                 str(self.delta_voids), str(self.rvoidmax), str(self.ngrid)]
         else:
             binpath = sys.path[0] + '/SVF_survey/bin/'
-            self.gridmin = -2000
-            self.gridmax = 2000
+            self.gridmin = -5000
+            self.gridmax = 5000
             cmd = ['mpirun', '-np', str(ncores), binpath + 'grow_spheres.exe',
                 self.tracer_unf, self.random_unf, self.centres_file, self.voids_file,
                 str(self.delta_voids), str(self.rvoidmax), str(self.gridmin),
@@ -400,7 +400,7 @@ class SphericalVoids:
 
     def overlap_filter(self, overlap=0.0):
 
-        self.filtered_file = self.recentred_file + '.ovl{}'.format(str(overlap))
+        self.filtered_file = self.recentred_file + '_ovl{}'.format(str(overlap))
 
         if self.is_box:
             binpath = sys.path[0] + '/SVF_box/bin/'
@@ -430,7 +430,7 @@ class SphericalVoids:
         '''
         print('Filtering voids by volume fraction...')
         if fname == '':
-            fname = self.recentred_file
+            fname = self.recentred_file + '_vf{}'.format(str(threshold))
 
         voids = np.genfromtxt(fname)
         volfrac = self.get_void_volume_fraction(fname=fname)
