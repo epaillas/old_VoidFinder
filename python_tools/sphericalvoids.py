@@ -214,6 +214,7 @@ class SphericalVoids:
         dra = 2
         ddec = 2
         dz = 0.01
+        nden = 5e-4
 
         ralo = self.randoms.ra.min() - dra
         rahi = self.randoms.ra.max() + dra
