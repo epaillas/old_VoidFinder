@@ -262,7 +262,7 @@ class SphericalVoids:
         sphere = self.gen_random_sphere()
         border_pix = self.get_mask_borders()
 
-        ind = hp.pixelfunc.ang2pix(nside, sphere[:,1], sphere[:,0], nest=False)
+        ind = hp.pixelfunc.ang2pix(self.nside, sphere[:,1], sphere[:,0], nest=False)
         angCap = sphere[border_pix[ind] == 1]
         redCap = sphere[self.mask[ind] == 1]
 
