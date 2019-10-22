@@ -429,12 +429,11 @@ class SphericalVoids:
         in the survey.
         '''
         print('Filtering voids by volume fraction...')
-        self.recentred_file = self.recentred_file + '_vf{}'.format(str(threshold))
-
         voids = np.genfromtxt(self.recentred_file)
         volfrac = self.get_void_volume_fraction(fname=self.recentred_file)
         voids = voids[volfrac > threshold]
 
+        self.recentred_file = self.recentred_file + '_vf{}'.format(str(threshold))
         fmt = 4*'%10.3f ' +  '%10i ' + '%10.3f '
         np.savetxt(self.recentred_file, voids, fmt=fmt)
         
