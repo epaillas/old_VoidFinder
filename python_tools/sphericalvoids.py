@@ -423,23 +423,20 @@ class SphericalVoids:
         return voids
 
 
-    def filter_by_volume_fraction(self, fname='', threshold=0.95):
+    def filter_by_volume_fraction(self, threshold=0.95):
         '''
         Filters voids by their volume fraction
         in the survey.
         '''
         print('Filtering voids by volume fraction...')
-        if fname == '':
-            fname = self.recentred_file + '_vf{}'.format(str(threshold))
+        self.recentred_file = self.recentred_file + '_vf{}'.format(str(threshold))
 
-        voids = np.genfromtxt(fname)
-        volfrac = self.get_void_volume_fraction(fname=fname)
-
-        #voids = np.c_[voids, volfrac]
+        voids = np.genfromtxt(self.recentred_file)
+        volfrac = self.get_void_volume_fraction(fname=self.recentred_file)
         voids = voids[volfrac > threshold]
 
         fmt = 4*'%10.3f ' +  '%10i ' + '%10.3f '
-        np.savetxt(fname, voids, fmt=fmt)
+        np.savetxt(self.recentred_file, voids, fmt=fmt)
         
         return voids
 
