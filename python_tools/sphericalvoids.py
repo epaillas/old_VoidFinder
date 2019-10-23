@@ -269,8 +269,8 @@ class SphericalVoids:
         dz = 0.005
         angCap = [i for i in angCap if (self.zmin < i[3] < self.zmax)]
         redCap = [i for i in redCap if (self.zmin - dz < i[3] < self.zmin) or (self.zmax < i[3] < self.zmax + dz)]
-        angCap = np.asarray(angCap)
-        redCap = np.asarray(redCap)
+        angCap = np.asarray(angCap).reshape((len(angCap), 3))
+        redCap = np.asarray(redCap).reshape((len(redCap), 3))
 
         return angCap, redCap
 
