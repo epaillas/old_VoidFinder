@@ -149,6 +149,21 @@ class SphericalVoids:
                 shifty = point[1] + np.copysign(self.box_size, (buffer - point[1]))
                 shiftz = point[2] + np.copysign(self.box_size, (buffer - point[2]))
                 images.append([shiftx, shifty, shiftz])
+            if condx and condy:
+                shiftx = point[0] + np.copysign(box, (buffer - point[0]))
+                shifty = point[1] + np.copysign(box, (buffer - point[1]))
+                shiftz = point[2]
+                images.append([shiftx, shifty, shiftz])
+            if condx and condz:
+                shiftx = point[0] + np.copysign(box, (buffer - point[0]))
+                shifty = point[1]
+                shiftz = point[2] + np.copysign(box, (buffer - point[2]))
+                images.append([shiftx, shifty, shiftz])
+            if condy and condz:
+                shiftx = point[0]
+                shifty = point[1] + np.copysign(box, (buffer - point[1]))
+                shiftz = point[2] + np.copysign(box, (buffer - point[2]))
+                images.append([shiftx, shifty, shiftz])
             if condx:
                 shiftx = point[0] + np.copysign(self.box_size, (buffer - point[0]))
                 shifty = point[1]
