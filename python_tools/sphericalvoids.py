@@ -69,7 +69,7 @@ class SphericalVoids:
                     self.randoms = GalaxyCatalogue(catalogue_file=random_file, is_box=self.is_box, 
                                                 randoms=True, boss_like=boss_like, omega_m=omega_m,
                                                 h=h, bin_write=True, output_file=self.random_unf,
-                                                pos_cols=pos_cols)
+                                                pos_cols=pos_cols, zmin=self.zmin, zmax=self.zmax)
                     
                 if self.mask_file == '':
                     print('No mask file provided. Generating a rough mask...')

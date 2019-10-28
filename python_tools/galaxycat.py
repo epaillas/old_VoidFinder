@@ -8,7 +8,7 @@ from scipy.io import FortranFile
 class GalaxyCatalogue:
 
     def __init__(self, catalogue_file, is_box=True, box_size=1024.0, randoms=False, boss_like=False,
-                pos_cols=[0, 1, 2], omega_m=0.31, h=0.6777, verbose=True,
+                pos_cols=[0, 1, 2], omega_m=0.31, h=0.6777, verbose=True, zmin=0, zmax=10,
                 bin_write=True, output_file=None):
 
         self.is_box = is_box
@@ -31,7 +31,6 @@ class GalaxyCatalogue:
             for f in a.names:
                 self.__dict__[f.lower()] = a.field(f)
   
-            self.size = self.ra.size
             self.redshift = self.z
 
             # initialize Cartesian positions and observer distance
@@ -57,14 +56,12 @@ class GalaxyCatalogue:
                 self.x = data[:, pos_cols[0]]
                 self.y = data[:, pos_cols[1]]
                 self.z = data[:, pos_cols[2]]
-                self.size = self.x.size
 
             else:
                 # position information is ra, dec and redshift
                 self.ra = data[:, pos_cols[0]]
                 self.dec = data[:, pos_cols[1]]
                 self.redshift = data[:, pos_cols[2]]
-                self.size = self.ra.size
 
                 cosmo = Cosmology(omega_m=omega_m)
                 self.dist = cosmo.get_comoving_distance(self.redshift)
@@ -75,6 +72,15 @@ class GalaxyCatalogue:
         self.x = self.x.reshape(len(self.x), 1)
         self.y = self.y.reshape(len(self.y), 1)
         self.z = self.z.reshape(len(self.z), 1)
+
+        # redshift cut
+        ind = (self.redshift >= zmin) & (self.redshift <= zmax)
+        self.x = self.x[ind]
+        self.y = self.y[ind]
+        self.z = self.z[ind]
+        self.ra = self.ra[ind]
+        self.dec = self.dec[ind]
+        self.redshift = self.redshift[ind]
 
         if bin_write:
             cout = np.hstack([self.x, self.y, self.z])
