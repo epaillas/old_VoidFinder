@@ -61,7 +61,8 @@ class SphericalVoids:
         # load tracers and find void centres
             self.tracers = GalaxyCatalogue(catalogue_file=tracer_file, is_box=is_box,
             box_size=box_size, randoms=False, boss_like=boss_like, omega_m=omega_m,
-            h=h, bin_write=True, output_file=self.tracer_unf, pos_cols=pos_cols)
+            h=h, bin_write=True, output_file=self.tracer_unf, pos_cols=pos_cols,
+            zmin=zmin, zmax=zmax)
             
             if self.is_box == False:
                 if random_file == '':
@@ -70,7 +71,7 @@ class SphericalVoids:
                     self.randoms = GalaxyCatalogue(catalogue_file=random_file, is_box=self.is_box, 
                                                 randoms=True, boss_like=boss_like, omega_m=omega_m,
                                                 h=h, bin_write=True, output_file=self.random_unf,
-                                                pos_cols=pos_cols, zmin=self.zmin, zmax=self.zmax)
+                                                pos_cols=pos_cols, zmin=zmin, zmax=zmax)
                     
                 if self.mask_file == '':
                     print('No mask file provided. Generating a rough mask...')
@@ -226,9 +227,9 @@ class SphericalVoids:
         return border
 
     def gen_random_sphere(self):
-        dra = 2
-        ddec = 2
-        dz = 0.01
+        dra = 5
+        ddec = 5
+        dz = 0.05
         nden = 5e-4
 
         ralo = self.randoms.ra.min() - dra
