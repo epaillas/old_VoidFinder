@@ -16,7 +16,7 @@ class SphericalVoids:
     def __init__(self, tracer_file, is_box=True, random_file='',
                  boss_like=False, pos_cols='0,1,2', box_size=1024.0,
                  omega_m=0.31, h=0.6777, mask_file='', zmin=0.43, zmax=0.7,
-                 verbose=False, handle='', nside=128, delta_voids=0.2,
+                 verbose=False, handle='', nside=512, delta_voids=0.2,
                  rvoidmax=100, ncores=1, steps='1,2,3,4'):
 
         steps = [int(i) for i in steps.split(',')]
@@ -34,6 +34,7 @@ class SphericalVoids:
         self.mask_file = mask_file
         self.steps = steps
         self.pos_cols = pos_cols
+        self.use_guards = True
 
         # void parameters
         self.delta_voids = delta_voids
@@ -148,6 +149,21 @@ class SphericalVoids:
                 shifty = point[1] + np.copysign(self.box_size, (buffer - point[1]))
                 shiftz = point[2] + np.copysign(self.box_size, (buffer - point[2]))
                 images.append([shiftx, shifty, shiftz])
+            if condx and condy:
+                shiftx = point[0] + np.copysign(self.box_size, (buffer - point[0]))
+                shifty = point[1] + np.copysign(self.box_size, (buffer - point[1]))
+                shiftz = point[2]
+                images.append([shiftx, shifty, shiftz])
+            if condx and condz:
+                shiftx = point[0] + np.copysign(self.box_size, (buffer - point[0]))
+                shifty = point[1]
+                shiftz = point[2] + np.copysign(self.box_size, (buffer - point[2]))
+                images.append([shiftx, shifty, shiftz])
+            if condy and condz:
+                shiftx = point[0]
+                shifty = point[1] + np.copysign(self.box_size, (buffer - point[1]))
+                shiftz = point[2] + np.copysign(self.box_size, (buffer - point[2]))
+                images.append([shiftx, shifty, shiftz])
             if condx:
                 shiftx = point[0] + np.copysign(self.box_size, (buffer - point[0]))
                 shifty = point[1]
@@ -208,6 +224,71 @@ class SphericalVoids:
                 if 0 < count <= 8:
                     border[i] = 1
         return border
+
+    def gen_random_sphere(self):
+        dra = 2
+        ddec = 2
+        dz = 0.01
+        nden = 5e-4
+
+        ralo = self.randoms.ra.min() - dra
+        rahi = self.randoms.ra.max() + dra
+        declo = self.randoms.dec.min() - ddec
+        dechi = self.randoms.dec.max() + ddec
+        zhi = self.zmax + dz
+        zlo = self.zmin - dz
+
+        rlo = self.cosmo.get_comoving_distance(zlo)
+        rhi = self.cosmo.get_comoving_distance(zhi)
+
+        vol = 4/3 * np.pi * (rhi**3)
+        npoints = int(vol * nden)
+
+        ralist = []
+        declist = []
+        rlist = []
+        zlist = []
+
+        for i in range(npoints):
+            ra = np.random.uniform(0, 2*np.pi)
+            cosdec = np.random.uniform(-1, 1)
+            dec = np.arccos(cosdec)
+            u = np.random.uniform(0, 1)
+            z = zhi * u ** (1/3)
+
+            if (ralo < ra < rahi) and (declo < dec < dechi) and (zlo < z < zhi):
+                r = cosmo.comoving_distance(z).value
+                ralist.append(ra)
+                declist.append(dec)
+                rlist.append(r)
+                zlist.append(z)
+
+        ralist = np.asarray(ralist).reshape(len(ralist), 1)
+        declist = np.asarray(declist).reshape(len(declist), 1)
+        rlist = np.asarray(rlist).reshape(len(rlist), 1)
+        zlist = np.asarray(zlist).reshape(len(zlist), 1)
+
+        sphere = np.hstack([ralist, declist, rlist, zlist])
+
+        return sphere
+
+    def gen_guard_particles(self):
+     
+        sphere = self.gen_random_sphere()
+        border_pix = self.get_mask_borders()
+
+        ind = hp.pixelfunc.ang2pix(self.nside, sphere[:,1], sphere[:,0], nest=False)
+        angCap = sphere[border_pix[ind] == 1]
+        redCap = sphere[self.mask[ind] == 1]
+
+        dz = 0.005
+        angCap = [i for i in angCap if (self.zmin < i[3] < self.zmax)]
+        redCap = [i for i in redCap if (self.zmin - dz < i[3] < self.zmin) or (self.zmax < i[3] < self.zmax + dz)]
+        angCap = np.asarray(angCap).reshape((len(angCap), 3))
+        redCap = np.asarray(redCap).reshape((len(redCap), 3))
+
+        return angCap, redCap
+
     
     def get_circumcentres(self, radius_limit=300, bin_write=True):
         '''
@@ -289,7 +370,7 @@ class SphericalVoids:
         return
         
 
-    def delaunay_triangulation(self):
+    def delaunay_triangulation(self, guards=False):
         '''eBOSS_LRG_NGC_v4.SVF.recen
         Make a Delaunay triangulation overeBOSS_LRG_NGC_v4.SVF.recen
         the cartesian positions of the tracers.eBOSS_LRG_NGC_v4.SVF.recen
@@ -299,6 +380,14 @@ class SphericalVoids:
         y = self.tracers.y
         z = self.tracers.z
         points = np.hstack([x, y, z])
+
+        print(np.shape(points))
+        
+        if self.is_box == False and self.use_guards == True:
+            angCap, redCap = self.gen_guard_particles()
+            points = np.vstack([points, angCap, redCap])
+
+        print(np.shape(points))
         
         # add periodic images if dealing with a box
         if self.is_box:
@@ -423,23 +512,19 @@ class SphericalVoids:
         return voids
 
 
-    def filter_by_volume_fraction(self, fname='', threshold=0.95):
+    def filter_by_volume_fraction(self, threshold=0.95):
         '''
         Filters voids by their volume fraction
         in the survey.
         '''
         print('Filtering voids by volume fraction...')
-        if fname == '':
-            fname = self.recentred_file + '_vf{}'.format(str(threshold))
-
-        voids = np.genfromtxt(fname)
-        volfrac = self.get_void_volume_fraction(fname=fname)
-
-        #voids = np.c_[voids, volfrac]
+        voids = np.genfromtxt(self.recentred_file)
+        volfrac = self.get_void_volume_fraction(fname=self.recentred_file)
         voids = voids[volfrac > threshold]
 
+        self.recentred_file = self.recentred_file + '_vf{}'.format(str(threshold))
         fmt = 4*'%10.3f ' +  '%10i ' + '%10.3f '
-        np.savetxt(fname, voids, fmt=fmt)
+        np.savetxt(self.recentred_file, voids, fmt=fmt)
         
         return voids
 
