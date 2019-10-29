@@ -63,7 +63,7 @@ read(dmax_char, *) dmax
 
 box2 = boxsize / 2.
 
-write(*,*) 'Computing the 3D void galaxy density profile with the followig.&
+write(*,*) 'Computing the 3D void galaxy density profile with the following.&
 & parameters:'
 write(*,*) ''
 write(*,*) 'Tracers file: ', trim(input_tracers)
