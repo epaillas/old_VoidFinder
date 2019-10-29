@@ -15,15 +15,17 @@ from python_tools.sphericalvoids import SphericalVoids
 @click.option('--boss_like', type=bool, default=False, help='[Survey] Is the data from BOSS/eBOSS?')
 @click.option('--zmin', type=float, default=0.43, help='[Survey] Low redshift cut')
 @click.option('--zmax', type=float, default=0.7, help='[Survey] High redshift cut')
+@click.option('--omega_m', type=float, default=0.31, help='[Survey] Omega matter.')
+@click.option('--h', type=float, default=67.77, help='[Survey] Little h.')
 
 def run_spherical_voids(tracers, handle, is_box, ncores, steps, pos_cols,
                         rvoidmax, box_size, randoms, mask, boss_like,
-                        zmin, zmax):
+                        zmin, zmax, omega_m, h):
     
     voids = SphericalVoids(tracer_file=tracers, random_file=randoms, handle=handle,
                            is_box=is_box, box_size=box_size, steps=steps,
-                           ncores=ncores, boss_like=boss_like,
-                           mask_file=mask, pos_cols=pos_cols,
+                           ncores=ncores, boss_like=boss_like, mask_file=mask,
+                           pos_cols=pos_cols, omega_m=omega_m, h=h,
                            rvoidmax=rvoidmax, zmin=zmin, zmax=zmax)
 
 if __name__ == '__main__':

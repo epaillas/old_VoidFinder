@@ -28,7 +28,7 @@ python $HOME/code/void_finder/void_finder.py \
 --steps "$steps" \
 --pos_cols "$pos_cols" \
 --rvoidmax "$rvoidmax" \
---box_size "$box_size"
+--box_size "$box_size" \
 --randoms "$randoms" \
 --mask "$mask" \
 --boss_like "$boss_like" \
