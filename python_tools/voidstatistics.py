@@ -63,7 +63,7 @@ class VoidStatistics:
             self._2PCF_monopole()
         elif kind == 'r-mu':
             self._2PCF_r_mu()
-        elif kind == 'sigma-pi'():
+        elif kind == 'sigma-pi':
             self._2PCF_sigma_pi()
         else:
             sys.exit('Correlation kind not recognized. Aborting...')
