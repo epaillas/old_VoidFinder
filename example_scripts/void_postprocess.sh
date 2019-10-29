@@ -1,6 +1,7 @@
 #!/bin/bash
 
 #-------- Universal settings --------
+voids=$HOME/voids.dat
 tracers=$HOME/tracers.unf
 handle=$HOME/tracers
 is_box=True
@@ -21,6 +22,7 @@ zmax=0.7
 
 #-------- Run (do not modify below this point) --------
 python $HOME/code/void_finder/void_postprocess.py \
+--voids "$voids" \
 --tracers "$tracers" \
 --handle "$handle" \
 --is_box "$is_box" \
