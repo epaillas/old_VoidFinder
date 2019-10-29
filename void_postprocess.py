@@ -12,8 +12,7 @@ from python_tools.voidstatistics import VoidStatistics
 @click.option('--box_size', type=float, default=1024, help='Size of the simulation box (only used if is_box is True)')
 @click.option('--pos_cols', type=str, default='1,2,3', help='Indices of columns where tracer positions are stored.')
 def postprocess_voids(voids, tracers, randoms, handle, is_box,
-                      ncores, box_size, steps, boss_like, mask_file,
-                      pos_cols):
+                      ncores, box_size, boss_like, pos_cols):
 
     voids = VoidStatistics(void_file=voids, tracer_file=tracers, random_file=randoms,
                         handle=handle, is_box=is_box, box_size=box_size,
