@@ -18,7 +18,7 @@ def postprocess_voids(voids, tracers, randoms, handle, is_box,
                         handle=handle, is_box=is_box, box_size=box_size,
                         ncores=ncores, boss_like=boss_like, pos_cols=pos_cols)
 
-    voids.VoidGalaxyCCF(kind='monopole')
+    #voids.VoidGalaxyCCF(kind='monopole')
     voids.VoidGalaxyCCF(kind='r-mu')
     voids.VoidGalaxyCCF(kind='sigma-pi')
 

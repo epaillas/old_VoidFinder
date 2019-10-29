@@ -28,6 +28,8 @@ class VoidStatistics:
         self.gridmin = -5000
         self.gridmax = 5000
         self.ngrid = 100
+        self.dmin = 0
+        self.dmax = 3
 
         # set cosmology
         self.omega_m = omega_m
