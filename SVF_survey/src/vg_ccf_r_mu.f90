@@ -226,8 +226,8 @@ do i = 1, nc
   ipy = int((yvc - gridmin) / rgrid + 1.)
   ipz = int((zvc - gridmin) / rgrid + 1.)
 
-  !ndif = int(rmax * rv / rgrid + 1)
-  ndif = int(rmax / rgrid + 1)
+  ndif = int(rmax * rv / rgrid + 1)
+  !ndif = int(rmax / rgrid + 1)
 
   do ix = ipx - ndif, ipx + ndif, 1
     do iy = ipy - ndif, ipy + ndif, 1
@@ -256,7 +256,7 @@ do i = 1, nc
             com = (/ comx, comy, comz /)
 
             mu = abs(dot_product(r, com) / (norm2(r) * norm2(com)))
-            dis = norm2(r)! / rv
+            dis = norm2(r) / rv
 
             if (dis .lt. rmax) then
               rind = int(dis / rwidth + 1)
@@ -286,7 +286,7 @@ do i = 1, nc
             com = (/ comx, comy, comz /)
 
             mu = abs(dot_product(r, com) / (norm2(r) * norm2(com)))
-            dis = norm2(r)! / rv
+            dis = norm2(r) / rv
 
             if (dis .lt. rmax) then
               rind = int(dis / rwidth + 1)
