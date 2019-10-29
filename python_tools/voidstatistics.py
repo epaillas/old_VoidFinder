@@ -32,7 +32,7 @@ class VoidStatistics:
         # set cosmology
         self.omega_m = omega_m
         self.h = h
-        self.cosmo = Cosmology(omega_m=omega_m)
+        self.cosmo = Cosmology(omega_m=omega_m, h=h)
 
         pos_cols = [int(i) for i in pos_cols.split(',')]
 
@@ -101,13 +101,13 @@ class VoidStatistics:
         function in bins of r and mu.
         '''
 
-        fout = handle + '_vg_ccf_rmu.dat'
+        fout = self.void_file + '.VG_CCF_rmu'
 
         if self.is_box:
             sys.exit('Not implemented!')
         else:
             binpath = sys.path[0] + '/SVF_survey/bin/'
-            cmd = [binpath + 'vg_ccf_r_mu',
+            cmd = [binpath + 'vg_ccf_r_mu.exe',
                    self.tracer_unf,
                    self.random_unf,
                    self.void_file,
@@ -131,7 +131,7 @@ class VoidStatistics:
         function in bins of sigma and pi.
         '''
 
-        fout = handle + '_vg_ccf_rmu.dat'
+        fout = self.void_file + '.VG_CCF_spi'
 
         if self.is_box:
             sys.exit('Not implemented!')

@@ -80,28 +80,20 @@ if (id == 0) write(*, *) 'rmax: ', trim(rmax_char), ' Mpc'
 if (id == 0) write(*, *) 'nrbin: ', trim(nrbin_char)
 if (id == 0) write(*,*) ''
 
-! Count the number of tracers
-open(10, file=input_tracers, status='old')
-ng = 0
-do
-  read(10, *, end=10)
-  ng = ng + 1
-end do
-10 rewind(10)
-if (id == 0) write(*,*) 'Number of tracers: ', ng
+open(10, file=input_tracers, status='old', form='unformatted')
+read(10) ng
+allocate(pos_data(3, ng))
+read(10) pos_data
+close(10)
+if (id == 0) write(*,*) 'ntracers: ', ng
 
-! Count the number of rands
-open(11, file=input_randoms, status='old')
-nr = 0
-do
-  read(11, *, end=11)
-  nr = nr + 1
-end do
-11 rewind(11)
-if (id == 0) write(*,*) 'Number of randoms: ', nr
-if (id == 0) write(*,*) 'nr/ng = ', nr * 1./ng
+open(11, file=input_randoms, status='old', form='unformatted')
+read(11) nr
+allocate(pos_rand(3, nr))
+read(11) pos_rand
+close(11)
+if (id == 0) write(*,*) 'nrandoms: ', nr
 
-! Count the number of centres
 open(12, file=input_centres, status='old')
 nc = 0
 do

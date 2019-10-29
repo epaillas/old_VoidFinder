@@ -71,7 +71,7 @@ read(min_rvoid_char, *) min_rvoid
 read(max_rvoid_char, *) max_rvoid
 
 if (id == 0) write(*,*) '-----------------------'
-if (id == 0) write(*,*) 'Running void_gal_CCF.exe'
+if (id == 0) write(*,*) 'Running vg_ccf_r_mu.exe'
 if (id == 0) write(*,*) 'Input parameters:'
 if (id == 0) write(*,*) ''
 if (id == 0) write(*, *) 'input_tracers: ', trim(input_tracers)
@@ -87,7 +87,6 @@ if (id == 0) write(*, *) 'min_rvoid: ', trim(min_rvoid_char), ' Mpc'
 if (id == 0) write(*, *) 'max_rvoid: ', trim(max_rvoid_char), ' Mpc'
 if (id == 0) write(*,*) ''
 
-! Count the number of tracers
 open(10, file=input_tracers, status='old', form='unformatted')
 read(10) ng
 allocate(pos_data(3, ng))
@@ -101,7 +100,6 @@ allocate(pos_rand(3, nr))
 read(11) pos_rand
 close(11)
 if (id == 0) write(*,*) 'nrandoms: ', nr
-if (id == 0) write(*,*) 'nr/ng = ', nr * 1./ng
 
 open(12, file=input_centres, status='old')
 nc = 0
@@ -110,7 +108,7 @@ do
   nc = nc + 1
 end do
 12 rewind(12)
-if (id == 0) write(*,*) 'ncentres: ', nc
+if (id == 0) write(*,*) 'Number of centres: ', nc
 
 
 ! Construct data catalogue linked list
