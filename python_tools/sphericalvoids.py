@@ -104,6 +104,9 @@ class SphericalVoids:
             voids = self.overlap_filter(overlap=0.2)
             voids = self.overlap_filter(overlap=0.5)
 
+            # save a catalog with sky coordinates
+            self.get_void_skycoords()
+
         if (2 in steps) or (3 in steps) or (4 in steps):
             self.x = voids[:,0]
             self.y = voids[:,1]
@@ -429,7 +432,7 @@ class SphericalVoids:
         if ncores > 1:
             files = glob.glob(self.voids_file + '.*')
             self.concat_files(input_files=files, output_file=self.voids_file)
-            #subprocess.call(['rm'] + files)
+            subprocess.call(['rm'] + files)
 
         voids = np.genfromtxt(self.voids_file)
         return voids
@@ -464,7 +467,7 @@ class SphericalVoids:
         if ncores > 1:
             files = glob.glob(self.recentred_file + '.*')
             self.concat_files(input_files=files, output_file=self.recentred_file)
-            #subprocess.call(['rm'] + files)
+            subprocess.call(['rm'] + files)
 
         voids = np.genfromtxt(self.recentred_file)
         return voids
@@ -576,4 +579,28 @@ class SphericalVoids:
         volfrac = np.asarray(volfrac)
         return volfrac
 
-    
+    def get_void_skycoords(self):
+        if fname == '':
+            fname = self.filtered_file
+        fout = self.filtered_file + '_sky'
+
+        voids = np.genfromtxt(fname)
+
+        x = voids[:,0]
+        y = voids[:,1]
+        z = voids[:,2]
+        r = voids[:,3]
+        nt = voids[:,4]
+        nden = voids[:,5]
+
+        dis = np.sqrt(x**2 + y**2 + z**2)
+        dec = np.arctan2(np.sqrt(x**2 + y**2), z)
+        ra = np.arctan(y, x)
+
+        dis = np.sqrt(data[:,0]**2 + data[:,1]**2 + data[:,2]**2)
+        dec = np.arctan2(np.sqrt(data[:,0]**2 + data[:,1]**2), data[:,2])
+        ra = np.arctan2(data[:,1], data[:,0])
+        redshift = self.cosmo.get_redshift(dis)
+
+        cout = np.c_[ra, dec, redshift, r, nt, nden]
+        np.savetxt(fout, cout)

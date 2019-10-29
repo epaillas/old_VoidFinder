@@ -37,6 +37,7 @@ class MockStatistics:
             f[f == np.inf] = -1 # Set invalid values to -1     
             data.append(f)
         data = np.asarray(data)
+        print(np.shape(data))
         return data
 
     def gluedBins(self, bins, factor):
