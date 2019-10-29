@@ -106,7 +106,7 @@ class VoidStatistics:
         function in bins of r and mu.
         '''
 
-        fout = self.void_file + '.VG_CCF_rmu'
+        fout = self.handle + '.VG_CCF_rmu'
 
         if self.is_box:
             sys.exit('Not implemented!')
@@ -136,7 +136,7 @@ class VoidStatistics:
         function in bins of sigma and pi.
         '''
 
-        fout = self.void_file + '.VG_CCF_spi'
+        fout = self.handle + '.VG_CCF_spi'
 
         if self.is_box:
             sys.exit('Not implemented!')
@@ -171,7 +171,7 @@ class VoidStatistics:
 
     def VoidAbundance(self):
 
-        fout = self.void_file + '.void_abundance'
+        fout = self.handle + '.void_abundance'
 
         voids = np.genfromtxt(self.void_file)
         radius = voids[:,3]
