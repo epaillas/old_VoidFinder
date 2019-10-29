@@ -155,7 +155,7 @@ class VoidStatistics:
                    str(self.min_rvoid),
                    str(self.max_rvoid)]
 
-        logfile = self.handle + '_vg_ccf_rmu.log'
+        logfile = self.handle + '_vg_ccf_spi.log'
         log = open(logfile, "w+")
         subprocess.call(cmd, stdout=log, stderr=log)
 
