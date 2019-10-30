@@ -51,4 +51,5 @@ class VoidCatalogue:
         if bin_write:
             cout = np.c_[self.x, self.y, self.z, self.radius, self.ntracers,
                         self.nden]
-            np.savetxt(output_file, cout)
+            fmt = 4*'%10.3f ' +  '%10i ' + '%10.3f '
+            np.savetxt(output_file, cout, fmt=fmt)

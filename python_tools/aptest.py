@@ -131,9 +131,9 @@ class VoidStatistics:
         else:
             binpath = sys.path[0] + '/SVF_survey/bin/'
             cmd = [binpath + 'vg_ccf_r_mu.exe',
-                   self.tracer_file,
-                   self.random_file,
-                   self.void_file,
+                   self.tracer_unf,
+                   self.random_unf,
+                   self.void_unf,
                    fout,
                    str(self.dmin),
                    str(self.dmax),
@@ -161,9 +161,9 @@ class VoidStatistics:
         else:
             binpath = sys.path[0] + '/SVF_survey/bin/'
             cmd = [binpath + 'vg_ccf_sigma_pi.exe',
-                   self.tracer_file,
-                   self.random_file,
-                   self.void_file,
+                   self.tracer_unf,
+                   self.random_unf,
+                   self.void_unf,
                    fout,
                    str(self.dmin),
                    str(self.dmax),
