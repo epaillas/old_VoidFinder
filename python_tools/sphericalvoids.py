@@ -593,7 +593,7 @@ class SphericalVoids:
         nt = voids[:,4]
         nden = voids[:,5]
 
-        print(x,y,z)
+        print(x[0],y[0],z[0])
 
         dis = np.sqrt(x**2 + y**2 + z**2)
         dec = np.arctan2(np.sqrt(x**2 + y**2), z)
@@ -608,4 +608,4 @@ class SphericalVoids:
         y = dis * np.cos(dec * np.pi / 180) * np.sin(ra * np.pi / 180)
         z = dis * np.sin(dec * np.pi / 180)
 
-        print(x,y,z)
+        print(x[0],y[0],z[0])
