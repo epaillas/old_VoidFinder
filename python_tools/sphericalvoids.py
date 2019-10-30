@@ -586,6 +586,8 @@ class SphericalVoids:
 
         voids = np.genfromtxt(fname)
 
+        print(voids[:3])
+
         x = voids[:,0]
         y = voids[:,1]
         z = voids[:,2]
