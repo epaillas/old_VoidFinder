@@ -596,10 +596,6 @@ class SphericalVoids:
         dis = np.sqrt(x**2 + y**2 + z**2)
         dec = np.arctan2(np.sqrt(x**2 + y**2), z)
         ra = np.arctan(y, x)
-
-        dis = np.sqrt(data[:,0]**2 + data[:,1]**2 + data[:,2]**2)
-        dec = np.arctan2(np.sqrt(data[:,0]**2 + data[:,1]**2), data[:,2])
-        ra = np.arctan2(data[:,1], data[:,0])
         redshift = self.cosmo.get_redshift(dis)
 
         cout = np.c_[ra, dec, redshift, r, nt, nden]
