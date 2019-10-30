@@ -579,7 +579,7 @@ class SphericalVoids:
         volfrac = np.asarray(volfrac)
         return volfrac
 
-    def get_void_skycoords(self):
+    def get_void_skycoords(self, fname=''):
         if fname == '':
             fname = self.filtered_file
         fout = self.filtered_file + '_sky'
