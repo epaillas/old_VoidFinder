@@ -229,8 +229,8 @@ do i = 1, nc
   ipy = int((yvc - gridmin) / rgrid + 1.)
   ipz = int((zvc - gridmin) / rgrid + 1.)
 
-  ndif = int(smax * rv / rgrid + 1)
-  !ndif = int(smax / rgrid + 1)
+  !ndif = int(smax * rv / rgrid + 1)
+  ndif = int(smax / rgrid + 1)
 
   do ix = ipx - ndif, ipx + ndif, 1
     do iy = ipy - ndif, ipy + ndif, 1
@@ -261,8 +261,8 @@ do i = 1, nc
             pi = abs(dot_product(r, com)) / norm2(com)
             sigma = sqrt(norm2(r)**2 - pi**2)
 
-            pi = pi / rv
-            sigma = sigma / rv
+            !pi = pi / rv
+            !sigma = sigma / rv
 
             if (sigma .lt. smax .and. pi .lt. smax) then
               sind = int(sigma / swidth + 1)
@@ -294,8 +294,8 @@ do i = 1, nc
             pi = abs(dot_product(r, com)) / norm2(com)
             sigma = sqrt(norm2(r)**2 - pi**2)
 
-            pi = pi / rv
-            sigma = sigma / rv
+            !pi = pi / rv
+            !sigma = sigma / rv
 
             if (sigma .lt. smax .and. pi .lt. smax) then
               sind = int(sigma / swidth + 1)

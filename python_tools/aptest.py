@@ -33,7 +33,7 @@ class VoidStatistics:
         self.gridmax = 5000
         self.ngrid = 100
         self.dmin = 0
-        self.dmax = 3
+        self.dmax = 200
         self.nbins = 30
         self.min_rvoid = 0
         self.max_rvoid = 200
@@ -92,9 +92,6 @@ class VoidStatistics:
         distance).
         '''
         fout = self.void_file + '.VG_CCF_monopole'
-        nbins = 30
-        dmin = 0
-        dmax = 3
 
         if self.is_box:
             binpath = sys.path[0] + '/SVF_box/bin/'
@@ -103,9 +100,9 @@ class VoidStatistics:
                    self.void_file,
                    fout,
                    str(self.box_size),
-                   str(nbins),
-                   str(dmin),
-                   str(dmax),
+                   str(self.nbins),
+                   str(self.dmin),
+                   str(self.dmax),
                    ]
         else:
             binpath = sys.path[0] + '/SVF_survey/bin/'
