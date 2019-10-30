@@ -6,6 +6,7 @@ import subprocess
 from astropy.io import fits
 from python_tools.cosmology import Cosmology
 from python_tools.galaxycat import GalaxyCatalogue
+from python_tools.voidcat import VoidCatalogue
 from scipy.spatial import Delaunay
 import healpy as hp
 from scipy.io import FortranFile
@@ -22,6 +23,9 @@ class VoidStatistics:
         self.tracer_file = tracer_file
         self.random_file = random_file
         self.handle = handle
+        self.tracer_unf = self.handle + '.dat.unf'
+        self.random_unf = self.handle + '.ran.unf'
+        self.void_unf = self.handle + '.voids.unf'
         self.ncores = ncores
         self.is_box = is_box
         self.box_size = box_size
@@ -40,6 +44,20 @@ class VoidStatistics:
         self.cosmo = Cosmology(omega_m=omega_m, h=h)
 
         pos_cols = [int(i) for i in pos_cols.split(',')]
+
+        self.tracers = GalaxyCatalogue(catalogue_file=tracer_file, is_box=is_box,
+            box_size=box_size, randoms=False, boss_like=boss_like, omega_m=omega_m,
+            h=h, bin_write=True, output_file=self.tracer_unf, pos_cols=pos_cols,
+            zmin=zmin, zmax=zmax)
+
+        self.randoms = GalaxyCatalogue(catalogue_file=random_file, is_box=self.is_box, 
+                                       randoms=True, boss_like=boss_like, omega_m=omega_m,
+                                       h=h, bin_write=True, output_file=self.random_unf,
+                                       pos_cols=pos_cols, zmin=zmin, zmax=zmax)
+
+        self.voids = VoidCatalogue(catalogue_file=void_file, is_box=self.is_box, 
+                                   omega_m=omega_m, h=h, bin_write=True,
+                                   output_file=self.void_unf, pos_cols=pos_cols)
 
     def _get_mean_monopole(self, fname, rmin=0, rmax=100):
         
