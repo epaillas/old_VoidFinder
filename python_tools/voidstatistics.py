@@ -16,7 +16,7 @@ class VoidStatistics:
     def __init__(self, void_file, tracer_file, is_box=True, random_file=None,
                  boss_like=False, pos_cols='0,1,2', box_size=1024.0,
                  omega_m=0.31, h=0.6777, verbose=False, handle=None,
-                 ncores=1:
+                 ncores=1):
 
         self.void_file = void_file
         self.tracer_file = tracer_file
