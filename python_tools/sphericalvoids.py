@@ -604,8 +604,8 @@ class SphericalVoids:
         fmt = 4*'%10.3f ' +  '%10i ' + '%10.3f '
         np.savetxt(fout, cout, fmt=fmt)
 
-        x = dist * np.cos(dec * np.pi / 180) * np.cos(ra * np.pi / 180)
-        y = dist * np.cos(dec * np.pi / 180) * np.sin(ra * np.pi / 180)
-        z = dist * np.sin(dec * np.pi / 180)
+        x = dis * np.cos(dec * np.pi / 180) * np.cos(ra * np.pi / 180)
+        y = dis * np.cos(dec * np.pi / 180) * np.sin(ra * np.pi / 180)
+        z = dis * np.sin(dec * np.pi / 180)
 
         print(x,y,z)
