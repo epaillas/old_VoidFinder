@@ -586,14 +586,14 @@ class SphericalVoids:
 
         voids = np.genfromtxt(fname)
 
-        print(voids[:3])
-
         x = voids[:,0]
         y = voids[:,1]
         z = voids[:,2]
         r = voids[:,3]
         nt = voids[:,4]
         nden = voids[:,5]
+
+        print(x,y,z)
 
         dis = np.sqrt(x**2 + y**2 + z**2)
         dec = np.arctan2(np.sqrt(x**2 + y**2), z)
@@ -603,3 +603,9 @@ class SphericalVoids:
         cout = np.c_[np.degrees(ra), np.degrees(dec), redshift, r, nt, nden]
         fmt = 4*'%10.3f ' +  '%10i ' + '%10.3f '
         np.savetxt(fout, cout, fmt=fmt)
+
+        x = dist * np.cos(dec * np.pi / 180) * np.cos(ra * np.pi / 180)
+        y = dist * np.cos(dec * np.pi / 180) * np.sin(ra * np.pi / 180)
+        z = dist * np.sin(dec * np.pi / 180)
+
+        print(x,y,z)
