@@ -47,13 +47,12 @@ class VoidStatistics:
 
         self.tracers = GalaxyCatalogue(catalogue_file=tracer_file, is_box=is_box,
             box_size=box_size, randoms=False, boss_like=boss_like, omega_m=omega_m,
-            h=h, bin_write=True, output_file=self.tracer_unf, pos_cols=pos_cols,
-            zmin=zmin, zmax=zmax)
+            h=h, bin_write=True, output_file=self.tracer_unf, pos_cols=pos_cols)
 
         self.randoms = GalaxyCatalogue(catalogue_file=random_file, is_box=self.is_box, 
                                        randoms=True, boss_like=boss_like, omega_m=omega_m,
                                        h=h, bin_write=True, output_file=self.random_unf,
-                                       pos_cols=pos_cols, zmin=zmin, zmax=zmax)
+                                       pos_cols=pos_cols)
 
         self.voids = VoidCatalogue(catalogue_file=void_file, is_box=self.is_box, 
                                    omega_m=omega_m, h=h, bin_write=True,
