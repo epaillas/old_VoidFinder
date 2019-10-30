@@ -600,4 +600,4 @@ class SphericalVoids:
 
         cout = np.c_[ra, dec, redshift, r, nt, nden]
         fmt = 4*'%10.3f ' +  '%10i ' + '%10.3f '
-        np.savetxt(fout, cout)
+        np.savetxt(fout, cout, fmt=fmt)
