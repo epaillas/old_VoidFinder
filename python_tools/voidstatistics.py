@@ -76,6 +76,8 @@ class VoidStatistics:
         '''
         fout = self.void_file + '.VG_CCF_monopole'
 
+        self.dmax = 3
+
         if self.is_box:
             binpath = sys.path[0] + '/SVF_box/bin/'
             cmd = [binpath + 'vg_ccf_monopole.exe',

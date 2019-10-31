@@ -17,7 +17,7 @@ class MockStatistics:
 
         self.handle = handle
 
-        self.bin_sampling = 3
+        self.bin_sampling = 2
         self.cutoff_lo = 1
         self.cutoff_hi = None
 
@@ -50,14 +50,14 @@ class MockStatistics:
         q = np.sqrt(qpara**2 * mu**2 + qper**2*(1 - mu**2))
         return q
 
-    def _getMonopole(self, data, epsilon=1, qper=1):
+    def _getMonopole(self, data, epsilon=1, qpara=1):
         r = np.unique(data[:,0])
         mu = np.unique(data[:,3])
         mu_edges = np.unique(data[:, 4:6], axis=0)
         mu_lo = mu_edges[:,0]
         mu_hi = mu_edges[:,1]
         
-        qpara = qper / epsilon
+        qper = qpara * epsilon
         q = self.qFactor(mu, qper, qpara)
         true_r = r * q
         true_mu = mu * qpara / q
@@ -86,7 +86,7 @@ class MockStatistics:
         mu_lo = mu_edges[:,0]
         mu_hi = mu_edges[:,1]
         
-        qpara = qper / epsilon
+        qper = qpara * epsilon
         q = self.qFactor(mu, qper, qpara)
         true_r = r * q
         true_mu = mu * qpara / q
@@ -118,7 +118,7 @@ class MockStatistics:
         mu_lo = mu_edges[:,0]
         mu_hi = mu_edges[:,1]
         
-        qpara = qper / epsilon
+        qper = qpara * epsilon
         q = self.qFactor(mu, qper, qpara)
         true_r = r * q
         true_mu = mu * qpara / q
