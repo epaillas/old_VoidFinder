@@ -385,14 +385,10 @@ class SphericalVoids:
         z = self.tracers.z
         points = np.hstack([x, y, z])
 
-        print(np.shape(points))
-        
         if self.is_box == False and self.use_guards == True:
             angCap, redCap = self.gen_guard_particles()
             points = np.vstack([points, angCap, redCap])
 
-        print(np.shape(points))
-        
         # add periodic images if dealing with a box
         if self.is_box:
             images = self.get_periodic_images(points)
