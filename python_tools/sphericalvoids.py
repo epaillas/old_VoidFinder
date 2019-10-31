@@ -593,20 +593,11 @@ class SphericalVoids:
         nt = voids[:,4]
         nden = voids[:,5]
 
-        print(x[0],y[0],z[0])
-
         dis = np.sqrt(x**2 + y**2 + z**2)
         dec = np.arctan2(np.sqrt(x**2 + y**2), z)
-        #dec = np.arccos(z / dis)
         ra = np.arctan2(y, x)
         redshift = self.cosmo.get_redshift(dis)
 
         cout = np.c_[np.degrees(ra), np.degrees(dec), redshift, r, nt, nden]
         fmt = 4*'%10.3f ' +  '%10i ' + '%10.3f '
         np.savetxt(fout, cout, fmt=fmt)
-
-        x = dis * np.sin(dec * np.pi / 180) * np.cos(ra * np.pi / 180)
-        y = dis * np.sin(dec * np.pi / 180) * np.sin(ra * np.pi / 180)
-        z = dis * np.cos(dec * np.pi / 180)
-
-        print(x[0],y[0],z[0])

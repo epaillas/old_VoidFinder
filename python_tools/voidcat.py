@@ -40,9 +40,9 @@ class VoidCatalogue:
 
             cosmo = Cosmology(omega_m=omega_m, h=h)
             self.dist = cosmo.get_comoving_distance(self.redshift)
-            self.x = self.dist * np.cos(self.dec * np.pi / 180) * np.cos(self.ra * np.pi / 180)
-            self.y = self.dist * np.cos(self.dec * np.pi / 180) * np.sin(self.ra * np.pi / 180)
-            self.z = self.dist * np.sin(self.dec * np.pi / 180)
+            self.x = self.dist * np.sin(self.dec * np.pi / 180) * np.cos(self.ra * np.pi / 180)
+            self.y = self.dist * np.sin(self.dec * np.pi / 180) * np.sin(self.ra * np.pi / 180)
+            self.z = self.dist * np.cos(self.dec * np.pi / 180)
 
         self.x = self.x.reshape(len(self.x), 1)
         self.y = self.y.reshape(len(self.y), 1)
