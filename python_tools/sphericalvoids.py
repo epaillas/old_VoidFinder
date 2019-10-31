@@ -596,8 +596,8 @@ class SphericalVoids:
         print(x[0],y[0],z[0])
 
         dis = np.sqrt(x**2 + y**2 + z**2)
-        #dec = np.arctan2(np.sqrt(x**2 + y**2), z)
-        dec = np.arccos(z / dis)
+        dec = np.arctan2(np.sqrt(x**2 + y**2), z)
+        #dec = np.arccos(z / dis)
         ra = np.arctan2(y, x)
         redshift = self.cosmo.get_redshift(dis)
 
