@@ -15,7 +15,7 @@ box_size=1000
 #### Survey settings ####
 randoms=$HOME/randoms.dat
 mask=
-boss_like=True
+boss_like=False
 zmin=0.43
 zmax=0.7
 

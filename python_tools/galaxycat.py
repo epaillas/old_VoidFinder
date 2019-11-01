@@ -74,13 +74,14 @@ class GalaxyCatalogue:
         self.z = self.z.reshape(len(self.z), 1)
 
         # redshift cut
-        ind = (self.redshift >= zmin) & (self.redshift <= zmax)
-        self.x = self.x[ind]
-        self.y = self.y[ind]
-        self.z = self.z[ind]
-        self.ra = self.ra[ind]
-        self.dec = self.dec[ind]
-        self.redshift = self.redshift[ind]
+        if not self.is_box:
+            ind = (self.redshift >= zmin) & (self.redshift <= zmax)
+            self.x = self.x[ind]
+            self.y = self.y[ind]
+            self.z = self.z[ind]
+            self.ra = self.ra[ind]
+            self.dec = self.dec[ind]
+            self.redshift = self.redshift[ind]
 
         if bin_write:
             cout = np.hstack([self.x, self.y, self.z])
