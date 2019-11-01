@@ -105,15 +105,8 @@ class SphericalVoids:
             voids = self.overlap_filter(overlap=0.5)
 
             # save a catalog with sky coordinates
-            self.get_void_skycoords()
-
-        if (2 in steps) or (3 in steps) or (4 in steps):
-            self.x = voids[:,0]
-            self.y = voids[:,1]
-            self.z = voids[:,2]
-            self.radius = voids[:,3]
-            self.ngal = voids[:,4]
-            self.nden = voids[:,5]
+            if not self.is_box:
+                self.get_void_skycoords()
 
 
     def concat_files(self, input_files, output_file):
