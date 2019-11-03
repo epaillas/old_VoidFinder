@@ -298,6 +298,7 @@ class SphericalVoids:
         vertices = self.delaunay_triangulation()
         cenx, ceny, cenz, r = [], [], [], []
         
+        sing = 0
         for tetra in vertices:
             x0, x1, x2, x3 = tetra
             A = []
@@ -308,7 +309,11 @@ class SphericalVoids:
             A = np.asarray(A)
             B = np.sum(A**2, axis=1)
             B = np.asarray(B)
-            C = np.linalg.inv(A).dot(B)
+            try:
+                C = np.linalg.inv(A).dot(B)
+            except:
+                sing += 1
+                continue
             centre = x0 + 0.5 * C
             radius = 0.5 * np.sqrt(np.sum(C**2))
             if radius < radius_limit:
@@ -316,6 +321,8 @@ class SphericalVoids:
                 ceny.append(centre[1])
                 cenz.append(centre[2])
                 r.append(radius)
+
+        print('{} singular matrices found.'.format(sing))
                 
         cenx = np.asarray(cenx)
         ceny = np.asarray(ceny)
@@ -368,9 +375,9 @@ class SphericalVoids:
         
 
     def delaunay_triangulation(self, guards=False):
-        '''eBOSS_LRG_NGC_v4.SVF.recen
-        Make a Delaunay triangulation overeBOSS_LRG_NGC_v4.SVF.recen
-        the cartesian positions of the tracers.eBOSS_LRG_NGC_v4.SVF.recen
+        '''
+        Make a Delaunay triangulation over
+        the cartesian positions of the tracers.
         Returns the vertices of tetrahedra.
         '''
         x = self.tracers.x
