@@ -17,7 +17,7 @@ class SphericalVoids:
                  boss_like=False, pos_cols='0,1,2', box_size=1024.0,
                  omega_m=0.31, h=0.6777, mask_file='', zmin=0.43, zmax=0.7,
                  verbose=False, handle='', nside=512, delta_voids=0.2,
-                 rvoidmax=100, ncores=1, steps='1,2,3,4'):
+                 rvoidmax=100, ncores=1, steps='1,2,3,4', periodic=True):
 
         steps = [int(i) for i in steps.split(',')]
         pos_cols = [int(i) for i in pos_cols.split(',')]
@@ -35,6 +35,7 @@ class SphericalVoids:
         self.steps = steps
         self.pos_cols = pos_cols
         self.use_guards = True
+        self.periodic = periodic
 
         # void parameters
         self.delta_voids = delta_voids
@@ -107,6 +108,9 @@ class SphericalVoids:
             # save a catalog with sky coordinates
             if not self.is_box:
                 self.get_void_skycoords()
+            else:
+                if not self.periodic:
+                    self.remove_edge_voids()
 
 
     def concat_files(self, input_files, output_file):
@@ -125,6 +129,25 @@ class SphericalVoids:
                 return False
         except NameError:
             return False
+
+    def remove_edge_voids(self, fname=''):
+        if fname == '':
+            fname = self.filtered_file
+
+        voids = np.genfromtxt(fname)
+        x = voids[:,0]
+        y = voids[:,1]
+        z = voids[:,2]
+        radius = voids[:,3]
+
+        condx = (x - rvoid < 0) or (x + rvoid > self.box_size)
+        condy = (y - rvoid < 0) or (y + rvoid > self.box_size)
+        condz = (z - rvoid < 0) or (z + rvoid > self.box_size)
+
+        cond = condx or condy or condz
+
+        voids = voids[~cond]
+        np.savetxt(fname, voids)
 
 
     def get_periodic_images(self, data):

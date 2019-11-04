@@ -10,6 +10,8 @@ from scipy.spatial import Delaunay
 import healpy as hp
 from scipy.io import FortranFile
 import matplotlib.pyplot as plt
+from scipy.interpolate import InterpolatedUnivariateSpline
+from scipy.integrate import quad
 
 class MockStatistics:
 
@@ -81,35 +83,30 @@ class MockStatistics:
         return true_r, xi0
 
     def _getQuadrupole(self, data, epsilon=1):
-        r = np.unique(data[:,0])
+        s = np.unique(data[:,0])
         mu = np.unique(data[:,3])
-        mu_edges = np.unique(data[:, 4:6], axis=0)
-        mu_lo = mu_edges[:,0]
-        mu_hi = mu_edges[:,1]
 
         qpara = 1 * epsilon ** (-2/3)
-        qper = epsilon * qpara
-        
-        q = self.qFactor(mu, qper, qpara)
-        true_r = r * q
-        true_mu = mu * qpara / q
-        true_mu_hi = mu_hi * qpara/self.qFactor(mu_hi, qper, qpara)
-        true_mu_lo = mu_lo * qpara/self.qFactor(mu_lo, qper, qpara)
-        true_dmu = mu_hi - mu_lo
+        qperp = epsilon * qpara
 
-        xi_rmu = np.zeros([len(r), len(mu)])
+        true_sperp = s * np.sqrt(1 - mu**2) * qperp
+        true_spara = s * mu * qpara
+        true_s = np.sqrt(true_spara ** 2 + true_sperp ** 2)
+        true_mu = true_spara / true_s
+
+        xi_smu = np.zeros([len(s), len(mu)])
         counter = 0
-        for i in range(len(r)):
+        for i in range(len(s)):
             for j in range(len(mu)):
-                xi_rmu[i, j] = data[counter, -1]
+                xi_smu[i, j] = data[counter, -1]
                 counter += 1
 
-        xi2 = np.zeros(len(r))
-        for i in range(len(r)):
-            xi2[i] = true_dmu[i] * (1 + 2*2) * np.sum((3 * true_mu**2 - 1)/2 * xi_rmu[i,:])
+        quadr = np.zeros(xi_smu.shape[0])
+        for j in range(xi_smu.shape[0]):
+            mufunc = InterpolatedUnivariateSpline(true_mu, xi_smu[j, :], k=3)
+            quadr[j] = quad(lambda x: mufunc(x) * 5 * (3. * x ** 2 - 1) / 2., 0, 1, full_output=1)[0]
 
-        xi2 /= mu_hi[-1] - mu_lo[0]
-        return true_r, xi2
+        return true_s, quadr
 
     def _getAverageMonopole(self, data, epsilon=1):
         r = np.unique(data[:,0])
