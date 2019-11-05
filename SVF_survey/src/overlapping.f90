@@ -6,8 +6,8 @@ contains
     implicit none
     integer :: i, ng, ipx, ipy, ipz
     integer, intent(in) :: ngrid
-    real, intent(in) :: gridmin, gridmax, rgrid
-    real, dimension(:,:), intent(in) :: pos
+    real*8, intent(in) :: gridmin, gridmax, rgrid
+    real*8, dimension(:,:), intent(in) :: pos
     integer, dimension(:,:,:), intent(out) :: lirst
     integer, dimension(:), intent(out) :: ll
 
@@ -57,13 +57,13 @@ program overlapping
   integer, dimension(ngrid, ngrid, ngrid) :: lirst
   integer, dimension(:), allocatable :: ll
 
-  real :: overlap, px, py, pz, rvoid, ng, nden
-  real :: disx, disy, disz, dis, rgrid, gridmin, gridmax
+  real*8 :: overlap, px, py, pz, rvoid, ng, nden
+  real*8 :: disx, disy, disz, dis, rgrid, gridmin, gridmax
 
   integer, dimension(:), allocatable :: ng_arr, mark
 
-  real, dimension(:,:), allocatable :: pos_arr
-  real, dimension(:), allocatable :: rvoid_arr, nden_arr
+  real*8, dimension(:,:), allocatable :: pos_arr
+  real*8, dimension(:), allocatable :: rvoid_arr, nden_arr
 
   character(len=500) :: input_voids, output_voids
   character(len=10) :: overlap_char, gridmin_char, gridmax_char
