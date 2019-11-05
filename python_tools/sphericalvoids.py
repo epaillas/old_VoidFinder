@@ -35,7 +35,6 @@ class SphericalVoids:
         self.steps = steps
         self.pos_cols = pos_cols
         self.use_guards = True
-        self.periodic = periodic
 
         # void parameters
         self.delta_voids = delta_voids
