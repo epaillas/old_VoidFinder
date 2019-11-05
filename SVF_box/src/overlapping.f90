@@ -112,7 +112,7 @@ do i = 1, nv
 end do
 
 do i = 1, nv - 1
-  if (mod(i, int(1e1)) .eq. 1) then
+  if (mod(i, int(5)) .eq. 1) then
     write(*, 101, advance='no' ) creturn , i , nv
     101 format(a, ' Void ', i8 ,' out of  ', i8)
   end if
