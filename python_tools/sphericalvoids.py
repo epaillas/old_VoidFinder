@@ -140,11 +140,11 @@ class SphericalVoids:
         z = voids[:,2]
         radius = voids[:,3]
 
-        condx = (x - radius < 0) or (x + radius > self.box_size)
-        condy = (y - radius < 0) or (y + radius > self.box_size)
-        condz = (z - radius < 0) or (z + radius > self.box_size)
+        condx = np.logical_or(x - radius < 0, x + radius > self.box_size)
+        condy = np.logical_or(y - radius < 0, y + radius > self.box_size)
+        condz = np.logical_or(z - radius < 0, z + radius > self.box_size)
 
-        cond = condx or condy or condz
+        cond = np.logical_or.reduce((condx, condy, condz))
 
         voids = voids[~cond]
         np.savetxt(fname, voids)
