@@ -98,8 +98,11 @@ do i = 1, nv
   indy = int(pos_voids(2, i) / rgrid + 1)
   indz = int(pos_voids(3, i) / rgrid + 1)
 
-  lirst(indx, indy, indz) = i
-  nlirst(indx, indy, indz) = nlirst(indx, indy, indz) + 1
+  if(indx.gt.0.and.indx.le.ngrid.and.indy.gt.0.and.indy.le.ngrid.and.&
+  indz.gt.0.and.indz.le.ngrid) then
+    lirst(indx, indy, indz) = i
+    nlirst(indx, indy, indz) = nlirst(indx, indy, indz) + 1
+  end if
 end do
 
 do i = 1, nv
@@ -107,8 +110,11 @@ do i = 1, nv
   indy = int(pos_voids(2, i) / rgrid + 1)
   indz = int(pos_voids(3, i) / rgrid + 1)
 
-  ll(lirst(indx, indy, indz)) = i
-  lirst(indx, indy, indz) = i
+  if(indx.gt.0.and.indx.le.ngrid.and.indy.gt.0.and.indy.le.ngrid.and.&
+  indz.gt.0.and.indz.le.ngrid) then
+    ll(lirst(indx, indy, indz)) = i
+    lirst(indx, indy, indz) = i
+  end if
 end do
 
 do i = 1, nv - 1
