@@ -132,7 +132,7 @@ class SphericalVoids:
 
     def remove_edge_voids(self, fname=''):
         if fname == '':
-            fname = self.filtered_file
+            fname = self.recentred_file
 
         voids = np.genfromtxt(fname)
         x = voids[:,0]
