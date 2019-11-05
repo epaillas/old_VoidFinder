@@ -53,7 +53,7 @@ class SphericalVoids:
         self.h = h
         self.cosmo = Cosmology(omega_m=omega_m)
 
-        if 1 not in steps:
+        if 1 not in steps and not self.is_box:
             if self.mask_file == '':
                 sys.exit('Mask file not provided. Aborting...')
             else:
