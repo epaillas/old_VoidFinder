@@ -53,11 +53,12 @@ class SphericalVoids:
         self.h = h
         self.cosmo = Cosmology(omega_m=omega_m)
 
-        if 1 not in steps and not self.is_box:
-            if self.mask_file == '':
-                sys.exit('Mask file not provided. Aborting...')
-            else:
-                self.mask = hp.read_map(self.mask_file, nest=False, verbose=False)
+        if 1 not in steps:
+            if not self.is_box:
+                if self.mask_file == '':
+                    sys.exit('Mask file not provided. Aborting...')
+                else:
+                    self.mask = hp.read_map(self.mask_file, nest=False, verbose=False)
         else:
         # load tracers and find void centres
             self.tracers = GalaxyCatalogue(catalogue_file=tracer_file, is_box=is_box,
