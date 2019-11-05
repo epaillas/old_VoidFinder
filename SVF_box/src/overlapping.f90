@@ -8,14 +8,14 @@ integer :: indx, indy, indz, ipx, ipy, ipz
 integer, dimension(:, :, :), allocatable :: lirst, nlirst
 integer, dimension(:), allocatable :: ll
 
-real :: overlap, boxsize, rgrid
-real :: xread, yread, zread, xv, yv, zv, rread, ngread, ndenread
-real :: disx, disy, disz, dis
+real*8 :: overlap, boxsize, rgrid
+real*8 :: xread, yread, zread, xv, yv, zv, rread, ngread, ndenread
+real*8 :: disx, disy, disz, dis
 
 integer, dimension(:), allocatable :: ngv, mark
 
-real, dimension(:,:), allocatable :: pos_voids, pos_rand
-real, dimension(:), allocatable :: rv, nden
+real*8, dimension(:,:), allocatable :: pos_voids, pos_rand
+real*8, dimension(:), allocatable :: rv, nden
 
 character(len=500) :: input_voids, output_voids
 character(len=10) :: overlap_char, ngrid_char, box_char
