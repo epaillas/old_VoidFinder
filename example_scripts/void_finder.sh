@@ -4,6 +4,7 @@
 tracers=$HOME/tracers.dat
 handle=$HOME/tracers
 is_box=True
+is_periodic=True
 ncores=1
 steps='1,2,3,4'
 pos_cols='0,1,2'
@@ -24,6 +25,7 @@ python $HOME/code/void_finder/void_finder.py \
 --tracers "$tracers" \
 --handle "$handle" \
 --is_box "$is_box" \
+--is_periodic "$is_periodic" \
 --ncores "$ncores" \
 --steps "$steps" \
 --pos_cols "$pos_cols" \

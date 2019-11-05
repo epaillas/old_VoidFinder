@@ -17,7 +17,7 @@ class SphericalVoids:
                  boss_like=False, pos_cols='0,1,2', box_size=1024.0,
                  omega_m=0.31, h=0.6777, mask_file='', zmin=0.43, zmax=0.7,
                  verbose=False, handle='', nside=512, delta_voids=0.2,
-                 rvoidmax=100, ncores=1, steps='1,2,3,4', periodic=True):
+                 rvoidmax=100, ncores=1, steps='1,2,3,4', is_periodic=True):
 
         steps = [int(i) for i in steps.split(',')]
         pos_cols = [int(i) for i in pos_cols.split(',')]
@@ -43,6 +43,7 @@ class SphericalVoids:
 
         # catalog data
         self.is_box = is_box
+        self.is_periodic = is_periodic
         self.box_size = box_size
         self.zmin = zmin
         self.zmax = zmax
@@ -98,9 +99,11 @@ class SphericalVoids:
         if 4 in steps:
             voids = self.sort_spheres()
 
-            # filter by void volume fraction
             if not self.is_box:
-                voids = self.filter_by_volume_fraction(threshold=0.9)
+                voids = self.filter_by_volume_fraction(threshold=0.95)
+            else:
+                if not self.is_periodic:
+                    self.remove_edge_voids()
 
             voids = self.overlap_filter(overlap=0.0)
             voids = self.overlap_filter(overlap=0.2)
@@ -109,10 +112,7 @@ class SphericalVoids:
             # save a catalog with sky coordinates
             if not self.is_box:
                 self.get_void_skycoords()
-            else:
-                if not self.periodic:
-                    self.remove_edge_voids()
-
+            
 
     def concat_files(self, input_files, output_file):
         with open(output_file, 'w+') as outfile:

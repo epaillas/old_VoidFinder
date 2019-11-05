@@ -5,6 +5,7 @@ from python_tools.sphericalvoids import SphericalVoids
 @click.option('--tracers', type=str, help='File containing tracers.')
 @click.option('--handle', type=str, help='Basename for the output files')
 @click.option('--is_box', type=bool, default=True, help='Is the data from a simulation box?')
+@click.option('--is_periodic', type=bool, default=True, help='Is the simulation box periodic?')
 @click.option('--ncores', type=int, default=1, help='Number of cores to use for parallel tasks.')
 @click.option('--steps', type=str, default='1,2,3,4', help='Which steps are to be run. (e.g. 1,2,3).')
 @click.option('--pos_cols', type=str, default='0,1,2', help='Indices of columns where tracer positions are stored.')
@@ -20,13 +21,13 @@ from python_tools.sphericalvoids import SphericalVoids
 
 def run_spherical_voids(tracers, handle, is_box, ncores, steps, pos_cols,
                         rvoidmax, box_size, randoms, mask, boss_like,
-                        zmin, zmax, omega_m, h):
+                        zmin, zmax, omega_m, h, is_periodic):
     
     voids = SphericalVoids(tracer_file=tracers, random_file=randoms, handle=handle,
                            is_box=is_box, box_size=box_size, steps=steps,
                            ncores=ncores, boss_like=boss_like, mask_file=mask,
                            pos_cols=pos_cols, omega_m=omega_m, h=h,
-                           rvoidmax=rvoidmax, zmin=zmin, zmax=zmax)
+                           rvoidmax=rvoidmax, zmin=zmin, zmax=zmax, is_periodic=is_periodic)
 
 if __name__ == '__main__':
     run_spherical_voids()
