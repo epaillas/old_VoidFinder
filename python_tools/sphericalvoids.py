@@ -140,9 +140,9 @@ class SphericalVoids:
         z = voids[:,2]
         radius = voids[:,3]
 
-        condx = (x - rvoid < 0) or (x + rvoid > self.box_size)
-        condy = (y - rvoid < 0) or (y + rvoid > self.box_size)
-        condz = (z - rvoid < 0) or (z + rvoid > self.box_size)
+        condx = (x - radius < 0) or (x + radius > self.box_size)
+        condy = (y - radius < 0) or (y + radius > self.box_size)
+        condz = (z - radius < 0) or (z + radius > self.box_size)
 
         cond = condx or condy or condz
 
