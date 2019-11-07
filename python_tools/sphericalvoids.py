@@ -310,7 +310,7 @@ class SphericalVoids:
         return angCap, redCap
 
     
-    def get_circumcentres(self, radius_limit=300, bin_write=True):
+    def get_circumcentres(self, radius_limit=1000, bin_write=True):
         '''
         Find the centre of the circumspheres
         associated to an input catalogue of

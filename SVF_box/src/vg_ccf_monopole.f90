@@ -131,7 +131,9 @@ close(10)
 
 
 ! Mean density inside the box
-rhomed = sum(weight) / (boxsize ** 3)
+!rhomed = sum(weight) / (boxsize ** 3)
+rhomed = 1e7 / boxsize**3
+print*, rhomed
 
 ! Construct linked list for tracers
 write(*,*) ''

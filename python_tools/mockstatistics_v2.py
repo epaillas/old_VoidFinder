@@ -19,7 +19,7 @@ class MockStatistics:
 
         self.handle = handle
 
-        self.bin_sampling = 2
+        self.bin_sampling = 3
         self.cutoff_lo = 1
         self.cutoff_hi = None
 
