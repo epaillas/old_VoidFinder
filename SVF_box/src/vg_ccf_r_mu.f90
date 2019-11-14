@@ -128,9 +128,8 @@ end do
 
 
 ! Mean density inside the box
-!rhomed = ng / (boxsize ** 3)
-rhomed = 5e7 / (boxsize**3)
-print*, rhomed
+rhomed = ng / (boxsize ** 3)
+!rhomed = 5e7 / (boxsize**3)
 
 ! Construct linked list for tracers
 write(*,*) ''
