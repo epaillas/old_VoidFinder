@@ -113,7 +113,7 @@ class VoidStatistics:
                    self.tracer_file,
                    self.void_file,
                    fout,
-                   str(self.box_size)
+                   str(self.box_size),
                    str(self.dmin),
                    str(self.dmax),
                    str(self.nbins),
