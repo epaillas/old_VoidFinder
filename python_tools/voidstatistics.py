@@ -29,8 +29,8 @@ class VoidStatistics:
         self.gridmax = 5000
         self.ngrid = 100
         self.dmin = 0
-        self.dmax = 200
-        self.nbins = 30
+        self.dmax = 3
+        self.nbins = 60
         self.min_rvoid = 0
         self.max_rvoid = 200
 
@@ -113,6 +113,7 @@ class VoidStatistics:
                    self.tracer_file,
                    self.void_file,
                    fout,
+                   str(self.box_size)
                    str(self.dmin),
                    str(self.dmax),
                    str(self.nbins),
