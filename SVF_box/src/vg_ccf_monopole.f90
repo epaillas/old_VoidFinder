@@ -138,7 +138,7 @@ print*, rhomed
 ! Construct linked list for tracers
 write(*,*) ''
 write(*,*) 'Constructing linked list...'
-ngridll = 60
+ngridll = 64
 allocate(lirst(ngridll, ngridll, ngridll))
 allocate(nlirst(ngridll, ngridll, ngridll))
 allocate(ll(np))

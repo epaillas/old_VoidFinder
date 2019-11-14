@@ -7,7 +7,7 @@ MLIBS = -lm
 
 #################
 
-EXES_3D = grow_spheres.exe recentring.exe overlapping.exe vg_ccf_monopole.exe
+EXES_3D = grow_spheres.exe recentring.exe overlapping.exe vg_ccf_monopole.exe vg_ccf_r_mu.exe
 EXES_2D = grow_spheres_2D.exe recentring_2D.exe overlapping_2D.exe
 EXES = $(EXES_3D) $(EXES_2D)
 
@@ -25,6 +25,9 @@ overlapping.exe: overlapping.o
 vg_ccf_monopole.exe: vg_ccf_monopole.o
 	$(MPIFC) vg_ccf_monopole.o -o vg_ccf_monopole.exe $(MLIBS)
 
+vg_ccf_r_mu.exe: vg_ccf_r_mu.o
+	$(MPIFC) vg_ccf_r_mu.o -o vg_ccf_r_mu.exe $(MLIBS)
+
 grow_spheres.o: grow_spheres.f90
 	$(MPIFC) -c grow_spheres.f90
 
@@ -36,6 +39,9 @@ overlapping.o: overlapping.f90
 
 vg_ccf_monopole.o: vg_ccf_monopole.f90
 	$(MPIFC) -c vg_ccf_monopole.f90
+
+vg_ccf_r_mu.o: vg_ccf_r_mu.f90
+	$(MPIFC) -c vg_ccf_r_mu.f90
 
 
 grow_spheres_2D.exe: grow_spheres_2D.o

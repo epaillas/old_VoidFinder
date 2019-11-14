@@ -108,7 +108,17 @@ class VoidStatistics:
         fout = self.handle + '.VG_CCF_rmu'
 
         if self.is_box:
-            sys.exit('Not implemented!')
+            binpath = sys.path[0] + '/SVF_box/bin/'
+            cmd = [binpath + 'vg_ccf_r_mu.exe',
+                   self.tracer_file,
+                   self.void_file,
+                   fout,
+                   str(self.dmin),
+                   str(self.dmax),
+                   str(self.nbins),
+                   str(self.min_rvoid),
+                   str(self.max_rvoid),
+                   str(self.ngrid)]
         else:
             binpath = sys.path[0] + '/SVF_survey/bin/'
             cmd = [binpath + 'vg_ccf_r_mu.exe',
