@@ -2,33 +2,33 @@ module procedures
   implicit none
 contains
 
-  subroutine linked_list(ngrid, rgrid, ll, lirst, pos)
+  subroutine linked_list(ngrid, rgrid, ll, lirst, pos_data)
     implicit none
     integer :: i, ng, ipx, ipy
+    real*8, intent(in) :: rgrid
     integer, intent(in) :: ngrid
-    real, intent(in) :: rgrid
-    real, dimension(:,:), intent(in) :: pos
+    real*8, dimension(:,:), intent(in) :: pos_data
     integer, dimension(:,:), intent(out) :: lirst
     integer, dimension(:), intent(out) :: ll
 
-    ng = size(pos, dim=2)
+    ng = size(pos_data, dim=2)
     lirst = 0
     ll = 0
     do i = 1, ng
-      ipx = int(pos(1, i) / rgrid + 1.)
-      ipy = int(pos(2, i) / rgrid + 1.)
+      ipx = int(pos_data(1, i) / rgrid + 1.)
+      ipy = int(pos_data(2, i) / rgrid + 1.)
       if(ipx.gt.0.and.ipx.le.ngrid.and.ipy.gt.0.and.ipy.le.ngrid) then
         lirst(ipx, ipy) = i
       end if
     end do
 
     do i = 1, ng
-      ipx = int(pos(1, i) / rgrid + 1.)
-      ipy = int(pos(2, i) / rgrid + 1.)
+      ipx = int(pos_data(1, i) / rgrid + 1.)
+      ipy = int(pos_data(2, i) / rgrid + 1.)
 
       if (ipx.gt.0.and.ipx.le.ngrid.and.ipy.gt.0.and.ipy.le.ngrid) then
         ll(lirst(ipx, ipy)) = i
-        lirst(ipx, ipy) = i
+        lirst(ipx, ipy) = i 
       endif
     end do
 
@@ -36,7 +36,7 @@ contains
 
   character(len=20) function str(k)
     implicit none
-    integer, intent(in) :: k
+    integer*4, intent(in) :: k
     write(str, *) k
     str = adjustl(str)
   end function str
@@ -45,30 +45,30 @@ contains
 end module procedures
 
 
-PROGRAM recentering_2D
+PROGRAM recentering
   use mpi
   use procedures
   implicit none
 
-  real :: boxsize, delta, rgrid, rho_mean, nden
-  real :: px, py, disx, disy, dis
-  real :: pxr, pyr, rvoidr
-  real :: rvoid, rwidth, rvoidmax
-  real :: rnd, rnd_phi, rnd_rvoid
-  real :: rnd_px, rnd_py, rnd_ng, rnd_nden
-  real :: pi = 4.*atan(1.)
+  real*8 :: boxsize, delta, rgrid, rho_mean, nden
+  real*8 :: px, py, disx, disy, dis
+  real*8 :: pxr, pyr, rvoidr
+  real*8 :: rvoid, rwidth, rvoidmax
+  real*8 :: rnd, rnd_phi, rnd_theta, rnd_rvoid
+  real*8 :: rnd_px, rnd_py, rnd_ng, rnd_nden
+  real*8 :: pi = 4.*atan(1.)
 
   integer :: ng, nc, nv, rind, stuck
   integer :: id, ierr, process_num, iargc, filenumber
-  integer :: i, j, ii, ix, iy, ix2, iy2
+  integer :: i, j, k, ii, ix, iy, ix2, iy2
   integer :: ipx, ipy, ndif, ngrid
-  integer, parameter :: nrbin = 1000, nrc = 128
+  integer, parameter ::  nrbin = 1000, nrc = 128
 
   integer, dimension(:,:), allocatable :: lirst
   integer, dimension(:), allocatable :: ll
 
-  real, allocatable, dimension(:,:)  :: pos
-  real, dimension(nrbin) :: rbin, cum_rbin
+  real*8, allocatable, dimension(:,:)  :: pos_data
+  real*8, dimension(nrbin) :: rbin, cum_rbin
 
   character(len=500) :: input_tracers, input_centres, output_voids
   character(len=10) :: box_char, rvoidmax_char, delta_char, ngrid_char
@@ -80,7 +80,7 @@ PROGRAM recentering_2D
 
 
   if (iargc() .ne. 7) then
-    if (id == 0) write(*,*) 'recentering_2D.exe: some parameters are missing.'
+    if (id == 0) write(*,*) 'recentering.exe: some parameters are missing.'
     if (id == 0) write(*,*) ''
     if (id == 0) write(*,*) '1) input_tracers'
     if (id == 0) write(*,*) '2) input_centres'
@@ -107,12 +107,10 @@ PROGRAM recentering_2D
 
 
   if (id == 0) write(*,*) '-----------------------'
-  if (id == 0) write(*,*) 'Running recentering_2D.exe'
+  if (id == 0) write(*,*) 'Running recentering.exe'
   if (id == 0) write(*,*) 'Input parameters:'
-
   if (id == 0) write(*,*) ''
-
-  if (id == 0) write(*,*) 'mpi_processes: ', trim(str(process_num))
+  if (id == 0) write(*,*) 'mpi_processes: ', process_num
   if (id == 0) write(*,*) 'input_tracers: ', trim(input_tracers)
   if (id == 0) write(*,*) 'input_centres: ', trim(input_centres)
   if (id == 0) write(*,*) 'output_voids: ', trim(output_voids)
@@ -120,20 +118,19 @@ PROGRAM recentering_2D
   if (id == 0) write(*,*) 'rvoidmax: ', trim(rvoidmax_char), ' Mpc/h'
   if (id == 0) write(*,*) 'density_threshold: ', trim(delta_char), ' * rho_mean'
   if (id == 0) write(*,*) 'random_centres: ', nrc
-  if (id == 0) write(*,*) 'ngrid: ', ngrid_char, ' Mpc/h'
+  if (id == 0) write(*,*) 'ngrid: ', ngrid, ' Mpc/h'
+  if (id == 0) write(*,*) ''
 
   if (process_num .gt. 1) then
     output_voids = trim(output_voids) // '.' // trim(str(id))
   end if
 
-  open(10, file=input_tracers, status='old')
-  ng = 0
-  do
-    read(10, *, end=10)
-    ng = ng + 1
-  end do
-  10 rewind(10)
-  if (id == 0) write(*,*) 'Number of tracers: ', trim(str(ng))
+  open(10, file=input_tracers, status='old', form='unformatted')
+  read(10) ng
+  allocate(pos_data(2, ng))
+  read(10) pos_data
+  close(10)
+  if (id == 0) write(*,*) 'ntracers: ', ng
 
   open(11, file=input_centres, status='old')
   nc = 0
@@ -142,18 +139,10 @@ PROGRAM recentering_2D
     nc = nc + 1
   end do
   11 rewind(11)
-  if (id == 0) write(*,*) 'Number of input centres: ', trim(str(nc))
+  if (id == 0) write(*,*) 'n_centres: ', nc
   if (id == 0) write(*,*) ''
 
-  allocate(pos(2, ng))
-
-  do i = 1, ng
-    read(10, *) px, py
-    pos(1, i) = px
-    pos(2, i) = py
-  end do
-  close(10)
-
+  
   rho_mean = ng * 1./(boxsize ** 2)
   rgrid = boxsize / ngrid
   ndif = int(rvoidmax / rgrid + 1.)
@@ -161,7 +150,7 @@ PROGRAM recentering_2D
 
   allocate(ll(ng))
   allocate(lirst(ngrid, ngrid))
-  call linked_list(ngrid, rgrid, ll, lirst, pos)
+  call linked_list(ngrid, rgrid, ll, lirst, pos_data)
 
   filenumber = id + 20
   open(filenumber, file=output_voids, status='unknown')
@@ -173,10 +162,10 @@ PROGRAM recentering_2D
     pyr = py
     rvoidr = rvoid
 
-    if (id == 0 .and. mod(i, int(1e2)) .eq. 1) then
-      write(*, 101, advance='no' ) creturn , i , nc
-      101 format(a , 'Centre ', i10 ,' out of', i10)
-    end if
+    ! if (id == 0 .and. mod(i, int(1e2)) .eq. 1) then
+    !   write(*, 101, advance='no' ) creturn , i , nc
+    !   101 format(a , 'Centre ', i10 ,' out of', i10)
+    ! end if
 
     if(mod(i, process_num) .eq. id) then
 
@@ -187,10 +176,12 @@ PROGRAM recentering_2D
 
         call random_number(rnd)
         rnd_phi = rnd * 2 * pi
-        rnd_px = rvoid/4  * cos(rnd_phi) + px
-        rnd_py = rvoid/4  * sin(rnd_phi) + py
 
-        if (sqrt((rnd_px-pxr)**2 + (rnd_py-pyr)**2) .gt. rvoidr) cycle
+        rnd_px = rvoid/4 * cos(rnd_phi) + px
+        rnd_py = rvoid/4 * sin(rnd_phi) + py
+
+        if (sqrt((rnd_px-pxr)**2 + (rnd_py-pyr)**2)&
+        & .gt. rvoidr) cycle
 
         if (rnd_px .lt. 0) rnd_px = rnd_px + boxsize
         if (rnd_px .gt. boxsize) rnd_px = rnd_px - boxsize
@@ -203,7 +194,7 @@ PROGRAM recentering_2D
         do ix = ipx - ndif, ipx + ndif, 1
           do iy = ipy - ndif, ipy + ndif, 1
 
-            if (sqrt(real((ix-ipx)**2 +(iy-ipy)**2)) .gt. ndif+1) cycle
+            if (sqrt(real((ix-ipx)**2 +(iy-ipy)**2+(iz-ipz)**2)).gt.ndif+1) cycle
 
             ix2 = ix
             iy2 = iy
@@ -218,16 +209,17 @@ PROGRAM recentering_2D
               do
                 ii = ll(ii)
 
-                disx = pos(1, ii) - rnd_px
-                disy = pos(2, ii) - rnd_py
+                disx = pos_data(1, ii) - rnd_px
+                disy = pos_data(2, ii) - rnd_py
 
                 if (disx .lt. -boxsize/2) disx = disx + boxsize
                 if (disx .gt. boxsize/2) disx = disx - boxsize
                 if (disy .lt. -boxsize/2) disy = disy + boxsize
                 if (disy .gt. boxsize/2) disy = disy - boxsize
 
-                if (sqrt(disx ** 2 + disy ** 2) .lt. rvoidmax) then
-                  dis = sqrt(disx ** 2 + disy ** 2)
+                dis = sqrt(disx ** 2 + disy ** 2)
+
+                if (dis .lt. rvoidmax) then
                   rind = int(dis / rwidth + 1)
                   rbin(rind) = rbin(rind) + 1
                 end if
@@ -235,6 +227,7 @@ PROGRAM recentering_2D
                 if (ii .eq. lirst(ix2, iy2)) exit
               end do
             end if
+
           end do
         end do
 
@@ -271,10 +264,11 @@ PROGRAM recentering_2D
   end do
 
   close(filenumber)
-  deallocate(pos)
+  deallocate(pos_data)
 
+  if (id == 0) write(*,*) ''
   if (id == 0) write(*,*) ''
 
   call MPI_Finalize(ierr)
 
-end PROGRAM recentering_2D
+end PROGRAM recentering

@@ -7,9 +7,7 @@ MLIBS = -lm
 
 #################
 
-EXES_3D = grow_spheres.exe recentring.exe overlapping.exe vg_ccf_monopole.exe vg_ccf_r_mu.exe
-EXES_2D = grow_spheres_2D.exe recentring_2D.exe overlapping_2D.exe
-EXES = $(EXES_3D) $(EXES_2D)
+EXES = grow_spheres.exe recentring.exe overlapping.exe vg_ccf_monopole.exe vg_ccf_r_mu.exe
 
 all: $(EXES)
 
@@ -43,27 +41,6 @@ vg_ccf_monopole.o: vg_ccf_monopole.f90
 vg_ccf_r_mu.o: vg_ccf_r_mu.f90
 	$(MPIFC) -c vg_ccf_r_mu.f90
 
-
-grow_spheres_2D.exe: grow_spheres_2D.o
-	$(MPIFC) grow_spheres_2D.o -o grow_spheres_2D.exe $(MLIBS)
-
-recentring_2D.exe: recentring_2D.o
-	$(MPIFC) recentring_2D.o -o recentring_2D.exe $(MLIBS)
-
-overlapping_2D.exe: overlapping_2D.o
-	$(MPIFC) overlapping_2D.o -o overlapping_2D.exe $(MLIBS)
-
-grow_spheres_2D.o: grow_spheres_2D.f90
-	$(MPIFC) -c grow_spheres_2D.f90
-
-recentring_2D.o: recentring_2D.f90
-	$(MPIFC) -c recentring_2D.f90
-
-overlapping_2D.o: overlapping_2D.f90
-	$(MPIFC) -c overlapping_2D.f90
-
-r8lib.o: r8lib.f90
-	$(FC) -c r8lib.f90
 
 install: $(EXES)
 	mv $(EXES) ../bin
