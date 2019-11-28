@@ -4,8 +4,9 @@ SVF:
 	make -C src -f Makefile1 install
 
 CVF:
-	make -c src -f Makefile2 install
+	make -C src -f Makefile2 install
 
 clean:
-	make -C src clean
+	make -C src -f Makefile1 clean
+	make -C src -f Makefile2 clean
 	rm -f bin/*.exe

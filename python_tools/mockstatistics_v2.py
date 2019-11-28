@@ -19,7 +19,7 @@ class MockStatistics:
 
         self.handle = handle
 
-        self.bin_sampling = 3
+        self.bin_sampling = 2
         self.cutoff_lo = 1
         self.cutoff_hi = None
 
@@ -33,7 +33,7 @@ class MockStatistics:
         
     def getData(self):
         data = []
-        for fname in self.files:
+        for fname in self.files[:5]:
             f = np.genfromtxt(fname)
             f[np.isnan(f)] = -1 # Set invalid values to -1
             f[f == np.inf] = -1 # Set invalid values to -1     
@@ -53,34 +53,38 @@ class MockStatistics:
         return q
 
     def _getMonopole(self, data, epsilon=1):
-        r = np.unique(data[:,0])
-        mu = np.unique(data[:,3])
-        mu_edges = np.unique(data[:, 4:6], axis=0)
-        mu_lo = mu_edges[:,0]
-        mu_hi = mu_edges[:,1]
-        
-        qpara = 1 * epsilon ** (-2/3)
-        qper = epsilon * qpara
-        q = self.qFactor(mu, qper, qpara)
-        true_r = r * q
-        true_mu = mu * qpara / q
-        true_mu_hi = mu_hi * qpara/self.qFactor(mu_hi, qper, qpara)
-        true_mu_lo = mu_lo * qpara/self.qFactor(mu_lo, qper, qpara)
-        true_dmu = mu_hi - mu_lo
+        '''
+        Computes the monopole from an input
+        3D correlation function. Distorts
+        input s and mu vectors according to the
+        value of the epsilon AP parameter.
+        '''
 
-        xi_rmu = np.zeros([len(r), len(mu)])
+        s = np.unique(data[:,0])
+        mu = np.unique(data[:,3])
+            
+        qpara = 1 * epsilon ** (-2/3)
+        qperp = epsilon * qpara
+
+        true_sperp = s * np.sqrt(1 - mu**2) * qperp
+        true_spara = s * mu * qpara
+        true_s = np.sqrt(true_spara ** 2 + true_sperp ** 2)
+        true_mu = true_spara / true_s
+
+        xi_smu = np.zeros([len(s), len(mu)])
         counter = 0
-        for i in range(len(r)):
+        for i in range(len(s)):
             for j in range(len(mu)):
-                xi_rmu[i, j] = data[counter, -1]
+                xi_smu[i, j] = data[counter, -1]
                 counter += 1
 
-        xi0 = np.zeros(len(r))
-        for i in range(len(r)):
-            xi0[i] = true_dmu[i] * np.sum(xi_rmu[i, :])
+        mono = np.zeros(xi_smu.shape[0])
+        for j in range(xi_smu.shape[0]):
+            mufunc = InterpolatedUnivariateSpline(true_mu, xi_smu[j, :], k=3)
+            mono[j] = quad(lambda x: mufunc(x), 0, 1, full_output=1)[0]
 
-        xi0 /= mu_hi[-1] - mu_lo[0]
-        return true_r, xi0
+
+        return true_s, mono
 
     def _getQuadrupole(self, data, epsilon=1):
         s = np.unique(data[:,0])
@@ -109,47 +113,38 @@ class MockStatistics:
         return true_s, quadr
 
     def _getAverageMonopole(self, data, epsilon=1):
-        r = np.unique(data[:,0])
-        mu = np.unique(data[:,3])
-        r_edges = np.unique(data[:, 1:3], axis=0)
-        r_lo = r_edges[:,0]
-        r_hi = r_edges[:,1]
-        mu_edges = np.unique(data[:, 4:6], axis=0)
-        mu_lo = mu_edges[:,0]
-        mu_hi = mu_edges[:,1]
-        
-        qpara = 1 * epsilon ** (-2/3)
-        qper = epsilon * qpara
-        q = self.qFactor(mu, qper, qpara)
-        true_r = r * q
-        true_mu = mu * qpara / q
-        true_mu_hi = mu_hi * qpara/self.qFactor(mu_hi, qper, qpara)
-        true_mu_lo = mu_lo * qpara/self.qFactor(mu_lo, qper, qpara)
-        true_r_hi = r_hi * q
-        true_r_lo = r_lo * q
-        true_dmu = true_mu_hi - true_mu_lo
-        true_dr = true_r_hi - true_r_lo
 
-        xi_rmu = np.zeros([len(r), len(mu)])
+        s = np.unique(data[:,0])
+        mu = np.unique(data[:,3])
+
+        qpara = 1 * epsilon ** (-2/3)
+        qperp = epsilon * qpara
+
+        true_sperp = s * np.sqrt(1 - mu**2) * qperp
+        true_spara = s * mu * qpara
+        true_s = np.sqrt(true_spara ** 2 + true_sperp ** 2)
+        true_mu = true_spara / true_s
+
+        xi_smu = np.zeros([len(s), len(mu)])
         counter = 0
-        for i in range(len(r)):
+        for i in range(len(s)):
             for j in range(len(mu)):
-                xi_rmu[i, j] = data[counter, -1]
+                xi_smu[i, j] = data[counter, -1]
                 counter += 1
 
-        xi0 = np.zeros(len(r))
-        for i in range(len(r)):
-            xi0[i] = true_dmu[i] * np.sum(xi_rmu[i, :])
+        mono = np.zeros(xi_smu.shape[0])
+        for j in range(xi_smu.shape[0]):
+            mufunc = InterpolatedUnivariateSpline(true_mu, xi_smu[j, :], k=3)
+            mono[j] = quad(lambda x: mufunc(x), 0, 1, full_output=1)[0]
 
-        xi0 /= true_mu_hi[-1] - true_mu_lo[0]
+        delta_r = InterpolatedUnivariateSpline(true_s, mono, k=3)
 
-        xi_av = np.zeros(len(r))
-        for i in range(len(r)):
-            xi_av[i] = 1./(true_r[i]+true_dr[i]/2)**3 *\
-                          (np.sum(xi0[:i+1]*((true_r[:i+1]+true_dr[i]/2)**3
-                           - (true_r[:i+1] - true_dr[i]/2)**3)))
-            
-        return true_r, xi_av
+        Delta_r = np.zeros(xi_smu.shape[0])
+        for i in range(len(true_s)):
+            integral = quad(lambda x: delta_r(x) * x ** 2, 0, true_s[i], full_output=1)[0]
+            Delta_r[i] = (3 / true_s[i]**3) * integral
+
+        return true_s, Delta_r
 
     def getMonopole(self, epsilon=1):
         monopole = []

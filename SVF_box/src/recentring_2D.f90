@@ -194,7 +194,7 @@ PROGRAM recentering
         do ix = ipx - ndif, ipx + ndif, 1
           do iy = ipy - ndif, ipy + ndif, 1
 
-            if (sqrt(real((ix-ipx)**2 +(iy-ipy)**2+(iz-ipz)**2)).gt.ndif+1) cycle
+            if (sqrt(real((ix-ipx)**2 +(iy-ipy)**2)).gt.ndif+1) cycle
 
             ix2 = ix
             iy2 = iy
