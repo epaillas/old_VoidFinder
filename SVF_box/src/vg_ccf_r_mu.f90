@@ -115,7 +115,7 @@ do i = 1, nrbin
   rbin(i) = rbin_edges(i+1)-rwidth/2.
 end do
 
-mumin = 0
+mumin = -1
 mumax = 1
 
 muwidth = (mumax - mumin) / nmubin
@@ -232,7 +232,7 @@ do i = 1, nc ! For each void
             !com = (/ comx, comy, comz /)
             com = (/ 0, 0, 1 /)
 
-            mu = abs(dot_product(r, com) / (norm2(r) * norm2(com)))
+            mu = dot_product(r, com) / (norm2(r) * norm2(com))
             dis = norm2(r) / rv
 
             if (dis .lt. rmax) then
