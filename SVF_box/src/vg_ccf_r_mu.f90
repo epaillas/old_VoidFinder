@@ -236,8 +236,8 @@ do i = 1, nc ! For each void
             dis = norm2(r) / rv
 
             if (dis .lt. rmax) then
-              rind = int(dis / rwidth + 1)
-              muind = int(mu / muwidth + 1)
+              rind = int((dis - rmin) / rwidth + 1)
+              muind = int((mu - mumin) / muwidth + 1)
               VG(rind, muind) = VG(rind, muind) + 1
             end if
 
