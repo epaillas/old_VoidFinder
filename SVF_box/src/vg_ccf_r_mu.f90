@@ -109,7 +109,7 @@ allocate(xi(nrbin, nmubin))
 
 rwidth = (rmax - rmin) / nrbin
 do i = 1, nrbin + 1
-  rbin_edges(i) = rmin+(i-1)*(rmax-rwidth)/(nrbin-1.)
+  rbin_edges(i) = rmin+(i-1)*rwidth
 end do
 do i = 1, nrbin
   rbin(i) = rbin_edges(i+1)-rwidth/2.
@@ -120,7 +120,7 @@ mumax = 1
 
 muwidth = (mumax - mumin) / nmubin
 do i = 1, nmubin + 1
-  mubin_edges(i) = mumin+(i-1)*(mumax-muwidth)/(nmubin-1.)
+  mubin_edges(i) = mumin+(i-1)*muwidth
 end do
 do i = 1, nmubin
   mubin(i) = mubin_edges(i+1)-muwidth/2.
