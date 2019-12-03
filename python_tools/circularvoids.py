@@ -131,6 +131,7 @@ class CircularVoids:
             return False
 
     def remove_edge_voids(self, fname=''):
+        print('Removing edge voids...')
         if fname == '':
             fname = self.recentred_file
 
