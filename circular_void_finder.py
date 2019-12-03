@@ -23,7 +23,7 @@ def run_circular_voids(tracers, handle, is_box, ncores, steps, pos_cols,
                         rvoidmax, box_size, randoms, mask, boss_like,
                         zmin, zmax, omega_m, h, is_periodic):
     
-    voids = CircularlVoids(tracer_file=tracers, random_file=randoms, handle=handle,
+    voids = CircularVoids(tracer_file=tracers, random_file=randoms, handle=handle,
                            is_box=is_box, box_size=box_size, steps=steps,
                            ncores=ncores, boss_like=boss_like, mask_file=mask,
                            pos_cols=pos_cols, omega_m=omega_m, h=h,
