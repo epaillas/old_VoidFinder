@@ -11,6 +11,7 @@ from python_tools.circularvoids import CircularVoids
 @click.option('--pos_cols', type=str, default='0,1,2', help='Indices of columns where tracer positions are stored.')
 @click.option('--rvoidmax', type=float, default=50, help='Maximum void radius to search.')
 @click.option('--box_size', type=float, default=1024, help='[Periodic box] Size of the simulation box')
+@click.option('--delta_voids', type=float, default=0.2, help='Void density threshold.')
 @click.option('--randoms', type=str, default='', help='[Survey] File containing randoms.')
 @click.option('--mask', type=str, default='', help='[Survey] File containing mask of survey footprint.')
 @click.option('--boss_like', type=bool, default=False, help='[Survey] Is the data from BOSS/eBOSS?')
@@ -21,12 +22,12 @@ from python_tools.circularvoids import CircularVoids
 
 def run_circular_voids(tracers, handle, is_box, ncores, steps, pos_cols,
                         rvoidmax, box_size, randoms, mask, boss_like,
-                        zmin, zmax, omega_m, h, is_periodic):
+                        zmin, zmax, omega_m, h, is_periodic, delta_voids):
     
     voids = CircularVoids(tracer_file=tracers, random_file=randoms, handle=handle,
                            is_box=is_box, box_size=box_size, steps=steps,
                            ncores=ncores, boss_like=boss_like, mask_file=mask,
-                           pos_cols=pos_cols, omega_m=omega_m, h=h,
+                           pos_cols=pos_cols, omega_m=omega_m, h=h, delta_voids=delta_voids,
                            rvoidmax=rvoidmax, zmin=zmin, zmax=zmax, is_periodic=is_periodic)
 
 if __name__ == '__main__':
