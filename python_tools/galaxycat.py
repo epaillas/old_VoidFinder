@@ -9,7 +9,7 @@ class GalaxyCatalogue:
 
     def __init__(self, catalogue_file, is_box=True, box_size=1024.0, randoms=False, boss_like=False,
                 pos_cols=[0, 1, 2], omega_m=0.31, h=0.6777, verbose=True, zmin=0, zmax=10,
-                bin_write=True, output_file=None):
+                bin_write=True, output_file=None, has_velocity=False, vel_cols=[3, 4, 5]):
 
         self.is_box = is_box
 
@@ -57,6 +57,11 @@ class GalaxyCatalogue:
                 self.y = data[:, pos_cols[1]]
                 self.z = data[:, pos_cols[2]]
 
+                if has_velocity:
+                    self.vx = data[:, vel_cols[0]]
+                    self.vy = data[:, vel_cols[1]]
+                    self.vz = data[:, vel_cols[2]]
+
             else:
                 # position information is ra, dec and redshift
                 self.ra = data[:, pos_cols[0]]
@@ -73,6 +78,11 @@ class GalaxyCatalogue:
         self.y = self.y.reshape(len(self.y), 1)
         self.z = self.z.reshape(len(self.z), 1)
 
+        if has_velocity:
+            self.vx = self.vx.reshape(len(self.vx), 1)
+            self.vy = self.vy.reshape(len(self.vy), 1)
+            self.vz = self.vz.reshape(len(self.vz), 1)
+
         # redshift cut
         if not self.is_box:
             ind = (self.redshift >= zmin) & (self.redshift <= zmax)
@@ -84,7 +94,12 @@ class GalaxyCatalogue:
             self.redshift = self.redshift[ind]
 
         if bin_write:
-            cout = np.hstack([self.x, self.y, self.z])
+            if has_velocity:
+                cout = np.hstack([self.x, self.y, self.z,
+                                  self.vx, self.vy, self.vz])
+            else:
+                cout = np.hstack([self.x, self.y, self.z])
+                
             f = FortranFile(output_file, 'w')
             npoints = len(self.x)
             f.write_record(npoints)
