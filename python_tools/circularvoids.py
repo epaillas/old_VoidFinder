@@ -61,7 +61,7 @@ class CircularVoids:
                     self.mask = hp.read_map(self.mask_file, nest=False, verbose=False)
         else:
         # load tracers and find void centres
-            self.tracers = GalaxyCatalogue(catalogue_file=tracer_file, is_box=is_box,
+            self.tracers = ProjectedGalaxyCatalogue(catalogue_file=tracer_file, is_box=is_box,
             box_size=box_size, randoms=False, boss_like=boss_like, omega_m=omega_m,
             h=h, bin_write=True, output_file=self.tracer_unf, pos_cols=pos_cols,
             zmin=zmin, zmax=zmax)
@@ -70,7 +70,7 @@ class CircularVoids:
                 if random_file == '':
                     sys.exit('Random catalogue is missing. Aborting...')
                 else:
-                    self.randoms = GalaxyCatalogue(catalogue_file=random_file, is_box=self.is_box, 
+                    self.randoms = ProjectedGalaxyCatalogue(catalogue_file=random_file, is_box=self.is_box, 
                                                 randoms=True, boss_like=boss_like, omega_m=omega_m,
                                                 h=h, bin_write=True, output_file=self.random_unf,
                                                 pos_cols=pos_cols, zmin=zmin, zmax=zmax)
@@ -131,6 +131,7 @@ class CircularVoids:
             return False
 
     def remove_edge_voids(self, fname=''):
+        print('Removing edge voids...')
         if fname == '':
             fname = self.recentred_file
 
