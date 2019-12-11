@@ -9,7 +9,7 @@ class GalaxyCatalogue:
 
     def __init__(self, catalogue_file, is_box=True, box_size=1024.0, randoms=False, boss_like=False,
                 pos_cols=[0, 1, 2], omega_m=0.31, h=0.6777, verbose=True, zmin=0, zmax=10,
-                bin_write=True, output_file=None, has_velocity=False, vel_cols=[3, 4, 5]):
+                bin_write=True, output_file=None):
 
         self.is_box = is_box
 
@@ -57,7 +57,10 @@ class GalaxyCatalogue:
                 self.y = data[:, pos_cols[1]]
                 self.z = data[:, pos_cols[2]]
 
-                if has_velocity:
+                if np.shape(data)[1] > 3:
+                    print('Velocities included in data file...')
+                    has_velocity = True
+                    vel_cols=[pos_cols[0] + 3, pos_cols[1] + 3, pos_cols[2] + 3]
                     self.vx = data[:, vel_cols[0]]
                     self.vy = data[:, vel_cols[1]]
                     self.vz = data[:, vel_cols[2]]
@@ -99,7 +102,7 @@ class GalaxyCatalogue:
                                   self.vx, self.vy, self.vz])
             else:
                 cout = np.hstack([self.x, self.y, self.z])
-                
+
             f = FortranFile(output_file, 'w')
             npoints = len(self.x)
             f.write_record(npoints)
