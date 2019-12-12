@@ -7,7 +7,7 @@ MLIBS = -lm
 
 #################
 
-EXES = grow_spheres.exe recentring.exe overlapping.exe vg_ccf_monopole.exe vg_ccf_r_mu.exe
+EXES = grow_spheres.exe recentring.exe overlapping.exe vg_ccf_monopole.exe vg_ccf_r_mu.exe vg_LOS_vel_profile.exe
 
 all: $(EXES)
 
@@ -26,6 +26,9 @@ vg_ccf_monopole.exe: vg_ccf_monopole.o
 vg_ccf_r_mu.exe: vg_ccf_r_mu.o
 	$(MPIFC) vg_ccf_r_mu.o -o vg_ccf_r_mu.exe $(MLIBS)
 
+vg_LOS_vel_profile.exe: vg_LOS_vel_profile.o
+	$(MPIFC) vg_LOS_vel_profile.o -o vg_LOS_vel_profile.exe $(MLIBS)
+
 grow_spheres.o: grow_spheres.f90
 	$(MPIFC) -c grow_spheres.f90
 
@@ -41,6 +44,8 @@ vg_ccf_monopole.o: vg_ccf_monopole.f90
 vg_ccf_r_mu.o: vg_ccf_r_mu.f90
 	$(MPIFC) -c vg_ccf_r_mu.f90
 
+vg_LOS_vel_profile.o: vg_LOS_vel_profile.f90
+	$(MPIFC) -c vg_LOS_vel_profile.f90
 
 install: $(EXES)
 	mv $(EXES) ../bin
