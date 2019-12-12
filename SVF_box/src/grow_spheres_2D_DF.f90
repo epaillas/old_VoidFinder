@@ -34,6 +34,7 @@ contains
 
   end subroutine linked_list
 
+
   character(len=20) function str(k)
     implicit none
     integer*4, intent(in) :: k
@@ -64,10 +65,10 @@ PROGRAM grow_spheres
   integer*4, dimension(:,:), allocatable :: lirst
   integer*4, dimension(:), allocatable :: ll
 
-  real*8, allocatable, dimension(:,:)  :: pos_data, centres
+  real*8, allocatable, dimension(:,:)  :: kmap, centres
   real*8, dimension(nrbin) :: rbin, cum_rbin
 
-  character(len=500) :: input_tracers, input_centres, output_voids
+  character(len=500) :: input_map, input_centres, output_voids
   character(len=10) :: box_char, rvoidmax_char, delta_char, ngrid_char
   character(len=1)  :: creturn = achar(13)
 
@@ -79,7 +80,7 @@ PROGRAM grow_spheres
   if (iargc() .ne. 7) then
     if (id == 0) write(*,*) 'grow_spheres.exe: some parameters are missing.'
     if (id == 0) write(*,*) ''
-    if (id == 0) write(*,*) '1) input_tracers'
+    if (id == 0) write(*,*) '1) input_map'
     if (id == 0) write(*,*) '2) input_centres'
     if (id == 0) write(*,*) '3) output_voids'
     if (id == 0) write(*,*) '4) boxsize'
@@ -89,7 +90,7 @@ PROGRAM grow_spheres
     stop
   end if
 
-  call getarg(1, input_tracers)
+  call getarg(1, input_map)
   call getarg(2, input_centres)
   call getarg(3, output_voids)
   call getarg(4, box_char)
@@ -104,11 +105,11 @@ PROGRAM grow_spheres
 
 
   if (id == 0) write(*,*) '-----------------------'
-  if (id == 0) write(*,*) 'Running grow_spheres.exe'
+  if (id == 0) write(*,*) 'Running grow_spheres_DF.exe'
   if (id == 0) write(*,*) 'Input parameters:'
   if (id == 0) write(*,*) ''
   if (id == 0) write(*,*) 'mpi_processes: ', process_num
-  if (id == 0) write(*,*) 'input_tracers: ', trim(input_tracers)
+  if (id == 0) write(*,*) 'input_map: ', trim(input_map)
   if (id == 0) write(*,*) 'input_centres: ', trim(input_centres)
   if (id == 0) write(*,*) 'output_voids: ', trim(output_voids)
   if (id == 0) write(*,*) 'boxsize: ', trim(box_char), ' Mpc/h'
@@ -120,14 +121,28 @@ PROGRAM grow_spheres
     output_voids = trim(output_voids) // '.' // trim(str(id))
   end if
 
-  open(10, file=input_tracers, status='old', form='unformatted')
-  read(10) ng
-  allocate(pos_data(2, ng))
-  read(10) pos_data
-  close(10)
-  if (id == 0) write(*,*) 'ntracers: ', ng
-  if (id == 0) write(*,*) 'xmin, xmax: ', minval(pos_data(1,:)), maxval(pos_data(1,:))
-  
+  open(10, file=input_map, status='old')
+  ng = 0
+  do
+    read(10, *, end=10)
+    ng = ng + 1
+  end do
+  10 rewind(10)
+
+  allocate(kmap(ng))
+  read(10, *) kmap
+
+  open(11, file=input_centres, status='old')
+  nc = 0
+  do
+    read(11, *, end=11)
+    nc = nc + 1
+  end do
+  11 rewind(11)
+  if (id == 0) write(*,*) 'n_centres: ', nc
+  if (id == 0) write(*,*) ''
+
+    
   open(11, file=input_centres, status='old', form='unformatted')
   read(11) nc
   allocate(centres(2, nc))

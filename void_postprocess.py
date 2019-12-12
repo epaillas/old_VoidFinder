@@ -19,6 +19,7 @@ def postprocess_voids(voids, tracers, randoms, handle, is_box,
                         ncores=ncores, boss_like=boss_like, pos_cols=pos_cols)
 
     voids.VoidGalaxyCCF(kind='r-mu')
+    voids.VoidGalaxyCCF(kind='los_velocity')
 
 
 if __name__ == '__main__':

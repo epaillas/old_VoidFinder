@@ -57,7 +57,8 @@ class VoidStatistics:
         fmt = 2*'%10.3f '
         np.savetxt(fout, cout, fmt=fmt)
 
-    
+
+   
     def VoidGalaxyCCF(self, kind='monopole'):
         if kind == 'monopole':
             self._2PCF_monopole()
@@ -65,6 +66,8 @@ class VoidStatistics:
             self._2PCF_r_mu()
         elif kind == 'sigma-pi':
             self._2PCF_sigma_pi()
+        elif kind == 'los_velocity':
+            self._2PCF_los_velocity()
         else:
             sys.exit('Correlation kind not recognized. Aborting...')
 
@@ -139,6 +142,46 @@ class VoidStatistics:
         log = open(logfile, "w+")
         subprocess.call(cmd, stdout=log, stderr=log)
 
+    def _2PCF_r_mu(self):
+        '''
+        Computes the void-galaxy cross-correlation
+        function in bins of r and mu.
+        '''
+
+        fout = self.handle + '.VG_CCF_rmu'
+
+        if self.is_box:
+            binpath = sys.path[0] + '/SVF_box/bin/'
+            cmd = [binpath + 'vg_ccf_r_mu.exe',
+                   self.tracer_file,
+                   self.void_file,
+                   fout,
+                   str(self.box_size),
+                   str(self.dmin),
+                   str(self.dmax),
+                   str(self.nbins),
+                   str(self.min_rvoid),
+                   str(self.max_rvoid),
+                   str(self.ngrid)]
+        else:
+            binpath = sys.path[0] + '/SVF_survey/bin/'
+            cmd = [binpath + 'vg_ccf_r_mu.exe',
+                   self.tracer_file,
+                   self.random_file,
+                   self.void_file,
+                   fout,
+                   str(self.dmin),
+                   str(self.dmax),
+                   str(self.nbins),
+                   str(self.gridmin),
+                   str(self.gridmax),
+                   str(self.min_rvoid),
+                   str(self.max_rvoid)]
+
+        logfile = self.handle + '_vg_ccf_rmu.log'
+        log = open(logfile, "w+")
+        subprocess.call(cmd, stdout=log, stderr=log)
+
 
     def _2PCF_sigma_pi(self):
         '''
@@ -166,6 +209,34 @@ class VoidStatistics:
                    str(self.max_rvoid)]
 
         logfile = self.handle + '_vg_ccf_spi.log'
+        log = open(logfile, "w+")
+        subprocess.call(cmd, stdout=log, stderr=log)
+
+    def _2PCF_los_velocity(self):
+        '''
+        Computes the void-galaxy cross-correlation
+        function in bins of r and mu.
+        '''
+
+        fout = self.handle + '.VG_CCF_losvel'
+
+        if self.is_box:
+            binpath = sys.path[0] + '/SVF_box/bin/'
+            cmd = [binpath + 'vg_ccf_los_velocity.exe',
+                   self.tracer_file,
+                   self.void_file,
+                   fout,
+                   str(self.box_size),
+                   str(self.dmin),
+                   str(self.dmax),
+                   str(self.nbins),
+                   str(self.min_rvoid),
+                   str(self.max_rvoid),
+                   str(self.ngrid)]
+        else:
+            sys.exit('Not implemented...')
+
+        logfile = self.handle + '_vg_ccf_losvel.log'
         log = open(logfile, "w+")
         subprocess.call(cmd, stdout=log, stderr=log)
 
