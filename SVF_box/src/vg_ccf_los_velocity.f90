@@ -240,7 +240,7 @@ program vg_ccf_r_mu
     do i = 1, nrbin
       mean_vel(i) = sum(VG(:, i)) / counter(i)
       write(*,*) i, 'ok'
-      std_vel(i) = sqrt(sum((VG(:, i) - mean_vel)**2) / (counter(i) - 1))
+      std_vel(i) = sqrt(sum((VG(:, i) - mean_vel(i))**2) / (counter(i) - 1))
     end do
     
     write(*,*) ''
