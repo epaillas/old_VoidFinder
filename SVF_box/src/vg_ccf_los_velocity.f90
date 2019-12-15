@@ -101,6 +101,7 @@ program vg_ccf_r_mu
     allocate(rbin(nrbin))
     allocate(rbin_edges(nrbin+1))
     allocate(VG(ng, nrbin))
+    allocate(mean_vel(nrbin))
     allocate(std_vel(nrbin))
     allocate(counter(nrbin))
     
