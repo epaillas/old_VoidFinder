@@ -13,7 +13,8 @@ from python_tools.voidstatistics import VoidStatistics
 @click.option('--pos_cols', type=str, default='1,2,3', help='Indices of columns where tracer positions are stored.')
 @click.option('--velocity', type=bool, default=False, help='Include velocity statistics?')
 def postprocess_voids(voids, tracers, randoms, handle, is_box,
-                      ncores, box_size, boss_like, pos_cols):
+                      ncores, box_size, boss_like, pos_cols,
+                      velocity):
 
     voids = VoidStatistics(void_file=voids, tracer_file=tracers, random_file=randoms,
                         handle=handle, is_box=is_box, box_size=box_size,
