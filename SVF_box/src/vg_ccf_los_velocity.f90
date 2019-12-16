@@ -252,7 +252,7 @@ program vg_ccf_r_mu
     
     open(12, file=output_den, status='unknown')
     do i = 1, nrbin
-      write(12, fmt='(5f10.5)') rbin(i), rbin_edges(i), rbin_edges(i + 1),&
+      write(12, fmt='(5f15.5)') rbin(i), rbin_edges(i), rbin_edges(i + 1),&
       & mean_vel(i), std_vel(i)
     end do
     
