@@ -197,7 +197,7 @@ program vg_ccf_r_mu
                 disz = pos_data(3, ii) - zvc
 
                 velx = pos_data(4, ii)
-                vely = pos_data(5, ii)sqrt(sum((VG(:, i) - mean_vel(i))**2) / (counter(i) - 1))
+                vely = pos_data(5, ii)
                 velz = pos_data(6, ii)
     
                 comx = (xvc + pos_data(1, ii)) / 2
