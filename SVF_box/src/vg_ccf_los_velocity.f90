@@ -168,7 +168,8 @@ program vg_ccf_r_mu
       ipy = int((yvc) / rgrid + 1.)
       ipz = int((zvc) / rgrid + 1.)
     
-      ndif = int((rmax * rv / rgrid + 1.))
+      !ndif = int((rmax * rv / rgrid + 1.))
+      ndif = int(rmax / rgrid + 1.)
     
       do ix = ipx - ndif, ipx + ndif
         do iy = ipy - ndif, ipy + ndif
@@ -221,7 +222,7 @@ program vg_ccf_r_mu
                 v = (/ velx, vely, velz /)
                 com = (/ 0, 0, 1 /) ! assumes z-axis to be LOS
     
-                dis = norm2(r) / rv
+                dis = norm2(r)! / rv
                 los_vel = dot_product(v, com)
     
                 if (dis .lt. rmax) then
