@@ -225,7 +225,7 @@ program vg_ccf_r_mu
                 dis = norm2(r)! / rv
                 los_vel = dot_product(v, com)
     
-                if (dis .lt. rmax) then
+                if (dis .gt. rmin .and. dis .lt. rmax) then
                   rind = int((dis - rmin) / rwidth + 1)
                   counter(rind) = counter(rind) + 1
                   VG(counter(rind), rind) = los_vel
