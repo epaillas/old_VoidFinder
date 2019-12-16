@@ -224,7 +224,7 @@ program vg_ccf_r_mu
                 com = (/ 0, 0, 1 /) ! assumes z-axis to be LOS
     
                 dis = norm2(r)! / rv
-                los_vel = dot_product(v, com)
+                los_vel = velz!dot_product(v, com)
     
                 if (dis .gt. rmin .and. dis .lt. rmax) then
                   rind = int((dis - rmin) / rwidth + 1)
