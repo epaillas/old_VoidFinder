@@ -244,7 +244,7 @@ program vg_ccf_r_mu
 
     do i = 1, nrbin
       mean_vel(i) = vel(i) / counter(i)
-      std_vel(i) = (vel2(i) - (vel(i) ** 2 / counter(i))) / (counter(i) - 1)
+      std_vel(i) = sqrt((vel2(i) - (vel(i) ** 2 / counter(i))) / (counter(i) - 1))
     end do
     
     write(*,*) ''
