@@ -16,7 +16,7 @@ class VoidStatistics:
     def __init__(self, void_file, tracer_file, is_box=True, random_file=None,
                  boss_like=False, pos_cols='0,1,2', box_size=1024.0,
                  omega_m=0.31, h=0.6777, verbose=False, handle=None,
-                 ncores=1):
+                 ncores=1, nrbins=60):
 
         self.void_file = void_file
         self.tracer_file = tracer_file
@@ -30,7 +30,7 @@ class VoidStatistics:
         self.ngrid = 100
         self.dmin = 0
         self.dmax = 3
-        self.nbins = 60
+        self.nrbins = nrbins
         self.min_rvoid = 0
         self.max_rvoid = 200
 
@@ -88,7 +88,7 @@ class VoidStatistics:
                    self.void_file,
                    fout,
                    str(self.box_size),
-                   str(self.nbins),
+                   str(self.nrbins),
                    str(self.dmin),
                    str(self.dmax),
                    ]
@@ -119,7 +119,7 @@ class VoidStatistics:
                    str(self.box_size),
                    str(self.dmin),
                    str(self.dmax),
-                   str(self.nbins),
+                   str(self.nrbins),
                    str(self.min_rvoid),
                    str(self.max_rvoid),
                    str(self.ngrid)]
@@ -132,7 +132,7 @@ class VoidStatistics:
                    fout,
                    str(self.dmin),
                    str(self.dmax),
-                   str(self.nbins),
+                   str(self.nrbins),
                    str(self.gridmin),
                    str(self.gridmax),
                    str(self.min_rvoid),
@@ -159,7 +159,7 @@ class VoidStatistics:
                    str(self.box_size),
                    str(self.dmin),
                    str(self.dmax),
-                   str(self.nbins),
+                   str(self.nrbins),
                    str(self.min_rvoid),
                    str(self.max_rvoid),
                    str(self.ngrid)]
@@ -172,7 +172,7 @@ class VoidStatistics:
                    fout,
                    str(self.dmin),
                    str(self.dmax),
-                   str(self.nbins),
+                   str(self.nrbins),
                    str(self.gridmin),
                    str(self.gridmax),
                    str(self.min_rvoid),
@@ -202,7 +202,7 @@ class VoidStatistics:
                    fout,
                    str(self.dmin),
                    str(self.dmax),
-                   str(self.nbins),
+                   str(self.nrbins),
                    str(self.gridmin),
                    str(self.gridmax),
                    str(self.min_rvoid),
@@ -229,7 +229,7 @@ class VoidStatistics:
                    str(self.box_size),
                    str(self.dmin),
                    str(self.dmax),
-                   str(self.nbins),
+                   str(self.nrbins),
                    str(self.min_rvoid),
                    str(self.max_rvoid),
                    str(self.ngrid)]
@@ -259,8 +259,8 @@ class VoidStatistics:
 
         minr = radius.min()
         maxr = radius.max()
-        nbins = 10
-        bins = np.logspace(np.log10(minr), np.log10(maxr), nbins)
+        nrbins = 10
+        bins = np.logspace(np.log10(minr), np.log10(maxr), nrbins)
         hist, bin_edges = np.histogram(radius, bins=bins)
        
         if self.is_box:

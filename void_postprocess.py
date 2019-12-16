@@ -12,12 +12,13 @@ from python_tools.voidstatistics import VoidStatistics
 @click.option('--box_size', type=float, default=1024, help='Size of the simulation box (only used if is_box is True)')
 @click.option('--pos_cols', type=str, default='1,2,3', help='Indices of columns where tracer positions are stored.')
 @click.option('--velocity', type=bool, default=False, help='Include velocity statistics?')
+@click.option('--nrbins', type=int, default=60, help='Number of radial bins')
 def postprocess_voids(voids, tracers, randoms, handle, is_box,
                       ncores, box_size, boss_like, pos_cols,
-                      velocity):
+                      velocity, nrbins):
 
     voids = VoidStatistics(void_file=voids, tracer_file=tracers, random_file=randoms,
-                        handle=handle, is_box=is_box, box_size=box_size,
+                        handle=handle, is_box=is_box, box_size=box_size, nrbins=nrbins,
                         ncores=ncores, boss_like=boss_like, pos_cols=pos_cols)
 
     voids.VoidGalaxyCCF(kind='r-mu')
