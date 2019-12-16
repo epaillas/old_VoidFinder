@@ -255,8 +255,10 @@ program vg_ccf_r_mu
       & mean_vel(i), std_vel(i)
     end do
     
-    close(11)
-    close(12)
+    stop
+
+    !close(11)
+    !close(12)
     
     end program vg_ccf_r_mu
     
