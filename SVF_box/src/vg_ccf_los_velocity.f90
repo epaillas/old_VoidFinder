@@ -162,7 +162,10 @@ program vg_ccf_r_mu
         write(*,*) 'Center', i, 'of', nc
       end if
 
-      if (rv .lt. min_rv .or. rv .gt. max_rv) cycle
+      if (rv .lt. min_rv .or. rv .gt. max_rv) then
+        print*, 'condition met'
+        cycle
+      end if
 
       ipx = int((xvc) / rgrid + 1.)
       ipy = int((yvc) / rgrid + 1.)
