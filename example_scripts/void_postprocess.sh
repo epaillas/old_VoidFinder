@@ -8,10 +8,14 @@ is_box=True
 ncores=1
 pos_cols='0,1,2'
 nrbins=30
+rvoid_min=30
+rvoid_max=300
+dmin=0
+dmax=3
 
 #-------- Periodic box settings --------
-box_size=1000
-velocity=False
+box_size=1500
+velocity=True
 
 #### Survey settings ####
 randoms=$HOME/randoms.unf
@@ -29,4 +33,9 @@ python $HOME/code/void_finder/void_postprocess.py \
 --randoms "$randoms" \
 --boss_like "$boss_like" \
 --velocity "$velocity" \
---nrbins "$nrbins"
+--nrbins "$nrbins" \
+--rvoid_min "$rvoid_min" \
+--rvoid_max "$rvoid_max" \
+--dmin "$dmin" \
+--dmax "$dmax"
+
