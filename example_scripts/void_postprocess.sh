@@ -7,9 +7,11 @@ handle=$HOME/tracers
 is_box=True
 ncores=1
 pos_cols='0,1,2'
+nrbins=30
 
 #-------- Periodic box settings --------
 box_size=1000
+velocity=False
 
 #### Survey settings ####
 randoms=$HOME/randoms.unf
@@ -26,3 +28,5 @@ python $HOME/code/void_finder/void_postprocess.py \
 --box_size "$box_size" \
 --randoms "$randoms" \
 --boss_like "$boss_like" \
+--velocity "$velocity" \
+--nrbins "$nrbins"

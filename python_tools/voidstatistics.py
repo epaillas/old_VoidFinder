@@ -16,7 +16,8 @@ class VoidStatistics:
     def __init__(self, void_file, tracer_file, is_box=True, random_file=None,
                  boss_like=False, pos_cols='0,1,2', box_size=1024.0,
                  omega_m=0.31, h=0.6777, verbose=False, handle=None,
-                 ncores=1, nrbins=60):
+                 ncores=1, nrbins=60, rvoid_min=0, rvoid_max=300,
+                 dmin=0, dmax=3, gridmin=-5000, gridmax=5000, ngrid=100):
 
         self.void_file = void_file
         self.tracer_file = tracer_file
@@ -25,14 +26,14 @@ class VoidStatistics:
         self.ncores = ncores
         self.is_box = is_box
         self.box_size = box_size
-        self.gridmin = -5000
-        self.gridmax = 5000
-        self.ngrid = 100
-        self.dmin = 0
-        self.dmax = 3
+        self.gridmin = gridmin
+        self.gridmax = gridmax
+        self.ngrid = ngrid
+        self.dmin = dmin
+        self.dmax = dmax
         self.nrbins = nrbins
-        self.min_rvoid = 0
-        self.max_rvoid = 200
+        self.rvoid_min = rvoid_min
+        self.rvoid_max = rvoid_max
 
         # set cosmology
         self.omega_m = omega_m
@@ -120,8 +121,8 @@ class VoidStatistics:
                    str(self.dmin),
                    str(self.dmax),
                    str(self.nrbins),
-                   str(self.min_rvoid),
-                   str(self.max_rvoid),
+                   str(self.rvoid_min),
+                   str(self.rvoid_max),
                    str(self.ngrid)]
         else:
             binpath = sys.path[0] + '/SVF_survey/bin/'
@@ -135,8 +136,8 @@ class VoidStatistics:
                    str(self.nrbins),
                    str(self.gridmin),
                    str(self.gridmax),
-                   str(self.min_rvoid),
-                   str(self.max_rvoid)]
+                   str(self.rvoid_min),
+                   str(self.rvoid_max)]
 
         logfile = self.handle + '_vg_ccf_rmu.log'
         log = open(logfile, "w+")
@@ -160,8 +161,8 @@ class VoidStatistics:
                    str(self.dmin),
                    str(self.dmax),
                    str(self.nrbins),
-                   str(self.min_rvoid),
-                   str(self.max_rvoid),
+                   str(self.rvoid_min),
+                   str(self.rvoid_max),
                    str(self.ngrid)]
         else:
             binpath = sys.path[0] + '/SVF_survey/bin/'
@@ -175,8 +176,8 @@ class VoidStatistics:
                    str(self.nrbins),
                    str(self.gridmin),
                    str(self.gridmax),
-                   str(self.min_rvoid),
-                   str(self.max_rvoid)]
+                   str(self.rvoid_min),
+                   str(self.rvoid_max)]
 
         logfile = self.handle + '_vg_ccf_rmu.log'
         log = open(logfile, "w+")
@@ -205,8 +206,8 @@ class VoidStatistics:
                    str(self.nrbins),
                    str(self.gridmin),
                    str(self.gridmax),
-                   str(self.min_rvoid),
-                   str(self.max_rvoid)]
+                   str(self.rvoid_min),
+                   str(self.rvoid_max)]
 
         logfile = self.handle + '_vg_ccf_spi.log'
         log = open(logfile, "w+")
@@ -230,8 +231,8 @@ class VoidStatistics:
                    str(self.dmin),
                    str(self.dmax),
                    str(self.nrbins),
-                   str(self.min_rvoid),
-                   str(self.max_rvoid),
+                   str(self.rvoid_min),
+                   str(self.rvoid_max),
                    str(self.ngrid)]
         else:
             sys.exit('Not implemented...')
