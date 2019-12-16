@@ -22,8 +22,7 @@ program vg_ccf_r_mu
     
     real(dp), dimension(3) :: com, r, v
     real(dp), allocatable, dimension(:,:)  :: pos_data
-    real(dp), dimension(:), allocatable :: rbin, rbin_edges, std_vel, mean_vel
-    real(dp), dimension(:,:), allocatable :: VG
+    real(dp), dimension(:), allocatable :: rbin, rbin_edges, vel, vel2, std_vel, mean_vel
     
     character(20), external :: str
     character(len=500) :: input_tracers, input_centres, output_den
@@ -100,7 +99,8 @@ program vg_ccf_r_mu
     
     allocate(rbin(nrbin))
     allocate(rbin_edges(nrbin+1))
-    allocate(VG(ng * 10, nrbin))
+    allocate(vel(nrbin))
+    allocate(vel2(nrbin))
     allocate(mean_vel(nrbin))
     allocate(std_vel(nrbin))
     allocate(counter(nrbin))
@@ -152,7 +152,8 @@ program vg_ccf_r_mu
     write(*,*) ''
     write(*,*) 'Starting loop over voids...'
     
-    VG = 0
+    vel = 0
+    vel2 = 0
     counter = 0
 
     do i = 1, nc
@@ -227,8 +228,9 @@ program vg_ccf_r_mu
     
                 if (dis .gt. rmin .and. dis .lt. rmax) then
                   rind = int((dis - rmin) / rwidth + 1)
+                  vel(rind) = vel(rind) + los_vel
+                  vel2(rind) = vel2(rind) + los_vel ** 2
                   counter(rind) = counter(rind) + 1
-                  VG(counter(rind), rind) = los_vel
                 end if
     
                 if(ii.eq.lirst(ix2,iy2,iz2)) exit
@@ -240,11 +242,9 @@ program vg_ccf_r_mu
       end do
     end do
 
-    print*, counter(rind)
-
     do i = 1, nrbin
-      mean_vel(i) = sum(VG(:, i)) / counter(i)
-      std_vel(i) = sqrt(sum((VG(:, i) - mean_vel(i))**2) / (counter(i) - 1))
+      mean_vel(i) = vel(i) / counter(i)
+      std_vel(i) = (vel2 - (vel ** 2 / counter(i))) / (counter(i) - 1)
     end do
     
     write(*,*) ''
