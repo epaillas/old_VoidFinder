@@ -133,6 +133,7 @@ PROGRAM recentering
   allocate(pos_data(ncols, nrows))
   read(10) pos_data
   close(10)
+  ng = nrows
   if (id == 0) write(*,*) 'ntracers: ', ng
 
   open(11, file=input_centres, status='old')
