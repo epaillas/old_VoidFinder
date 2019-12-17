@@ -385,8 +385,9 @@ class SphericalVoids:
 
         if bin_write:
             f = FortranFile(self.centres_file, 'w')
-            npoints = len(cout)
-            f.write_record(npoints)
+            nrows, ncols = np.shape(cout)
+            f.write_record(nrows)
+            f.write_record(ncols)
             f.write_record(cout)
             f.close()
         else:

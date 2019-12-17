@@ -104,8 +104,9 @@ class GalaxyCatalogue:
                 cout = np.hstack([self.x, self.y, self.z])
 
             f = FortranFile(output_file, 'w')
-            npoints = len(self.x)
-            f.write_record(npoints)
+            nrows, ncols = np.shape(cout)
+            f.write_record(nrows)
+            f.write_record(ncols)
             f.write_record(cout)
             f.close()
 
@@ -186,7 +187,8 @@ class ProjectedGalaxyCatalogue:
         if bin_write:
             cout = np.hstack([self.x, self.y])
             f = FortranFile(output_file, 'w')
-            npoints = len(self.x)
-            f.write_record(npoints)
+            nrows, ncols = np.shape(cout)
+            f.write_record(nrows)
+            f.write_record(ncols)
             f.write_record(cout)
             f.close()

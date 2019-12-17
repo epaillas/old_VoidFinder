@@ -10,7 +10,7 @@ program vg_ccf_r_mu
     real(dp) :: rwidth, muwidth, rmax, rmin, mumax, mumin
     real(dp) :: pi = 4.*atan(1.)
     
-    integer*4 :: ng, nr, nc, nrbin, rind, muind
+    integer*4 :: ng, nr, nc, nrbin, rind, muind, nrows, ncols
     integer*4 :: id, iargc
     integer*4 :: i, j, ii, jj, ix, iy, iz, ix2, iy2, iz2
     integer*4 :: indx, indy, indz
@@ -82,8 +82,9 @@ program vg_ccf_r_mu
       write(*,*) ''
     
       open(10, file=input_tracers, status='old', form='unformatted')
-      read(10) ng
-      allocate(pos_data(6, ng))
+      read(10) nrows
+      read(10) ncols
+      allocate(pos_data(ncols, nrows))
       read(10) pos_data
       close(10)
       if (id == 0) write(*,*) 'ntracers: ', ng
@@ -224,7 +225,7 @@ program vg_ccf_r_mu
                 com = (/ 0, 0, 1 /) ! assumes z-axis to be LOS
     
                 dis = norm2(r)! / rv
-                los_vel = velz!dot_product(v, com)
+                los_vel = dot_product(v, com)
     
                 if (dis .gt. rmin .and. dis .lt. rmax) then
                   rind = int((dis - rmin) / rwidth + 1)

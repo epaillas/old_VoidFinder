@@ -60,7 +60,7 @@ PROGRAM recentering
   real*8 :: rnd_px, rnd_py, rnd_pz, rnd_ng, rnd_nden
   real*8 :: pi = 4.*atan(1.)
 
-  integer :: ng, nc, nv, rind, stuck
+  integer :: ng, nc, nv, rind, stuck, nrows, ncols
   integer :: id, ierr, process_num, iargc, filenumber
   integer :: i, j, k, ii, ix, iy, iz, ix2, iy2, iz2
   integer :: ipx, ipy, ipz, ndif, ngrid
@@ -128,8 +128,9 @@ PROGRAM recentering
   end if
 
   open(10, file=input_tracers, status='old', form='unformatted')
-  read(10) ng
-  allocate(pos_data(3, ng))
+  read(10) nrows
+  read(10) ncols
+  allocate(pos_data(ncols, nrows))
   read(10) pos_data
   close(10)
   if (id == 0) write(*,*) 'ntracers: ', ng
