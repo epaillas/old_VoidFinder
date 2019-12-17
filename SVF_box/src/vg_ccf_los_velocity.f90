@@ -87,7 +87,7 @@ program vg_ccf_r_mu
       allocate(pos_data(ncols, nrows))
       read(10) pos_data
       close(10)
-      ng = rows
+      ng = nrows
       if (id == 0) write(*,*) 'ntracers: ', ng
     
     nc = 0
