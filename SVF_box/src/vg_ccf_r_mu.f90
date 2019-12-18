@@ -253,8 +253,8 @@ do i = 1, nc ! For each void
 
   do ii = 1, nrbin
     do jj = 1, nmubin
-        vol = 4./3 * pi * ((rv * (rbin(ii) + rwidth/2.)) ** 3 - &
-        & (rv * (rbin(ii) - rwidth/2.)) ** 3) / (nmubin)
+        vol = 4./3 * pi * ((rbin(ii) + rwidth/2.) ** 3 - &
+        & (rbin(ii) - rwidth/2.) ** 3) / (nmubin)
 
         VR(ii, jj) = VR(ii, jj) + rhomed * vol
     end do
