@@ -13,7 +13,7 @@ real(dp) :: pi = 4.*atan(1.)
 integer*4 :: ng, nr, nc, nrbin, nmubin, rind, muind
 integer*4 :: id, iargc
 integer*4 :: i, j, ii, jj, ix, iy, iz, ix2, iy2, iz2
-integer*4 :: indx, indy, indz
+integer*4 :: indx, indy, indz, nrows, ncols
 integer*4 :: ipx, ipy, ipz, ndif
 integer*4 :: ngrid
 
@@ -83,10 +83,12 @@ if (iargc() .ne. 10) then
   write(*,*) ''
 
   open(10, file=input_tracers, status='old', form='unformatted')
-  read(10) ng
-  allocate(pos_data(3, ng))
+  read(10) nrows
+  read(10) ncols
+  allocate(pos_data(ncols, nrows))
   read(10) pos_data
   close(10)
+  ng = nrows
   if (id == 0) write(*,*) 'ntracers: ', ng
 
 nc = 0
@@ -129,7 +131,6 @@ end do
 
 ! Mean density inside the box
 rhomed = ng / (boxsize ** 3)
-!rhomed = 5e7 / (boxsize**3)
 
 ! Construct linked list for tracers
 write(*,*) ''
@@ -184,7 +185,8 @@ do i = 1, nc ! For each void
   ipy = int((yvc) / rgrid + 1.)
   ipz = int((zvc) / rgrid + 1.)
 
-  ndif = int((rmax * rv / rgrid + 1.))
+  !ndif = int((rmax * rv / rgrid + 1.))
+  ndif = int(rmax / rgrid + 1.)
 
   do ix = ipx - ndif, ipx + ndif
     do iy = ipy - ndif, ipy + ndif
@@ -233,7 +235,7 @@ do i = 1, nc ! For each void
             com = (/ 0, 0, 1 /)
 
             mu = dot_product(r, com) / (norm2(r) * norm2(com))
-            dis = norm2(r) / rv
+            dis = norm2(r)! / rv
 
             if (dis .lt. rmax) then
               rind = int((dis - rmin) / rwidth + 1)
