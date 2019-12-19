@@ -16,7 +16,7 @@ class VoidStatistics:
     def __init__(self, void_file, tracer_file, is_box=True, random_file=None,
                  boss_like=False, pos_cols='0,1,2', box_size=1024.0,
                  omega_m=0.31, h=0.6777, verbose=False, handle=None,
-                 ncores=1, nrbins=60, rvoid_min=0, rvoid_max=300,
+                 ncores=1, nrbins=60, rvoid_min=0, rvoid_max=500,
                  dmin=0, dmax=3, gridmin=-5000, gridmax=5000, ngrid=100):
 
         self.void_file = void_file
@@ -60,7 +60,14 @@ class VoidStatistics:
 
 
    
-    def VoidGalaxyCCF(self, kind='monopole'):
+    def VoidGalaxyCCF(self, kind='monopole', median_cut=False):
+
+        if median_cut:
+            data = np.genfromtxt(self.void_file)
+            rv = data[:,3]
+            self.rvoid_min = np.median(rv)
+            self.rvoid_max = 500
+
         if kind == 'monopole':
             self._2PCF_monopole()
         elif kind == 'r-mu':
@@ -103,7 +110,7 @@ class VoidStatistics:
 
         self._get_mean_monopole(fout)
 
-    def _2PCF_r_mu(self):
+    def _2PCF_r_mu(self, rv_low, rv_high):
         '''
         Computes the void-galaxy cross-correlation
         function in bins of r and mu.
