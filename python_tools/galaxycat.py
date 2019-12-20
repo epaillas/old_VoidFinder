@@ -9,7 +9,7 @@ class GalaxyCatalogue:
 
     def __init__(self, catalogue_file, is_box=True, box_size=1024.0, randoms=False, boss_like=False,
                 pos_cols=[0, 1, 2], omega_m=0.31, h=0.6777, verbose=True, zmin=0, zmax=10,
-                bin_write=True, output_file=None):
+                bin_write=True, output_file=None, has_velocity=False):
 
         self.is_box = is_box
 
