@@ -35,4 +35,4 @@ python $HOME/code/void_finder/void_finder.py \
 --mask "$mask" \
 --boss_like "$boss_like" \
 --zmin "$zmin" \
---zmax "$zmax" \
+--zmax "$zmax"

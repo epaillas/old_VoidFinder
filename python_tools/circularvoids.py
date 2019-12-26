@@ -181,115 +181,17 @@ class CircularVoids:
 
     def make_survey_mask(self):
         sys.exit('Not implemented!')
-        # '''
-        # Constructs a binary HEALPix mask
-        # of the survey footprint.
-        # 1 == inside survey
-        # 0 == outside survey
-        # '''
-        # npix = hp.nside2npix(self.nside)
-        # mask = np.zeros(npix)
-        # theta = np.radians(90 - self.randoms.dec)
-        # phi = np.radians(self.randoms.ra)
-        # ind = hp.pixelfunc.ang2pix(self.nside, theta, phi, nest=False)
-        # mask[ind] = 1
-        # self.mask_file = self.handle + '_mask_nside{}.fits'.format(self.nside)
-        # hp.write_map(self.mask_file, mask, overwrite=True)
-        # return mask
     
     def get_mask_borders(self):
         sys.exit('Not implemented!')
-        # '''
-        # Gets the boundary pixels from
-        # a HEALPix mask.
-        # 1 == inside boundary pixel
-        # 0 == outside boundary pixel
-        # '''
-        # npix = len(self.mask)
-        # nside = hp.npix2nside(npix)
-        # border = np.zeros(npix)
-        # ind = [i for i in range(npix)]
-        # neigh = hp.pixelfunc.get_all_neighbours(nside, ind, nest=False).T
-                
-        # for i in range(npix):
-        #     if self.mask[i] == 0:
-        #         count = 0
-        #         for j in range(8):
-        #             ind = neigh[i, j]
-        #             if self.mask[ind] == 1:
-        #                 count = count + 1
-        #         if 0 < count <= 8:
-        #             border[i] = 1
-        # return border
 
     def gen_random_sphere(self):
         sys.exit('Not implemented!')
-        # dra = 5
-        # ddec = 5
-        # dz = 0.05
-        # nden = 5e-4
-
-        # ralo = self.randoms.ra.min() - dra
-        # rahi = self.randoms.ra.max() + dra
-        # declo = self.randoms.dec.min() - ddec
-        # dechi = self.randoms.dec.max() + ddec
-        # zhi = self.zmax + dz
-        # zlo = self.zmin - dz
-
-        # rlo = self.cosmo.get_comoving_distance(zlo)
-        # rhi = self.cosmo.get_comoving_distance(zhi)
-
-        # vol = 4/3 * np.pi * (rhi**3)
-        # npoints = int(vol * nden)
-
-        # ralist = []
-        # declist = []
-        # rlist = []
-        # zlist = []
-
-        # for i in range(npoints):
-        #     ra = np.random.uniform(0, 2*np.pi)
-        #     cosdec = np.random.uniform(-1, 1)
-        #     dec = np.arccos(cosdec)
-        #     u = np.random.uniform(0, 1)
-        #     z = zhi * u ** (1/3)
-
-        #     if (ralo < ra < rahi) and (declo < dec < dechi) and (zlo < z < zhi):
-        #         r = self.cosmo.comoving_distance(z).value
-        #         ralist.append(ra)
-        #         declist.append(dec)
-        #         rlist.append(r)
-        #         zlist.append(z)
-
-        # ralist = np.asarray(ralist).reshape(len(ralist), 1)
-        # declist = np.asarray(declist).reshape(len(declist), 1)
-        # rlist = np.asarray(rlist).reshape(len(rlist), 1)
-        # zlist = np.asarray(zlist).reshape(len(zlist), 1)
-
-        # sphere = np.hstack([ralist, declist, rlist, zlist])
-
-        # return sphere
 
     def gen_guard_particles(self):
 
         sys.exit('Not implemented!')
      
-        # sphere = self.gen_random_sphere()
-        # border_pix = self.get_mask_borders()
-
-        # ind = hp.pixelfunc.ang2pix(self.nside, sphere[:,1], sphere[:,0], nest=False)
-        # angCap = sphere[border_pix[ind] == 1]
-        # redCap = sphere[self.mask[ind] == 1]
-
-        # dz = 0.005
-        # angCap = [i for i in angCap if (self.zmin < i[3] < self.zmax)]
-        # redCap = [i for i in redCap if (self.zmin - dz < i[3] < self.zmin) or (self.zmax < i[3] < self.zmax + dz)]
-        # angCap = np.asarray(angCap).reshape((len(angCap), 3))
-        # redCap = np.asarray(redCap).reshape((len(redCap), 3))
-
-        # return angCap, redCap
-
-    
     def get_circumcentres(self, radius_limit=1000, bin_write=True):
         '''
         Find the centre of the circumspheres
@@ -330,18 +232,6 @@ class CircularVoids:
 
         if not self.is_box:
             sys.exit('Not implemented!')
-            # Transform to sky coordinates
-            # cendis = np.sqrt(cenx ** 2 + ceny ** 2 + cenz ** 2)
-            # cenred = self.cosmo.get_redshift(cendis)
-            # cendec = np.arctan2(np.sqrt(cenx**2 + ceny**2), cenz)
-            # cenra = np.arctan2(ceny, cenx)
-
-            # # keep only those centres that are inside the survey
-            # ind = hp.pixelfunc.ang2pix(self.nside, cendec, cenra, nest=False)
-            # in_survey = (self.mask[ind] == 1) & (self.zmin < cenred) & (cenred < self.zmax)
-            # cenx = cenx[in_survey]
-            # ceny = ceny[in_survey]
-            # cenz = cenz[in_survey]
 
         else:
             # keep only those centres inside the box
@@ -384,8 +274,6 @@ class CircularVoids:
 
         if self.is_box == False and self.use_guards == True:
             sys.exit('Not implemented!')
-            # angCap, redCap = self.gen_guard_particles()
-            # points = np.vstack([points, angCap, redCap])
 
         # add periodic images if dealing with a box
         if self.is_box:
@@ -412,13 +300,7 @@ class CircularVoids:
                 str(self.delta_voids), str(self.rvoidmax), str(self.ngrid)]
         else:
             sys.exit('Not implemented!')
-            # binpath = sys.path[0] + '/SVF_survey/bin/'
-            # self.gridmin = -5000
-            # self.gridmax = 5000
-            # cmd = ['mpirun', '-np', str(ncores), binpath + 'grow_spheres.exe',
-            #     self.tracer_unf, self.random_unf, self.centres_file, self.voids_file,
-            #     str(self.delta_voids), str(self.rvoidmax), str(self.gridmin),
-            #     str(self.gridmax)]
+
         logfile = self.handle + '_grow_circles.log'
         log = open(logfile, "w+")
 
@@ -448,13 +330,7 @@ class CircularVoids:
                 str(self.ngrid)]
         else:
             sys.exit('Not implemented!')
-            # binpath = sys.path[0] + '/SVF_survey/bin/'
-            # self.gridmin = -5000
-            # self.gridmax = 5000
-            # cmd = ['mpirun', '-np', str(ncores), binpath + 'recentring.exe',
-            #     self.tracer_unf, self.random_unf, self.voids_file,
-            #     self.recentred_file, str(self.delta_voids), str(self.rvoidmax),
-            #     str(self.gridmin), str(self.gridmax)]
+
         logfile = self.handle + '_recentring.log'
         log = open(logfile, "w+")
 
@@ -498,11 +374,6 @@ class CircularVoids:
                    str(self.box_size), str(overlap), str(self.ngrid)]
         else:
             sys.exit('Not implemented!')
-            # binpath = sys.path[0] + '/SVF_survey/bin/'
-            # self.gridmin = -5000
-            # self.gridmax = 5000
-            # cmd = [binpath + 'overlapping.exe', self.recentred_file, self.filtered_file,
-            #        str(overlap), str(self.gridmin), str(self.gridmax)]
 
         logfile = self.handle + '_overlapping.log'
         log = open(logfile, "w+")
@@ -515,89 +386,11 @@ class CircularVoids:
 
     def filter_by_volume_fraction(self, threshold=0.95):
         sys.exit('Not implemented!')
-        # '''
-        # Filters voids by their volume fraction
-        # in the survey.
-        # '''
-        # print('Filtering voids by volume fraction...')
-        # voids = np.genfromtxt(self.recentred_file)
-        # volfrac = self.get_void_volume_fraction(fname=self.recentred_file)
-        # voids = voids[volfrac > threshold]
-
-        # self.recentred_file = self.recentred_file + '_vf{}'.format(str(threshold))
-        # fmt = 4*'%10.3f ' +  '%10i ' + '%10.3f '
-        # np.savetxt(self.recentred_file, voids, fmt=fmt)
-        
-        # return voids
 
 
     def get_void_volume_fraction(self, fname='', pos_cols=[0,1,2],
                                  radius_col=3):
         sys.exit('Not implemented!')
-        # '''
-        # Compute the fraction of the void
-        # that is contained within the survey
-        # footprint.
-        # '''
-        # if fname == '':
-        #     fname = self.recentred_file
-
-        # voids = np.genfromtxt(fname)
-
-        # volfrac = []
-        # for void in voids:
-
-        #     # Generate random points around each void
-        #     npoints = 1000
-        #     ra = np.random.uniform(0, 2*np.pi, npoints)
-        #     cosdec = np.random.uniform(-1, 1, npoints)
-        #     dec = np.arccos(cosdec)
-        #     _ = np.random.uniform(0, 1, npoints)
-        #     r = void[radius_col] * _ ** (1/3)
-
-        #     # shift points to the global coordinate system
-        #     x = r * np.sin(dec) * np.cos(ra) + void[pos_cols[0]]
-        #     y = r * np.sin(dec) * np.sin(ra) + void[pos_cols[1]]
-        #     z = r * np.cos(dec) + void[pos_cols[2]]
-
-        #     # switch to sky coordinates
-        #     dis = np.sqrt(x**2 + y**2 + z**2)
-        #     dec = np.arctan2(np.sqrt(x**2 + y**2), z)
-        #     ra = np.arctan2(y, x)
-        #     redshift = self.cosmo.get_redshift(dis)
-
-        #     # compute volume fraction
-        #     nin = 0
-        #     for i in range(npoints):
-        #         ind = hp.pixelfunc.ang2pix(self.nside, dec[i], ra[i], nest=False)
-        #         if self.mask[ind] == 1 and self.zmin < redshift[i] < self.zmax:
-        #             nin += 1
-
-        #     volfrac.append(nin / npoints)
-
-        # volfrac = np.asarray(volfrac)
-        # return volfrac
 
     def get_void_skycoords(self, fname=''):
         sys.exit('Not implemented!')
-        # if fname == '':
-        #     fname = self.filtered_file
-        # fout = self.filtered_file + '_sky'
-
-        # voids = np.genfromtxt(fname)
-
-        # x = voids[:,0]
-        # y = voids[:,1]
-        # z = voids[:,2]
-        # r = voids[:,3]
-        # nt = voids[:,4]
-        # nden = voids[:,5]
-
-        # dis = np.sqrt(x**2 + y**2 + z**2)
-        # dec = np.arctan2(np.sqrt(x**2 + y**2), z)
-        # ra = np.arctan2(y, x)
-        # redshift = self.cosmo.get_redshift(dis)
-
-        # cout = np.c_[np.degrees(ra), np.degrees(dec), redshift, r, nt, nden]
-        # fmt = 4*'%10.3f ' +  '%10i ' + '%10.3f '
-        # np.savetxt(fout, cout, fmt=fmt)
