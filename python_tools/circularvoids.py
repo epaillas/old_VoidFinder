@@ -53,6 +53,12 @@ class CircularVoids:
         self.h = h
         self.cosmo = Cosmology(omega_m=omega_m)
 
+        print('handle: ' + self.handle)
+        print('field_file: ' + self.field_file)
+        print('centres_file: ' + self.centres_file)
+        print('voids_file: ' + self.voids_file)
+        print('recentred_file: ' + self.recentred_file)
+
         if 1 not in steps:
             if not self.is_box:
                 if self.mask_file == '':
