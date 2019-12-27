@@ -173,7 +173,7 @@ PROGRAM grow_spheres
 
   open(11, file=input_centres, status='old', form='unformatted')
   read(11) nrows
-  ncols = 2 ! need to rerun centres
+  read(11) ncols
   allocate(centres(ncols, nrows))
   read(11) centres
   nc = nrows

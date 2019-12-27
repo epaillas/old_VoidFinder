@@ -55,7 +55,7 @@ PROGRAM grow_spheres
   real*8 :: rvoid, rwidth, rvoidmax
   real*8 :: pi = 4.*atan(1.)
 
-  integer*4 :: ng, nc, nv, rind
+  integer*4 :: ng, nc, nv, rind, nrows, ncols
   integer*4 :: id, ierr, process_num, iargc, filenumber
   integer*4 :: i, j, k, ii, ix, iy, ix2, iy2
   integer*4 :: ipx, ipy, ndif, ngrid
@@ -121,18 +121,22 @@ PROGRAM grow_spheres
   end if
 
   open(10, file=input_tracers, status='old', form='unformatted')
-  read(10) ng
-  allocate(pos_data(2, ng))
+  read(10) nrows
+  read(10) ncols
+  allocate(pos_data(ncols, nrows))
   read(10) pos_data
   close(10)
+  ng = nrows
   if (id == 0) write(*,*) 'ntracers: ', ng
   if (id == 0) write(*,*) 'xmin, xmax: ', minval(pos_data(1,:)), maxval(pos_data(1,:))
   
   open(11, file=input_centres, status='old', form='unformatted')
-  read(11) nc
-  allocate(centres(2, nc))
+  read(11) nrows
+  read(11) ncols
+  allocate(centres(ncols, nrows))
   read(11) centres
   close(11)
+  nc = nrows
   if (id == 0) write(*,*) 'ncentres: ', nc
   if (id == 0) write(*,*) 'xmin, xmax: ', minval(centres(1,:)), maxval(centres(1,:))
 
