@@ -162,7 +162,29 @@ class FieldVoids:
         Find better centres for an input
         void catalogue.
         '''
-        sys.exit('Not implemented!')
+        print('Recentring spheres...')
+
+        if self.is_box:
+            binpath = sys.path[0] + '/SVF_box/bin/'
+            self.ngrid = 100
+            cmd = ['mpirun', '-np', str(ncores), binpath + 'recentring_2D_DF.exe',
+                self.field_file, self.voids_file, self.recentred_file,
+                str(self.box_size), str(self.delta_voids), str(self.rvoidmax)]
+        else:
+            sys.exit('Not implemented!')
+
+        logfile = self.handle + '_recentring.log'
+        log = open(logfile, "w+")
+
+        subprocess.call(cmd, stdout=log, stderr=log)
+
+        if ncores > 1:
+            files = glob.glob(self.recentred_file + '.*')
+            self.concat_files(input_files=files, output_file=self.recentred_file)
+            subprocess.call(['rm'] + files)
+
+        voids = np.genfromtxt(self.recentred_file)
+        return voids
 
     def sort_circles(self, fname='', radius_col=2):
         '''

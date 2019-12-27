@@ -2,37 +2,75 @@ module procedures
   implicit none
 contains
 
-  subroutine linked_list(ngrid, rgrid, ll, lirst, pos_data)
-    implicit none
-    integer*4 :: i, ng, ipx, ipy
-    integer*4, intent(in) :: ngrid
-    real*8, intent(in) :: rgrid
-    real*8, dimension(:,:), intent(in) :: pos_data
-    integer*4, dimension(:,:), intent(out) :: lirst
-    integer*4, dimension(:), intent(out) :: ll
+subroutine hpsort_eps_epw (n, ra, ind, eps)
+  implicit none  
+  integer, intent(in)   :: n  
+  real*8, intent(in)  :: eps
+  integer :: ind (n)  
+  real*8 :: ra (n)
+  integer :: i, ir, j, l, iind  
+  real*8 :: rra  
 
-    ng = size(pos_data, dim=2)
-    lirst = 0
-    ll = 0
-    do i = 1, ng
-      ipx = int(pos_data(1, i) / rgrid + 1.)
-      ipy = int(pos_data(2, i) / rgrid + 1.)
-      if(ipx.gt.0.and.ipx.le.ngrid.and.ipy.gt.0.and.ipy.le.ngrid) then
-        lirst(ipx, ipy) = i
-      end if
-    end do
+  IF (ind (1) .eq.0) then  
+     DO i = 1, n  
+        ind (i) = i  
+     ENDDO
+  ENDIF
+  IF (n.lt.2) return  
+  l = n / 2 + 1  
+  ir = n  
 
-    do i = 1, ng
-      ipx = int(pos_data(1, i) / rgrid + 1.)
-      ipy = int(pos_data(2, i) / rgrid + 1.)
+  sorting: do 
+    IF ( l .gt. 1 ) then  
+       l    = l - 1  
+       rra  = ra (l)  
+       iind = ind (l)  
+    ELSE  
+       rra  = ra (ir)  
+       iind = ind (ir)  
+       ra (ir) = ra (1)  
+       ind (ir) = ind (1)  
+       ir = ir - 1  
+       IF ( ir .eq. 1 ) then  
+          ra (1)  = rra  
+          ind (1) = iind  
+          exit sorting  
+       ENDIF
+    ENDIF
+    i = l  
+    j = l + l  
+    DO while ( j .le. ir )  
+       IF ( j .lt. ir ) then  
+          IF ( hslt( ra (j),  ra (j + 1) ) ) then  
+             j = j + 1  
+          ENDIF
+       ENDIF
+       IF ( hslt( rra, ra (j) ) ) then  
+          ra (i) = ra (j)  
+          ind (i) = ind (j)  
+          i = j  
+          j = j + j  
+       ELSE
+          j = ir + 1  
+       ENDIF
+    ENDDO
+    ra (i) = rra  
+    ind (i) = iind  
 
-      if (ipx.gt.0.and.ipx.le.ngrid.and.ipy.gt.0.and.ipy.le.ngrid) then
-        ll(lirst(ipx, ipy)) = i
-        lirst(ipx, ipy) = i
-      endif
-    end do
+  END DO sorting    
+contains 
 
-  end subroutine linked_list
+  logical function hslt( a, b )
+    REAL*8 :: a, b
+    IF( abs(a-b) <  eps ) then
+      hslt = .false.
+    ELSE
+      hslt = ( a < b )
+    end if
+  end function hslt
+
+  !
+end subroutine hpsort_eps_epw
 
 
   character(len=20) function str(k)
@@ -52,17 +90,20 @@ PROGRAM grow_spheres
   implicit none
 
   real*8 :: boxsize, delta, rgrid, rho_mean, nden
-  real*8 :: px, py, disx, disy, dis
+  real*8 :: px, py, disx, disy, dis, quant, eps
   real*8 :: rvoid, rwidth, rvoidmax
   real*8 :: pi = 4.*atan(1.)
 
   integer*4 :: ng, nc, nv, rind, nrows, ncols
   integer*4 :: id, ierr, process_num, iargc, filenumber
   integer*4 :: i, j, k, ii, ix, iy, ix2, iy2
-  integer*4 :: ipx, ipy, ndif, ngrid
+  integer*4 :: ipx, ipy, ndif, ngrid, ncells
   integer*4, parameter :: nrbin = 1000
 
+  integer*4, allocatable, dimension(:) :: ind
+
   real*8, allocatable, dimension(:,:)  :: field, centres
+  real*8, allocatable, dimension(:) :: flat_field
   real*8, dimension(nrbin) :: rbin, cum_rbin, counter
 
   character(len=500) :: input_field, input_centres, output_voids
@@ -122,6 +163,14 @@ PROGRAM grow_spheres
   ngrid = nrows
   field = field + 1
 
+  ! find 0.25 quantile of field
+  allocate(flat_field(nrows*ncols))
+  allocate(ind(nrows*ncols))
+  eps = 1e-10
+  flat_field = pack(field, .true.)
+  call hpsort_eps_epw (nrows * ncols, flat_field, ind, eps)
+  quant = flat_field((nrows*ncols)/10)
+
   open(11, file=input_centres, status='old', form='unformatted')
   read(11) nrows
   ncols = 2 ! need to rerun centres
@@ -129,6 +178,7 @@ PROGRAM grow_spheres
   read(11) centres
   nc = nrows
 
+  if (id == 0) write(*,*) 'quantile 0.1: ', quant
   if (id == 0) write(*,*) 'ncentres: ', nc
   if (id == 0) write(*,*) 'xmin, xmax: ', minval(centres(1,:)), maxval(centres(1,:))
 
@@ -150,13 +200,14 @@ PROGRAM grow_spheres
 
     px = centres(1, i)
     py = centres(2, i)
-    counter = 0
+
 
 
     if(mod(i, process_num) .eq. id) then
 
         rbin = 0
         cum_rbin = 0
+        counter = 0
 
         ipx = int(px / rgrid + 1)
         ipy = int(py / rgrid + 1)
@@ -201,11 +252,12 @@ PROGRAM grow_spheres
 
         do ii = nrbin, 1, -1
           rvoid = rwidth * ii
-          nden = cum_rbin(ii) / sum(counter(1:ii))
-          if (nden .lt. delta * rho_mean) then
+          ncells = sum(counter(1:ii))
+          nden = cum_rbin(ii) / ncells
+          if (nden .lt. quant .and. ncells .ge. 1) then
             nv = nv + 1
             write(filenumber, '(4F10.3)') &
-            px, py, rvoid, nden / rho_mean
+            px, py, rvoid, nden
             exit
           end if
         end do
