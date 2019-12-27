@@ -51,6 +51,12 @@ class FieldVoids:
         self.h = h
         self.cosmo = Cosmology(omega_m=omega_m)
 
+        print('handle: ' + self.handle)
+        print('field_file: ' + self.field_file)
+        print('centres_file: ' + self.centres_file)
+        print('voids_file: ' + self.voids_file)
+        print('recentred_file: ' + self.recentred_file)
+
 
         # Grow spheres from the centres found in the previous step
         if 2 in steps:
