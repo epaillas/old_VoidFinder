@@ -275,5 +275,6 @@ do i = 1, nrbin
   end do
 end do
 
+stop
 
 end program vg_ccf_r_mu
