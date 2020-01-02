@@ -104,7 +104,7 @@ PROGRAM grow_spheres
 
 
   if (id == 0) write(*,*) '-----------------------'
-  if (id == 0) write(*,*) 'Running grow_spheres.exe'
+  if (id == 0) write(*,*) 'Running grow_spheres_2D.exe'
   if (id == 0) write(*,*) 'Input parameters:'
   if (id == 0) write(*,*) ''
   if (id == 0) write(*,*) 'mpi_processes: ', process_num
