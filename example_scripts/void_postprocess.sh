@@ -10,8 +10,9 @@ pos_cols='0,1,2'
 nrbins=30
 rvoid_min=30
 rvoid_max=300
-dmin=0
-dmax=3
+dmin=5
+dmax=150
+median_cut=False
 
 #-------- Periodic box settings --------
 box_size=1500
@@ -37,5 +38,6 @@ python $HOME/code/void_finder/void_postprocess.py \
 --rvoid_min "$rvoid_min" \
 --rvoid_max "$rvoid_max" \
 --dmin "$dmin" \
---dmax "$dmax"
+--dmax "$dmax" \
+--median_cut "$median_cut"
 

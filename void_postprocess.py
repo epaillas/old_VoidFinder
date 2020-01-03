@@ -15,19 +15,20 @@ from python_tools.voidstatistics import VoidStatistics
 @click.option('--nrbins', type=int, default=60, help='Number of radial bins')
 @click.option('--rvoid_min', type=float, default=0, help='Minimum void radius cut')
 @click.option('--rvoid_max', type=float, default=300, help='Maximum void radius cut')
-@click.option('--dmin', type=float, default=0, help='Minimum radial distance')
-@click.option('--dmax', type=float, default=3, help='Maximum radial distance')
+@click.option('--median_cut', type=bool, default=False, help='Use median void radius as a cut.')
+@click.option('--dmin', type=float, default=5, help='Minimum radial distance')
+@click.option('--dmax', type=float, default=150, help='Maximum radial distance')
 def postprocess_voids(voids, tracers, randoms, handle, is_box,
                       ncores, box_size, boss_like, pos_cols,
                       velocity, nrbins, rvoid_min, rvoid_max,
-                      dmin, dmax):
+                      dmin, dmax, median_cut):
 
     voids = VoidStatistics(void_file=voids, tracer_file=tracers, random_file=randoms,
                         handle=handle, is_box=is_box, box_size=box_size, nrbins=nrbins,
                         ncores=ncores, boss_like=boss_like, pos_cols=pos_cols,
                         rvoid_min=rvoid_min, rvoid_max=rvoid_max, dmin=dmin, dmax=dmax)
 
-    voids.VoidGalaxyCCF(kind='r-mu')
+    voids.VoidGalaxyCCF(kind='r-mu', median_cut=median_cut)
     
     if velocity:
         voids.VoidGalaxyCCF(kind='los_velocity')
