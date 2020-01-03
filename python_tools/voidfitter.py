@@ -110,6 +110,10 @@ class CaiModel:
         self.p0 = np.asarray([beta_0]) \
              + 1e-4*np.random.randn(self.nwalkers, self.ndim)
 
+        self.run_mcmc(niter=2000)
+        self.plot_mcmc_stats()
+
+
 
     def get_AP_splines(self, epsilon_grid):
         xi2_ap = []
@@ -142,12 +146,14 @@ class CaiModel:
 
 
     def run_mcmc(self, niter=500):
-        sampler = emcee.EnsembleSampler(self.nwalkers, self.ndim, self.log_probability)
-        sampler.run_mcmc(self.p0, niter, progress=True);
-        
-        fig, axes = plt.subplots(2, figsize=(10, 7), sharex=True)
-        samples = sampler.get_chain()
-        labels = [r"$\beta$", r"$\epsilon$"]
+        self.sampler = emcee.EnsembleSampler(self.nwalkers, self.ndim, self.log_probability)
+        self.sampler.run_mcmc(self.p0, niter, progress=True);
+
+    def plot_mcmc_stats(self):
+
+        fig, axes = plt.subplots(1, figsize=(10, 7), sharex=True)
+        samples = self.sampler.get_chain()
+        labels = [r"$\beta$"]
         for i in range(self.ndim):
             ax = axes[i]
             ax.plot(samples[:, :, i], "r", alpha=0.3)
@@ -157,14 +163,12 @@ class CaiModel:
 
         axes[-1].set_xlabel("step number")
 
-        plt.show()
+        plt.savefig('/media/epaillasv/BlackIce/eboss/FlatChain_RedshiftRedshift_MedianVoids_BetaOnly.pdf')
 
-    def plot_mcmc_corner(self):
         flat_samples = self.sampler.get_chain(discard=100, thin=15, flat=True)
-        fig = corner.corner(flat_samples, labels=[r"$\beta$", r"$\epsilon$"],
+        fig = corner.corner(flat_samples, labels=[r"$\beta$"],
                     show_titles=True)
-
-        plt.savefig('/home/epaillasv/Desktop/corner.pdf')
+        plt.savefig('/media/epaillasv/BlackIce/eboss/PosteriorCorner_RedshiftRedshift_MedianVoids_BetaOnly.pdf')
 
 
 
