@@ -51,7 +51,7 @@ class SphericalVoids:
         # set cosmology
         self.omega_m = omega_m
         self.h = h
-        self.cosmo = Cosmology(omega_m=omega_m)
+        self.cosmo = Cosmology(om_m=omega_m)
 
         if 1 not in steps:
             if not self.is_box:
