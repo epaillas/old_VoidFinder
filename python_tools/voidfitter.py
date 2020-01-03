@@ -36,6 +36,7 @@ class CaiModel:
 
         self.eff_z = 0.57 # effective redshift for LRGs
         self.b = 2.3 # bias for LRGs
+        self.G = (2 * self.b) / (3 * self.b)
 
         self.growth = self.cosmo.get_growth(self.eff_z)
         self.f = self.cosmo.get_f(self.eff_z)
@@ -44,17 +45,42 @@ class CaiModel:
 
         # build covariance matrix
         files_mocks = sorted(glob.glob(handle_mocks))
-        self.s_for_xi, self.mu_for_xi, xi_smu_mocks = self.readCorrFileList(files_mocks)
-        self.s_for_xi, xi2_mocks = self.getQuadrupole(self.s_for_xi, self.mu_for_xi, xi_smu_mocks)
-        print(np.shape(xi2_mocks))
-        cov_xi2 = self.getCovarianceMatrix(xi2_mocks)
-        corr_xi2 = self.getCovarianceMatrix(xi2_mocks, norm=True)
-        self.cov = cov_xi2
-        self.icov = np.linalg.inv(self.cov)
 
-        fig, ax = plt.subplots(1, figsize=(5,5))
-        ax.imshow(corr_xi2, origin='lower')
-        plt.savefig('/media/epaillasv/BlackIce/eboss/test/corr_xi2.png')
+        # self.s_for_xi, self.mu_for_xi, xi_smu_mocks = self.readCorrFileList(files_mocks)
+        # self.s_for_xi, xi2_mocks = self.getQuadrupole(self.s_for_xi, self.mu_for_xi, xi_smu_mocks)
+        # print(np.shape(xi2_mocks))
+        # cov_xi2 = self.getCovarianceMatrix(xi2_mocks)
+        # corr_xi2 = self.getCovarianceMatrix(xi2_mocks, norm=True)
+        # self.cov = cov_xi2
+        # self.icov = np.linalg.inv(self.cov)
+        mock_dxi0 = []
+        mock_xi2 = []
+        for fname in files_mocks:
+            s, mu, xi_smu_mock = self.readCorrFile(fname)
+            s, xi0 = self._getMonopole(s, mu, xi_smu_mock)
+            s, xi2 = self._getQuadrupole(s, mu, xi_smu_mock)
+
+            monofunc = InterpolatedUnivariateSpline(s, xi0, k=3)
+            integral = np.zeros_like(s)
+            for i in range(len(integral)):
+                integral[i] = quad(lambda x: monofunc(x) * x ** 2, 0, s[i], full_output=1)[0]
+            xibar = 3 * integral / s ** 3
+
+            dxi0 = xi0 - xibar
+
+            mock_dxi0.append(dxi0)
+            mock_xi2.append(xi2)
+
+        mock_dxi0 = np.asarray(mock_dxi0)
+        mock_xi2 = np.asarray(mock_xi2)
+
+        cov_dxi0 = self.getCovarianceMatrix(mock_dxi0)
+        cov_xi2 = self.getCovarianceMatrix(mock_xi2)
+        cov_xi02 = self.getCrossCovarianceMatrix(mock_dxi0, mock_xi2)
+        cov_xi20 = self.getCrossCovarianceMatrix(mock_xi2, mock_dxi0)
+
+        self.cov = cov_xi2 + self.G**2 * cov_dxi0 - self.G*cov_xi02 - self.G*cov_xi20
+        self.icov = np.linalg.inv(self.cov)
 
      
         if mock_observation:
@@ -70,9 +96,6 @@ class CaiModel:
         self.xi_smu = RectBivariateSpline(self.s_for_xi, self.mu_for_xi,
                                           xi_smu_obs, kx=3, ky=3)
 
-        fig, ax = plt.subplots(1, figsize=(6,4))
-        ax.imshow(self.xi_smu(self.s_for_xi, self.mu_for_xi))
-        plt.savefig('/media/epaillasv/BlackIce/eboss/test/xi_smu.png')
 
         # calculate multiples for a finite set of epsilon values,
         # and build splines to use later with mcmc
@@ -158,10 +181,6 @@ class CaiModel:
         model = G * (xi0 - xibar)
         chi2 = np.dot(np.dot((xi2 - model), self.icov), xi2 - model)
         loglike = -1/2 * chi2 - np.log((2*np.pi)**(len(self.cov)/2)) * np.sum(np.linalg.eig(self.cov)[0])
-        time.sleep(5)
-        print(xi2[:5])
-        print(xi0[:5])
-        print(np.dot((xi2 - model), self.icov))
         return loglike
 
     def log_prior(self, theta):
