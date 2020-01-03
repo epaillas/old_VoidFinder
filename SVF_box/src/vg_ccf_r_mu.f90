@@ -6,7 +6,7 @@ integer, parameter:: dp=kind(0.d0)
 real(dp) :: rgrid, boxsize, vol, rhomed
 real(dp) :: posx, posy, posz, disx, disy, disz, dis
 real(dp) :: comx, comy, comz, mu
-real(dp) :: xvc, yvc, zvc, rv, min_rv, max_rv
+real(dp) :: xvc, yvc, zvc, rv, min_rv, max_rv, median_rv
 real(dp) :: rwidth, muwidth, rmax, rmin, mumax, mumin
 real(dp) :: pi = 4.*atan(1.)
 
@@ -22,7 +22,7 @@ integer*4, dimension(:), allocatable :: ll
 
 real(dp), dimension(3) :: com, r
 real(dp), allocatable, dimension(:,:)  :: pos_data
-real(dp), dimension(:), allocatable :: rbin, rbin_edges, mubin, mubin_edges
+real(dp), dimension(:), allocatable :: rbin, rbin_edges, mubin, mubin_edges, rvs
 real(dp), dimension(:,:), allocatable :: VG, VR, xi
 
 character(20), external :: str
@@ -99,6 +99,16 @@ do
 end do
 11 rewind(11)
 write(*,*) 'Number of voids: ', nc
+
+! find the median void radius
+allocate(rvs(nc))
+do i = 1, nc
+  read(11, *) rvs(i)
+end do
+median_rv = rvs(nc / 2)
+min_rv = median_rv ! cuts sample at the median void radius
+write(*,*) 'Median void radius: ', median_rv
+  
 
 nmubin = nrbin
 allocate(rbin(nrbin))
@@ -180,6 +190,8 @@ do i = 1, nc ! For each void
   if (mod(i, int(1e3)) .eq. 1) then
     write(*,*) 'Center', i, 'of', nc
   end if
+
+  if (rv .lt. min_rv .or. rv .gt. max_rv) cycle
 
   ipx = int((xvc) / rgrid + 1.)
   ipy = int((yvc) / rgrid + 1.)
