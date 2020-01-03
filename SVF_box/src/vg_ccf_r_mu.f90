@@ -103,8 +103,9 @@ write(*,*) 'Number of voids: ', nc
 ! find the median void radius
 allocate(rvs(nc))
 do i = 1, nc
-  read(11, *) rvs(i)
+  read(11, *) xvc, yvc, zvc, rvs(i)
 end do
+rewind(11)
 median_rv = rvs(nc / 2)
 min_rv = median_rv ! cuts sample at the median void radius
 write(*,*) 'Median void radius: ', median_rv
