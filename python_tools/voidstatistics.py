@@ -34,6 +34,7 @@ class VoidStatistics:
         self.nrbins = nrbins
         self.rvoid_min = rvoid_min
         self.rvoid_max = rvoid_max
+        self.is_matter = False
 
         # set cosmology
         self.omega_m = omega_m
@@ -60,6 +61,27 @@ class VoidStatistics:
 
 
    
+    def VoidMatterCCF(self, kind='monopole', median_cut=False):
+        self.is_matter = True
+
+        if median_cut:
+            data = np.genfromtxt(self.void_file)
+            rv = data[:,3]
+            self.rvoid_min = np.median(rv)
+            self.rvoid_max = 500
+
+        if kind == 'monopole':
+            self._2PCF_monopole()
+        elif kind == 'r-mu':
+            self._2PCF_r_mu()
+        elif kind == 'sigma-pi':
+            self._2PCF_sigma_pi()
+        elif kind == 'los_velocity':
+            self._2PCF_los_velocity()
+        else:
+            sys.exit('Correlation kind not recognized. Aborting...')
+
+
     def VoidGalaxyCCF(self, kind='monopole', median_cut=False):
 
         if median_cut:
@@ -85,7 +107,10 @@ class VoidStatistics:
         cross-correlation function (bins in
         distance).
         '''
-        fout = self.void_file + '.VG_CCF_monopole'
+        if self.ismatter: 
+            fout = self.void_file + '.VM_CCF_monopole'
+        else:
+            fout = self.void_file + '.VG_CCF_monopole'
 
         self.dmax = 3
 
@@ -110,45 +135,6 @@ class VoidStatistics:
 
         self._get_mean_monopole(fout)
 
-    def _2PCF_r_mu(self, rv_low, rv_high):
-        '''
-        Computes the void-galaxy cross-correlation
-        function in bins of r and mu.
-        '''
-
-        fout = self.handle + '.VG_CCF_rmu'
-
-        if self.is_box:
-            binpath = sys.path[0] + '/SVF_box/bin/'
-            cmd = [binpath + 'vg_ccf_r_mu.exe',
-                   self.tracer_file,
-                   self.void_file,
-                   fout,
-                   str(self.box_size),
-                   str(self.dmin),
-                   str(self.dmax),
-                   str(self.nrbins),
-                   str(self.rvoid_min),
-                   str(self.rvoid_max),
-                   str(self.ngrid)]
-        else:
-            binpath = sys.path[0] + '/SVF_survey/bin/'
-            cmd = [binpath + 'vg_ccf_r_mu.exe',
-                   self.tracer_file,
-                   self.random_file,
-                   self.void_file,
-                   fout,
-                   str(self.dmin),
-                   str(self.dmax),
-                   str(self.nrbins),
-                   str(self.gridmin),
-                   str(self.gridmax),
-                   str(self.rvoid_min),
-                   str(self.rvoid_max)]
-
-        logfile = self.handle + '_vg_ccf_rmu.log'
-        log = open(logfile, "w+")
-        subprocess.call(cmd, stdout=log, stderr=log)
 
     def _2PCF_r_mu(self):
         '''
@@ -156,7 +142,10 @@ class VoidStatistics:
         function in bins of r and mu.
         '''
 
-        fout = self.handle + '.VG_CCF_rmu'
+        if self.ismatter: 
+            fout = self.handle + '.VM_CCF_rmu'
+        else:
+            fout = self.handle + '.VG_CCF_rmu'
 
         if self.is_box:
             binpath = sys.path[0] + '/SVF_box/bin/'
@@ -226,7 +215,10 @@ class VoidStatistics:
         function in bins of r and mu.
         '''
 
-        fout = self.handle + '.VG_CCF_losvel'
+        if self.ismatter: 
+            fout = self.handle + '.VM_CCF_losvel'
+        else:
+            fout = self.handle + '.VG_CCF_losvel'
 
         if self.is_box:
             binpath = sys.path[0] + '/SVF_box/bin/'
