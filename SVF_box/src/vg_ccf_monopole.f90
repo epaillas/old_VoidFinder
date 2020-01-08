@@ -1,275 +1,242 @@
 program vg_ccf_monopole
-implicit none
+  implicit none
+  
+  integer, parameter:: dp=kind(0.d0)
+  
+  real(dp) :: rgrid, boxsize, vol, rhomed
+  real(dp) :: posx, posy, posz, disx, disy, disz, dis
+  real(dp) :: xvc, yvc, zvc, rv, min_rv, max_rv, median_rv
+  real(dp) :: rwidth, rmax, rmin
+  real(dp) :: pi = 4.*atan(1.)
+  
+  integer*4 :: ng, nc, nrbin, rind
+  integer*4 :: id, iargc
+  integer*4 :: i, j, ii, jj, ix, iy, iz, ix2, iy2, iz2
+  integer*4 :: indx, indy, indz, nrows, ncols
+  integer*4 :: ipx, ipy, ipz, ndif
+  integer*4 :: ngrid
+  
+  integer*4, dimension(:, :, :), allocatable :: lirst, nlirst
+  integer*4, dimension(:), allocatable :: ll
+  
+  real(dp), dimension(3) :: com, r
+  real(dp), allocatable, dimension(:,:)  :: pos_data
+  real(dp), dimension(:), allocatable :: rbin, rbin_edges
+  real(dp), dimension(:,:), allocatable :: VG, VR, xi
+  
+  character(20), external :: str
+  character(len=500) :: input_tracers, input_centres, output_den
+  character(len=10) :: rmax_char, rmin_char, nrbin_char, ngrid_char
+  character(len=100) :: min_rv_char, max_rv_char, box_char
+  character(len=1)  :: creturn = achar(13)
+  
+  if (iargc() .ne. 10) then
+      write(*,*) 'Some arguments are missing.'
+      write(*,*) '1) input_data'
+      write(*,*) '2) input_centres'
+      write(*,*) '3) output_den'
+      write(*,*) '4) boxsize'
+      write(*,*) '5) rmin'
+      write(*,*) '6) rmax'
+      write(*,*) '7) nrbin'
+      write(*,*) '8) min_rv'
+      write(*,*) '9) max_rv'
+      write(*,*) '10) ngrid'
+      write(*,*) ''
+      stop
+    end if
+    
+  call getarg(1, input_tracers)
+  call getarg(2, input_centres)
+  call getarg(3, output_den)
+  call getarg(4, box_char)
+  call getarg(5, rmin_char)
+  call getarg(6, rmax_char)
+  call getarg(7, nrbin_char)
+  call getarg(8, min_rv_char)
+  call getarg(9, max_rv_char)
+  call getarg(10, ngrid_char)
+  
+  read(box_char, *) boxsize
+  read(rmin_char, *) rmin
+  read(rmax_char, *) rmax
+  read(nrbin_char, *) nrbin
+  read(min_rv_char, *) min_rv
+  read(max_rv_char, *) max_rv
+  read(ngrid_char, *) ngrid
+  
+  write(*,*) '-----------------------'
+  write(*,*) 'Running vg_ccf_monopole.exe'
+  write(*,*) 'input parameters:'
+  write(*,*) ''
+  write(*, *) 'input_tracers: ', trim(input_tracers)
+  write(*, *) 'input_centres: ', trim(input_centres)
+  write(*, *) 'boxsize: ', trim(box_char)
+  write(*, *) 'output_den: ', trim(output_den)
+  write(*, *) 'rmin: ', trim(rmin_char), ' Mpc'
+  write(*, *) 'rmax: ', trim(rmax_char), ' Mpc'
+  write(*, *) 'nrbin: ', trim(nrbin_char)
+  write(*, *) 'min_rv: ', trim(min_rv_char), ' Mpc'
+  write(*, *) 'max_rv: ', trim(max_rv_char), ' Mpc'
+  write(*, *) 'ngrid: ', trim(ngrid_char)
+  write(*,*) ''
 
-real*8 :: boxsize, box2
-real*8 :: xvc, yvc, zvc, rvoid
-real*8 :: gx, gy, gz
-real*8 :: disx, disy, disz, rescaled_distance
-real*8 :: dis
-real*8 :: dbin, dmin, dmax
-real*8 :: rhomed
-real*8 :: rcell
-real*8 :: pi = 4.*atan(1.)
-real*8 :: rmin, rmax
+  open(10, file=input_tracers, status='old', form='unformatted')
+  read(10) nrows
+  read(10) ncols
+  allocate(pos_data(ncols, nrows))
+  read(10) pos_data
+  close(10)
+  ng = nrows
+  if (id == 0) write(*,*) 'ntracers: ', ng
 
-real*8, allocatable, dimension (: , :) :: pos
-real*8, dimension(:), allocatable :: weight, w
-real*8, allocatable, dimension (: , :) :: DD, RR, dprofile
-real*8, allocatable, dimension(:) :: bins, bin_edges
-real*8, allocatable, dimension(:) :: r
-
-integer*8 :: np
-integer*8 :: nvc
-integer*8 :: nbins
-integer*8 :: ii, i, j, k, ix, iy, iz, ipx, ipy, ipz, ix2, iy2, iz2
-integer*8 :: ndif
-integer*8 :: ngridll, ncell
-integer*8 :: indx, indy, indz
-integer*8 :: bin_index
-integer*8 :: nperx, npery, nperz
-integer*8 :: neigh, counter
-
-integer*8, dimension(:, :, :), allocatable :: nincell, ngrid, lirst, nlirst
-integer*8, dimension(:), allocatable :: ll 
-
-character(len=600) :: input_tracers, input_voids, output_file
-character(len=10) :: box_char
-character(len=10) :: nbins_char
-character(len=10) :: dmin_char
-character(len=10) :: dmax_char
-character(len=100) :: fmt_char
-
-! Get files
-if (iargc() .ne. 7) then
-  write(*,*) 'Wrong number of arguments.'
-  write(*,*) 'Usage: ./vg_ccf_monopole.exe tracers_file voids_file output_file boxsize&
-  & nbins dmin dmax'
-  write(*,*) 'Exiting...'
-  stop
-end if
-
-call getarg(1, input_tracers)
-call getarg(2, input_voids)
-call getarg(3, output_file)
-call getarg(4, box_char)
-call getarg(5, nbins_char)
-call getarg(6, dmin_char)
-call getarg(7, dmax_char)
-
-read(box_char, *) boxsize
-read(nbins_char, *) nbins
-read(dmin_char, *) dmin
-read(dmax_char, *) dmax
-
-box2 = boxsize / 2.
-
-write(*,*) 'Computing the 3D void galaxy density profile with the following.&
-& parameters:'
-write(*,*) ''
-write(*,*) 'Tracers file: ', trim(input_tracers)
-write(*,*) ''
-write(*,*) 'Voids file: ', trim(input_voids)
-write(*,*) ''
-write(*,*) 'Output file: ', trim(output_file)
-write(*,*) ''
-write(*,*) 'Size of the simulation box: ', trim(box_char // ' Mpc/h')
-write(*,*) 'Radial range: ', trim(dmin_char // dmax_char // ' void radii')
-write(*,*) 'Number of bins: ', trim(nbins_char)
-write(*,*) ''
-
-! Count the number of tracers
-open(10, file=input_tracers, status='old')
-np = 0
-do
-  read(10, *, end=10)
-  np = np + 1
-end do
-10 rewind(10)
-write(*,*) 'Number of tracers: ', np
-
-! Count the number of voids
-nvc = 0 ! Total number of voids
-open(11, file=input_voids, status='old')
-do
-  read(11, *, end=11)
-  nvc = nvc + 1
-end do
-11 rewind(11)
-write(*,*) 'Number of voids: ', nvc
-
-
-! Memory allocation
-allocate(bin_edges(nbins + 1))
-allocate(bins(nbins))
-allocate(DD(nvc, nbins))
-allocate(RR(nvc, nbins))
-allocate(r(nvc))
-
-! Construct bins for the density profile
-dbin = (dmax - dmin) / nbins
-
-do i = 1, nbins + 1
-  bin_edges(i) = dmin + (i - 1) * (dmax - dbin) / (nbins - 1.)
-end do
-
-do i = 1, nbins
-  bins(i) = bin_edges(i + 1) - dbin / 2.
-end do
-
-! Store tracers positions in arrays
-allocate(pos(3, np))
-allocate(weight(np))
-
-do i = 1, np
-  read(10, *) gx, gy, gz
-  pos(1, i) = gx
-  pos(2, i) = gy
-  pos(3, i) = gz
-  weight(i) = 1.
-end do
-close(10)
-
-
-! Mean density inside the box
-!rhomed = sum(weight) / (boxsize ** 3)
-rhomed = 1e7 / boxsize**3
-print*, rhomed
-
-! Construct linked list for tracers
-write(*,*) ''
-write(*,*) 'Constructing linked list...'
-ngridll = 64
-allocate(lirst(ngridll, ngridll, ngridll))
-allocate(nlirst(ngridll, ngridll, ngridll))
-allocate(ll(np))
-rcell = (boxsize) / real(ngridll)
-
-lirst = 0
-ll = 0
-
-do i = 1, np
-  indx = int((pos(1, i)) / rcell + 1.)
-  indy = int((pos(2, i)) / rcell + 1.)
-  indz = int((pos(3, i)) / rcell + 1.)
-
-  if(indx.gt.0.and.indx.le.ngridll.and.indy.gt.0.and.indy.le.ngridll.and.&
-  indz.gt.0.and.indz.le.ngridll)lirst(indx,indy,indz)=i
-
-  if(indx.gt.0.and.indx.le.ngridll.and.indy.gt.0.and.indy.le.ngridll.and.&
-  indz.gt.0.and.indz.le.ngridll)nlirst(indx,indy,indz) = &
-  nlirst(indx, indy, indz) + 1
-end do
-
-do i = 1, np
-  indx = int((pos(1, i))/ rcell + 1.)
-  indy = int((pos(2, i))/ rcell + 1.)
-  indz = int((pos(3, i))/ rcell + 1.)
-  if(indx.gt.0.and.indx.le.ngridll.and.indy.gt.0.and.indy.le.ngridll.and.&
-  &indz.gt.0.and.indz.le.ngridll) then
-    ll(lirst(indx,indy,indz)) = i
-    lirst(indx,indy,indz) = i
-  endif
-end do
-
-write(*,*) 'Linked list successfully constructed'
-write(*,*) ''
-write(*,*) 'Starting loop over voids...'
-
-! Compute the density profile for each void
-do i = 1, nvc ! For each void
-  read (11, *) xvc, yvc, zvc, rvoid ! Read its data
-
-  r(i) = rvoid
-
-  if (mod(i, int(1e3)) .eq. 1) then
-    write(*,*) 'Center', i, 'of', nvc
-  end if
-
-  ipx = int((xvc) / rcell + 1.)
-  ipy = int((yvc) / rcell + 1.)
-  ipz = int((zvc) / rcell + 1.)
-
-  ndif = int((dmax * rvoid / rcell + 1.))
-
-  neigh = 0
-
-  do ix = ipx - ndif, ipx + ndif
-    do iy = ipy - ndif, ipy + ndif
-      do iz = ipz - ndif, ipz + ndif
-
-        ix2 = ix
-        iy2 = iy
-        iz2 = iz
-
-        if (ix2 .gt. ngridll) ix2 = ix2 - ngridll
-        if (ix2 .lt. 1) ix2 = ix2 + ngridll
-        if (iy2 .gt. ngridll) iy2 = iy2 - ngridll
-        if (iy2 .lt. 1) iy2 = iy2 + ngridll
-        if (iz2 .gt. ngridll) iz2 = iz2 - ngridll
-        if (iz2 .lt. 1) iz2 = iz2 + ngridll
-
-        ii = lirst(ix2,iy2,iz2)
-        if(ii.ne.0) then
-          do
-            ii = ll(ii)
-            neigh = neigh + 1
-            disx = pos(1, ii) - xvc
-            disy = pos(2, ii) - yvc
-            disz = pos(3, ii) - zvc
-
-            ! Periodic boundary conditions
-            if (disx .lt. -box2) disx = disx + boxsize
-            if (disx .gt. box2) disx = disx - boxsize
-            if (disy .lt. -box2) disy = disy + boxsize
-            if (disy .gt. box2) disy = disy - boxsize
-            if (disz .lt. -box2) disz = disz + boxsize
-            if (disz .gt. box2) disz = disz - boxsize
-
-            dis = sqrt(disx ** 2 + disy ** 2 + disz ** 2)
-
-            rescaled_distance = dis / rvoid
-
-            if (rescaled_distance .le. dmax ) then
-
-              bin_index = int((rescaled_distance - dmin) / dbin + 1)
-              DD(i, bin_index) = DD(i, bin_index) + weight(ii)
-
-            end if
-
-            if(ii.eq.lirst(ix2,iy2,iz2)) exit
-
-          end do
-        end if
+  nc = 0
+  open(11, file=input_centres, status='old')
+  do
+    read(11, *, end=11)
+    nc = nc + 1
+  end do
+  11 rewind(11)
+  write(*,*) 'Number of voids: ', nc
+  
+  allocate(rbin(nrbin))
+  allocate(rbin_edges(nrbin+1))
+  allocate(VG(nrbin))
+  allocate(VR(nrbin))
+  allocate(xi(nrbin))
+  
+  rwidth = (rmax - rmin) / nrbin
+  do i = 1, nrbin + 1
+    rbin_edges(i) = rmin+(i-1)*rwidth
+  end do
+  do i = 1, nrbin
+    rbin(i) = rbin_edges(i+1)-rwidth/2.
+  end do
+  
+  ! Mean density inside the box
+  rhomed = ng / (boxsize ** 3)
+  
+  ! Construct linked list for tracers
+  write(*,*) ''
+  write(*,*) 'Constructing linked list...'
+  allocate(lirst(ngrid, ngrid, ngrid))
+  allocate(nlirst(ngrid, ngrid, ngrid))
+  allocate(ll(ng))
+  rgrid = (boxsize) / real(ngrid)
+  
+  lirst = 0
+  ll = 0
+  
+  do i = 1, ng
+    indx = int((pos_data(1, i)) / rgrid + 1.)
+    indy = int((pos_data(2, i)) / rgrid + 1.)
+    indz = int((pos_data(3, i)) / rgrid + 1.)
+  
+    if(indx.gt.0.and.indx.le.ngrid.and.indy.gt.0.and.indy.le.ngrid.and.&
+    indz.gt.0.and.indz.le.ngrid)lirst(indx,indy,indz)=i
+  
+    if(indx.gt.0.and.indx.le.ngrid.and.indy.gt.0.and.indy.le.ngrid.and.&
+    indz.gt.0.and.indz.le.ngrid)nlirst(indx,indy,indz) = &
+    nlirst(indx, indy, indz) + 1
+  end do
+  
+  do i = 1, ng
+    indx = int((pos_data(1, i))/ rgrid + 1.)
+    indy = int((pos_data(2, i))/ rgrid + 1.)
+    indz = int((pos_data(3, i))/ rgrid + 1.)
+    if(indx.gt.0.and.indx.le.ngrid.and.indy.gt.0.and.indy.le.ngrid.and.&
+    &indz.gt.0.and.indz.le.ngrid) then
+      ll(lirst(indx,indy,indz)) = i
+      lirst(indx,indy,indz) = i
+    endif
+  end do
+  
+  write(*,*) 'Linked list successfully constructed'
+  write(*,*) ''
+  write(*,*) 'Starting loop over voids...'
+  
+  VG = 0
+  VR = 0
+  
+  do i = 1, nc
+    read (11, *) xvc, yvc, zvc, rv
+  
+    if (rv .lt. min_rv .or. rv .gt. max_rv) cycle
+  
+    ipx = int((xvc) / rgrid + 1.)
+    ipy = int((yvc) / rgrid + 1.)
+    ipz = int((zvc) / rgrid + 1.)
+  
+    !ndif = int((rmax * rv / rgrid + 1.))
+    ndif = int(rmax / rgrid + 1.)
+  
+    do ix = ipx - ndif, ipx + ndif
+      do iy = ipy - ndif, ipy + ndif
+        do iz = ipz - ndif, ipz + ndif
+  
+          ix2 = ix
+          iy2 = iy
+          iz2 = iz
+  
+          if (ix2 .gt. ngrid) ix2 = ix2 - ngrid
+          if (ix2 .lt. 1) ix2 = ix2 + ngrid
+          if (iy2 .gt. ngrid) iy2 = iy2 - ngrid
+          if (iy2 .lt. 1) iy2 = iy2 + ngrid
+          if (iz2 .gt. ngrid) iz2 = iz2 - ngrid
+          if (iz2 .lt. 1) iz2 = iz2 + ngrid
+  
+          ii = lirst(ix2,iy2,iz2)
+          if(ii.ne.0) then
+            do
+              ii = ll(ii)
+              disx = pos_data(1, ii) - xvc
+              disy = pos_data(2, ii) - yvc
+              disz = pos_data(3, ii) - zvc
+  
+              if (disx .lt. -boxsize/2) disx = disx + boxsize
+              if (disx .gt. boxsize/2) disx = disx - boxsize
+              if (disy .lt. -boxsize/2) disy = disy + boxsize
+              if (disy .gt. boxsize/2) disy = disy - boxsize
+              if (disz .lt. -boxsize/2) disz = disz + boxsize
+              if (disz .gt. boxsize/2) disz = disz - boxsize
+  
+              r = (/ disx, disy, disz /)
+              dis = norm2(r)
+  
+              if (dis .lt. rmax) then
+                rind = int((dis - rmin) / rwidth + 1)
+                VG(rind) = VG(rind) + 1
+              end if
+  
+              if(ii.eq.lirst(ix2,iy2,iz2)) exit
+  
+            end do
+          end if
+        end do
       end do
     end do
+  
+    do ii = 1, nrbin
+        vol = 4./3 * pi * ((rbin(ii) + rwidth/2.) ** 3 - &
+        & (rbin(ii) - rwidth/2.) ** 3)
+
+        VR(ii) = VR(ii) + rhomed * vol
+      end do
+    end do
+  
   end do
-
-  ! Volume of a spherical shell at r
-  do k = 1, nbins
-    RR(i, k) =  4./3 * pi * ((rvoid * (bins(k) + dbin/2.)) ** 3 - &
-    & (rvoid * (bins(k) - dbin/2.)) ** 3)
+  
+  write(*,*) ''
+  write(*,*) 'Calculation finished. Writing output...'
+  
+  xi = (VG * 1./VR) - 1
+  
+  open(12, file=output_den, status='unknown')
+  do i = 1, nrbin
+    write(12, fmt='(4f10.5)') rbin(i), rbin_edges(i), rbin_edges(i + 1), xi(i, j)
   end do
-
-end do ! End loop over voids
-
-write(*,*) ''
-write(*,*) 'Calculation finished. Writing output...'
-
-! Density profiles in units of the mean density
-allocate(dprofile(nvc, nbins))
-dprofile = (DD / RR) * 1. / rhomed
-
-open(12, file=output_file, status='unknown')
-fmt_char = trim(nbins_char // 'f10.3)')
-write(12, fmt='(' // fmt_char) (bins(i), i = 1, nbins)
-
-do i = 1, nvc
-    write(12, fmt='(f10.3,' // fmt_char) r(i), (dprofile(i, j), j = 1, nbins)
-end do
-
-close(10)
-close(11)
-close(12)
-close(13)
-
-end program vg_ccf_monopole
+  
+  stop
+  
+  end program vg_ccf_monopole
+  

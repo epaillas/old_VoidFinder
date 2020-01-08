@@ -43,23 +43,6 @@ class VoidStatistics:
 
         pos_cols = [int(i) for i in pos_cols.split(',')]
 
-    def _get_mean_monopole(self, fname, rmin=0, rmax=100):
-        
-        # read original data
-        data= np.genfromtxt(fname, skip_header=1)
-        bins = np.genfromtxt(fname, skip_footer=len(data))
-
-        # subsample data by void radius
-        data = np.asarray([i for i in data if rmin <= i[0] <= rmax])
-
-        # get mean profile and save data
-        mean_profile = np.mean(data[:, 1:], axis=0)
-        cout = np.c_[bins, mean_profile]
-        fout = self.void_file + '.mean_VG_CCF_monopole'
-        fmt = 2*'%10.3f '
-        np.savetxt(fout, cout, fmt=fmt)
-
-
    
     def VoidMatterCCF(self, kind='monopole', median_cut=False):
         self.is_matter = True
@@ -121,10 +104,12 @@ class VoidStatistics:
                    self.void_file,
                    fout,
                    str(self.box_size),
-                   str(self.nrbins),
                    str(self.dmin),
                    str(self.dmax),
-                   ]
+                   str(self.nrbins),
+                   str(self.rvoid_min),
+                   str(self.rvoid_max),
+                   str(self.ngrid)]
         else:
             binpath = sys.path[0] + '/SVF_survey/bin/'
             sys.exit('Not implemented!')
@@ -132,8 +117,6 @@ class VoidStatistics:
         logfile = self.handle + '_VG_CCF_monopole.log'
         log = open(logfile, "w+")
         subprocess.call(cmd, stdout=log, stderr=log)
-
-        self._get_mean_monopole(fout)
 
 
     def _2PCF_r_mu(self):
