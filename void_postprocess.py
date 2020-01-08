@@ -7,6 +7,7 @@ from python_tools.voidstatistics import VoidStatistics
 @click.option('--randoms', type=str, help='File containing randoms.')
 @click.option('--handle', type=str, required=True, help='Basename for the output files')
 @click.option('--is_box', type=bool, default=True, help='Is the data from a simulation box?')
+@click.option('--is_matter', type=bool, default=False, help='Are the tracers DM particles?')
 @click.option('--boss_like', type=bool, default=False, help='Is the data from BOSS/eBOSS?')
 @click.option('--ncores', type=int, default=1, help='Number of cores to use for parallel tasks.')
 @click.option('--box_size', type=float, default=1024, help='Size of the simulation box (only used if is_box is True)')
@@ -21,17 +22,24 @@ from python_tools.voidstatistics import VoidStatistics
 def postprocess_voids(voids, tracers, randoms, handle, is_box,
                       ncores, box_size, boss_like, pos_cols,
                       velocity, nrbins, rvoid_min, rvoid_max,
-                      dmin, dmax, median_cut):
+                      dmin, dmax, median_cut, is_matter):
 
     voids = VoidStatistics(void_file=voids, tracer_file=tracers, random_file=randoms,
                         handle=handle, is_box=is_box, box_size=box_size, nrbins=nrbins,
                         ncores=ncores, boss_like=boss_like, pos_cols=pos_cols,
                         rvoid_min=rvoid_min, rvoid_max=rvoid_max, dmin=dmin, dmax=dmax)
 
-    voids.VoidGalaxyCCF(kind='r-mu', median_cut=median_cut)
+    if is_matter:
+        voids.VoidMatterCCF(kind='r-mu', median_cut=median_cut)
+
+        if velocity:
+            voids.VoidMatterCCF(kind='los_velocity')
     
-    if velocity:
-        voids.VoidGalaxyCCF(kind='los_velocity')
+    else:
+        voids.VoidGalaxyCCF(kind='r-mu', median_cut=median_cut)
+        
+        if velocity:
+            voids.VoidGalaxyCCF(kind='los_velocity')
 
 
 if __name__ == '__main__':
