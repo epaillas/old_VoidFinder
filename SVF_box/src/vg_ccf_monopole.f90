@@ -19,10 +19,10 @@ program vg_ccf_monopole
   integer*4, dimension(:, :, :), allocatable :: lirst, nlirst
   integer*4, dimension(:), allocatable :: ll
   
-  real(dp), dimension(3) :: com, r
+  real(dp), dimension(3) :: r
   real(dp), allocatable, dimension(:,:)  :: pos_data
   real(dp), dimension(:), allocatable :: rbin, rbin_edges
-  real(dp), dimension(:,:), allocatable :: VG, VR, xi
+  real(dp), dimension(:), allocatable :: VG, VR, xi
   
   character(20), external :: str
   character(len=500) :: input_tracers, input_centres, output_den
