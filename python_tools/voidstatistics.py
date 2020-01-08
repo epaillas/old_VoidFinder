@@ -91,11 +91,9 @@ class VoidStatistics:
         distance).
         '''
         if self.is_matter: 
-            fout = self.void_file + '.VM_CCF_monopole'
+            fout = self.handle + '.VM_CCF_monopole'
         else:
-            fout = self.void_file + '.VG_CCF_monopole'
-
-        self.dmax = 3
+            fout = self.handle + '.VG_CCF_monopole'
 
         if self.is_box:
             binpath = sys.path[0] + '/SVF_box/bin/'
