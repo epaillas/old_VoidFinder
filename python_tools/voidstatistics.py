@@ -107,7 +107,7 @@ class VoidStatistics:
         cross-correlation function (bins in
         distance).
         '''
-        if self.ismatter: 
+        if self.is_matter: 
             fout = self.void_file + '.VM_CCF_monopole'
         else:
             fout = self.void_file + '.VG_CCF_monopole'
@@ -142,7 +142,7 @@ class VoidStatistics:
         function in bins of r and mu.
         '''
 
-        if self.ismatter: 
+        if self.is_matter: 
             fout = self.handle + '.VM_CCF_rmu'
         else:
             fout = self.handle + '.VG_CCF_rmu'
@@ -215,7 +215,7 @@ class VoidStatistics:
         function in bins of r and mu.
         '''
 
-        if self.ismatter: 
+        if self.is_matter: 
             fout = self.handle + '.VM_CCF_losvel'
         else:
             fout = self.handle + '.VG_CCF_losvel'
