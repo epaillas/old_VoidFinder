@@ -233,7 +233,7 @@ program vg_ccf_monopole
   
   open(12, file=output_den, status='unknown')
   do i = 1, nrbin
-    write(12, fmt='(4f10.5)') rbin(i), rbin_edges(i), rbin_edges(i + 1), xi(i, j)
+    write(12, fmt='(4f10.5)') rbin(i), rbin_edges(i), rbin_edges(i + 1), xi(i)
   end do
   
   stop
