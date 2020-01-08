@@ -217,11 +217,10 @@ program vg_ccf_monopole
     end do
   
     do ii = 1, nrbin
-        vol = 4./3 * pi * ((rbin(ii) + rwidth/2.) ** 3 - &
-        & (rbin(ii) - rwidth/2.) ** 3)
+      vol = 4./3 * pi * ((rbin(ii) + rwidth/2.) ** 3 - &
+      & (rbin(ii) - rwidth/2.) ** 3)
 
-        VR(ii) = VR(ii) + rhomed * vol
-      end do
+      VR(ii) = VR(ii) + rhomed * vol
     end do
   
   end do
