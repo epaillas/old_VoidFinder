@@ -387,12 +387,12 @@ class NadathurModel:
     in Cai et al. (2016).
     '''
 
-    def __init__(self, handle_obs, handle_mocks):
+    def __init__(self, delta_r_file, xi_r_file, sv_file, xi_smu_file):
 
-        self.handle_real_real_obs = handle_real_real_obs
-        self.handle_real_redshift_obs = handle_real_redshift_obs
-        self.handle_real_real_mocks = handle_real_real_mocks
-        self.handle_real_redshift_mocks = handle_real_redshift_mocks
+        self.delta_r_file = delta_r_file
+        self.xi_r_file = xi_r_file
+        self.sv_file = sv_file
+        self.xi_smu_file = xi_smu_file
 
 
         print("Setting up Nadathur's void RSD model.")
@@ -407,36 +407,62 @@ class NadathurModel:
 
         self.growth = self.cosmo.get_growth(self.eff_z)
         self.f = self.cosmo.get_f(self.eff_z)
-        self.fs8 = self.f * self.s8 * self.growth
-        self.bs8 = self.b * self.s8 * self.growth
-        self.beta = self.fs8 / self.bs8
-        self.G = (2 * self.beta) / (3 + self.beta)
+        self.s8norm = self.s8 * self.growth 
 
         # build covariance matrix
-        self.handle_cov = self.handle_real_redshift_mocks + '_covmat.npy'
-        if os.path.isfile(self.handle_cov):
-            cov_list = np.load(self.handle_cov)
+        # self.handle_cov = self.handle_real_redshift_mocks + '_covmat.npy'
+        # if os.path.isfile(self.handle_cov):
+        #     cov_list = np.load(self.handle_cov)
         
-        else:
-            cov_list = self.getMultipoleCovariance()
+        # else:
+        #     cov_list = self.getMultipoleCovariance()
 
-        cov_dxi0, cov_xi2, cov_xi02, cov_xi20 = cov_list
+        # cov_dxi0, cov_xi2, cov_xi02, cov_xi20 = cov_list
 
-        self.cov = cov_xi2 + self.G**2 * cov_dxi0 - self.G*cov_xi02 - self.G*cov_xi20
-        self.icov = np.linalg.inv(self.cov)
+        # self.cov = cov_xi2 + self.G**2 * cov_dxi0 - self.G*cov_xi02 - self.G*cov_xi20
+        # self.icov = np.linalg.inv(self.cov)
 
+
+        # read real-space monopole
+        data = np.genfromtxt(self.xi_r_file)
+        self.r_for_xi = data[:,0]
+        xi_r = data[:,-1]
+        self.xi_r = InterpolatedUnivariateSpline(self.r_for_xi, xi_r, k=1, ext=3)
+
+        # read void-matter correlation function
+        data = np.genfromtxt(self.delta_r_file)
+        self.r_for_delta = data[:,0]
+        delta_r = data[:,-1]
+        self.delta_r = InterpolatedUnivariateSpline(self.r_for_delta, delta_r, k=1, ext=3)
+
+        integral = np.zeros_like(self.r_for_delta)
+        for i in range(len(integral)):
+            integral[i] = quad(lambda x: self.delta_r(x) * x ** 2, 0, self.r_for_delta[i], full_output=1)[0]
+        Delta_r = 3 * integral / self.r_for_delta ** 3
+        self.Delta_r = InterpolatedUnivariateSpline(self.r_for_delta, Delta_r, k=1, ext=3)
+
+        # read los velocity dispersion profile
+        data = np.genfromtxt(self.sv_file)
+        self.r_for_sv = data[:,0]
+        sv = data[:,-1] / data[-1, 1]
+        self.sv = InterpolatedUnivariateSpline(self.r_for_sv, sv, k=1, ext=3)
+
+        # read redshift-space correlation function
+        s, mu xi_smu_obs = self.readCorrFile(self.xi_smu_file)
+        s, self.xi0 = self._getMonopole(s, mu, xi_smu_obs)
+        s, self.xi2 = self._getQuadrupole(s, mu, xi_smu_obs)
+
+        monofunc = InterpolatedUnivariateSpline(s, xi0, k=3)
+        integral = np.zeros_like(s)
+        for i in range(len(integral)):
+            integral[i] = quad(lambda x: monofunc(x) * x ** 2, 0, s[i], full_output=1)[0]
+        self.xibar = 3 * integral / s ** 3
 
         # build an interpolating bivariate spline for 
         # the correlation functions
-        self.s_for_xi, self.mu_for_xi, xi_smu_obs = self.readCorrFile(handle_obs)
-        self.xi_smu = RectBivariateSpline(self.s_for_xi, self.mu_for_xi,
-                                          xi_smu_obs, kx=3, ky=3)
+        # self.xi_smu = RectBivariateSpline(self.s_for_xi, self.mu_for_xi,
+        #                                   xi_smu_obs, kx=3, ky=3)
 
-
-        # calculate multiples for a finite set of epsilon values,
-        # and build splines to use later with mcmc
-        #epsilon_grid = np.linspace(0.8, 1.2, 30)
-        #self.get_AP_splines(epsilon_grid)
 
 
         #self.nwalkers = 64
@@ -446,38 +472,7 @@ class NadathurModel:
         #self.p0 = np.asarray([beta_0, epsilon_0]) \
         #     + 1e-4*np.random.randn(self.nwalkers, self.ndim)
 
-    def getMultipoleCovariance(self):
-        files_mocks = sorted(glob.glob(handle_mocks))
-        mock_dxi0 = []
-        mock_xi2 = []
-        for fname in files_mocks:
-            s, mu, xi_smu_mock = self.readCorrFile(fname)
-            s, xi0 = self._getMonopole(s, mu, xi_smu_mock)
-            s, xi2 = self._getQuadrupole(s, mu, xi_smu_mock)
-
-            monofunc = InterpolatedUnivariateSpline(s, xi0, k=3)
-            integral = np.zeros_like(s)
-            for i in range(len(integral)):
-                integral[i] = quad(lambda x: monofunc(x) * x ** 2, 0, s[i], full_output=1)[0]
-            xibar = 3 * integral / s ** 3
-
-            dxi0 = xi0 - xibar
-
-            mock_dxi0.append(dxi0)
-            mock_xi2.append(xi2)
-
-        mock_dxi0 = np.asarray(mock_dxi0)
-        mock_xi2 = np.asarray(mock_xi2)
-
-        cov_dxi0 = self.getCovarianceMatrix(mock_dxi0)
-        cov_xi2 = self.getCovarianceMatrix(mock_xi2)
-        cov_xi02 = self.getCrossCovarianceMatrix(mock_dxi0, mock_xi2)
-        cov_xi20 = self.getCrossCovarianceMatrix(mock_xi2, mock_dxi0)
-
-        cout = [cov_dxi0, cov_xi2, cov_xi02, cov_xi20]
-        np.save(self.handle_cov, cout)
-
-        return cov_dxi0, cov_xi2, cov_xi02, cov_xi20
+    
 
     def run_mcmc(self, niter=500, backend_name=''):
         if backend_name == '':
@@ -531,7 +526,7 @@ class NadathurModel:
 
 
     def log_likelihood(self, theta):
-        beta, epsilon = theta
+        fs8, bs8, sigmav, alpha, epsilon = theta
         alpha = 1.0
         G = 2 * beta / (3 + beta)
         xi0 = self.get_AP_multipole(self.xi0_APSpline, epsilon)
@@ -558,12 +553,13 @@ class NadathurModel:
         return lp + self.log_likelihood(theta)
 
 
-    def theory_multipoles(self, beta, alpha_perp, alpha_para, s, mu):
+    def theory_multipoles(self, fs8, bs8, sigma_v, alpha_perp, alpha_par, s, mu):
 
         monopole = np.zeros(len(s))
         quadrupole = np.zeros(len(s))
         true_mu = np.zeros(len(mu))
         xi_model = np.zeros(len(mu))
+        scaled_fs8 = fs8 / self.s8norm
 
         # rescale input monopole functions to account for alpha values
         mus = np.linspace(0, 1., 101)
@@ -571,35 +567,21 @@ class NadathurModel:
         rescaled_r = np.zeros_like(r)
         for i in range(len(r)):
             rescaled_r[i] = np.trapz((r[i] * alpha_par) * np.sqrt(1. + (1. - mus ** 2) *
-                                                                       (alpha_perp ** 2 / alpha_par ** 2 - 1)), mus)
-        if rescaled_r[-1] < r[-1]:
-            # hack: extend the range at least as far to avoid uncontrolled extrapolation later
-            numpts = 0
-            x = np.hstack([rescaled_r, np.linspace(rescaled_r[-1], r[-1], numpts + 1)[1:]])
-            y1 = np.hstack([xi_r_func(r), xi_r_func(r[-1]) * np.ones(numpts)])
-            y2 = np.hstack([self.delta_r(r), self.delta_r(r[-1] * np.ones(numpts))])
-            y3 = np.hstack([self.Delta_r(r), self.Delta_r(r[-1]) * np.ones(numpts)])
-            y4 = np.hstack([self.sv_norm_func(r), self.sv_norm_func(r[-1]) * np.ones(numpts)])
-        else:
-            x = rescaled_r
-            y1 = xi_r_func(r)
-            y2 = self.delta_r(r)
-            y3 = self.Delta_r(r)
-            y4 = self.sv_norm_func(r)
+                            (alpha_perp ** 2 / alpha_par ** 2 - 1)), mus)
+
+        x = rescaled_r
+        y1 = xi_r_func(r)
+        y2 = self.delta_r(r)
+        y3 = self.Delta_r(r)
+        y4 = self.sv(r)
+
         # build rescaled interpolating functions using the relabelled separation vectors
         rescaled_xi_r = InterpolatedUnivariateSpline(x, y1, k=3)
-        if rescale_all:
-            # default: rescale all real-space monopoles calibrated to the fiducial cosmology, and correct amplitude
-            # of the dispersion function
-            rescaled_delta_r = InterpolatedUnivariateSpline(x, y2, k=3, ext=3)
-            rescaled_Delta_r = InterpolatedUnivariateSpline(x, y3, k=3, ext=3)
-            rescaled_sv_norm_func = InterpolatedUnivariateSpline(x, y4, k=3, ext=3)
-            sigma_v = alpha_par * sigma_v
-        else:
-            # alternative for historical purposes: leave matter density and velocity dispersion profiles fixed
-            rescaled_delta_r = InterpolatedUnivariateSpline(r, self.delta_r(r), k=3, ext=3)
-            rescaled_Delta_r = InterpolatedUnivariateSpline(r, self.Delta_r(r), k=3, ext=3)
-            rescaled_sv_norm_func = InterpolatedUnivariateSpline(r, self.sv_norm_func(r), k=3, ext=3)
+        rescaled_delta_r = InterpolatedUnivariateSpline(x, y2, k=3, ext=3)
+        rescaled_Delta_r = InterpolatedUnivariateSpline(x, y3, k=3, ext=3)
+        rescaled_sv = InterpolatedUnivariateSpline(x, y4, k=3, ext=3)
+        sigma_v = alpha_par * sigma_v
+ 
 
         for i in range(len(s)):
             for j in range(len(mu)):
@@ -609,7 +591,7 @@ class NadathurModel:
                 true_mu[j] = true_spar / true_s
 
                 rpar = true_spar + true_s * scaled_fs8 * rescaled_Delta_r(true_s) * true_mu[j] / 3.
-                sy_central = sigma_v * rescaled_sv_norm_func(np.sqrt(true_sperp**2 + rpar**2)) * self.iaH
+                sy_central = sigma_v * rescaled_sv(np.sqrt(true_sperp**2 + rpar**2)) * self.iaH
                 y = np.linspace(-3 * sy_central, 3 * sy_central, 100)
 
                 rpar = true_spar + true_s * scaled_fs8 * rescaled_Delta_r(true_s) * true_mu[j] / 3. - y
@@ -640,34 +622,6 @@ class NadathurModel:
 
         return monopole, monopole_bar, quadrupole
 
-    def get_AP_splines(self, epsilon_grid):
-        xi2_ap = []
-        xi0_ap = []
-        xibar_ap  = []
-        alpha = 1.0
-        for epsilon in epsilon_grid:
-            alpha_para = alpha * epsilon ** (-2/3)
-            alpha_perp = epsilon * alpha_para
-            xi0, xibar, xi2 = self.theory_multipoles(alpha_perp, alpha_para,
-                                                     self.s_for_xi, self.mu_for_xi)
-
-            xi0_ap.append(xi0)
-            xibar_ap.append(xibar)
-            xi2_ap.append(xi2)
-
-        xi0_ap = np.asarray(xi0_ap)
-        xibar_ap = np.asarray(xibar_ap)
-        xi2_ap = np.asarray(xi2_ap)
-
-        self.xi0_APSpline = [interp1d(epsilon_grid, xi0_ap[:,i]) for i in range(len(self.s_for_xi))]
-        self.xibar_APSpline = [interp1d(epsilon_grid, xibar_ap[:,i]) for i in range(len(self.s_for_xi))]
-        self.xi2_APSpline = [interp1d(epsilon_grid, xi2_ap[:,i]) for i in range(len(self.s_for_xi))]
-
-    def get_AP_multipole(self, splines, epsilon):
-        xi = []
-        for i in range(len(splines)):
-            xi.append(splines[i](epsilon))
-        return np.asarray(xi)
 
 
     def readCorrFileList(self, fnames):
@@ -737,56 +691,7 @@ class NadathurModel:
 
         return s, quadr
 
-    def getCovarianceMatrix(self, data, norm=False):
-        """
-        Assumes rows are observations,
-        columns are variables
-        """
-        nobs, nbins = np.shape(data)
-        mean = np.mean(data, axis=0)
-        cov = np.zeros([nbins, nbins])
 
-        for k in range(nobs):
-            for i in range(nbins):
-                for j in range(nbins):
-                    cov[i, j] += (data[k, i] - mean[i])*(data[k, j] - mean[j])
-
-        cov /= nobs - 1
-        
-        if norm:
-            corr = np.zeros_like(cov)
-            for i in range(nbins):
-                for j in range(nbins):
-                    corr[i, j] = cov[i, j] / np.sqrt(cov[i, i] * cov[j, j])
-            return corr
-        else:
-            return cov
-
-    def getCrossCovarianceMatrix(self, data1, data2, norm=False):
-        """
-        Assumes rows are observations,
-        columns are variables
-        """
-        nobs, nbins = np.shape(data1)
-        mean1 = np.mean(data1, axis=0)
-        mean2 = np.mean(data2, axis=0)
-        cov = np.zeros([nbins, nbins])
-
-        for k in range(nobs):
-            for i in range(nbins):
-                for j in range(nbins):
-                    cov[i, j] += (data1[k, i] - mean1[i])*(data2[k, j] - mean2[j])
-
-        cov /= nobs - 1
-        
-        if norm:
-            corr = np.zeros_like(cov)
-            for i in range(nbins):
-                for j in range(nbins):
-                    corr[i, j] = cov[i, j] / np.sqrt(cov[i, i] * cov[j, j])
-            return corr
-        else:
-            return cov
             
 
 

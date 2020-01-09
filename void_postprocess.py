@@ -37,7 +37,7 @@ def postprocess_voids(voids, tracers, randoms, handle, is_box,
             voids.VoidMatterCCF(kind='los_velocity')
     
     else:
-        voids.VoidMatterCCF(kind='monopole', median_cut=median_cut)
+        voids.VoidGalaxyCCF(kind='monopole', median_cut=median_cut)
         voids.VoidGalaxyCCF(kind='r-mu', median_cut=median_cut)
         
         if velocity:

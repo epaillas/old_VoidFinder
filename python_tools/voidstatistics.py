@@ -92,8 +92,10 @@ class VoidStatistics:
         '''
         if self.is_matter: 
             fout = self.handle + '.VM_CCF_monopole'
+            logfile = self.handle + '_vm_ccf_monopole.log'
         else:
             fout = self.handle + '.VG_CCF_monopole'
+            logfile = self.handle + '_vg_ccf_monopole.log'
 
         if self.is_box:
             binpath = sys.path[0] + '/SVF_box/bin/'
@@ -112,7 +114,6 @@ class VoidStatistics:
             binpath = sys.path[0] + '/SVF_survey/bin/'
             sys.exit('Not implemented!')
 
-        logfile = self.handle + '_VG_CCF_monopole.log'
         log = open(logfile, "w+")
         subprocess.call(cmd, stdout=log, stderr=log)
 
@@ -125,7 +126,10 @@ class VoidStatistics:
 
         if self.is_matter: 
             fout = self.handle + '.VM_CCF_rmu'
+            logfile = self.handle + '_vm_ccf_rmu.log'
+
         else:
+            logfile = self.handle + '_vg_ccf_rmu.log'
             fout = self.handle + '.VG_CCF_rmu'
 
         if self.is_box:
@@ -156,7 +160,6 @@ class VoidStatistics:
                    str(self.rvoid_min),
                    str(self.rvoid_max)]
 
-        logfile = self.handle + '_vg_ccf_rmu.log'
         log = open(logfile, "w+")
         subprocess.call(cmd, stdout=log, stderr=log)
 
@@ -198,8 +201,10 @@ class VoidStatistics:
 
         if self.is_matter: 
             fout = self.handle + '.VM_CCF_losvel'
+            logfile = self.handle + '_vm_ccf_losvel.log'
         else:
             fout = self.handle + '.VG_CCF_losvel'
+            logfile = self.handle + '_vg_ccf_losvel.log'
 
         if self.is_box:
             binpath = sys.path[0] + '/SVF_box/bin/'
@@ -217,7 +222,6 @@ class VoidStatistics:
         else:
             sys.exit('Not implemented...')
 
-        logfile = self.handle + '_vg_ccf_losvel.log'
         log = open(logfile, "w+")
         subprocess.call(cmd, stdout=log, stderr=log)
 
