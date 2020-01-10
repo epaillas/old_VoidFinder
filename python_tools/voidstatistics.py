@@ -61,6 +61,8 @@ class VoidStatistics:
             self._2PCF_sigma_pi()
         elif kind == 'los_velocity':
             self._2PCF_los_velocity()
+        elif kind == 'voidcen_velocity':
+            self._2PCF_voidcen_velocity()
         else:
             sys.exit('Correlation kind not recognized. Aborting...')
 
@@ -81,6 +83,8 @@ class VoidStatistics:
             self._2PCF_sigma_pi()
         elif kind == 'los_velocity':
             self._2PCF_los_velocity()
+        elif kind == 'voidcen_velocity':
+            self._2PCF_voidcen_velocity()
         else:
             sys.exit('Correlation kind not recognized. Aborting...')
 
@@ -209,6 +213,39 @@ class VoidStatistics:
         if self.is_box:
             binpath = sys.path[0] + '/SVF_box/bin/'
             cmd = [binpath + 'vg_ccf_los_velocity.exe',
+                   self.tracer_file,
+                   self.void_file,
+                   fout,
+                   str(self.box_size),
+                   str(self.dmin),
+                   str(self.dmax),
+                   str(self.nrbins),
+                   str(self.rvoid_min),
+                   str(self.rvoid_max),
+                   str(self.ngrid)]
+        else:
+            sys.exit('Not implemented...')
+
+        log = open(logfile, "w+")
+        subprocess.call(cmd, stdout=log, stderr=log)
+
+
+    def _2PCF_voidcen_velocity(self):
+        '''
+        Computes the void-galaxy cross-correlation
+        function in bins of r and mu.
+        '''
+
+        if self.is_matter: 
+            fout = self.handle + '.VM_CCF_voidcenvel'
+            logfile = self.handle + '_vm_ccf_voidcenvel.log'
+        else:
+            fout = self.handle + '.VG_CCF_voidcenvel'
+            logfile = self.handle + '_vg_ccf_voidcenvel.log'
+
+        if self.is_box:
+            binpath = sys.path[0] + '/SVF_box/bin/'
+            cmd = [binpath + 'vg_ccf_voidcen_velocity.exe',
                    self.tracer_file,
                    self.void_file,
                    fout,
