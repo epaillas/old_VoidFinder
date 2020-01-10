@@ -35,6 +35,7 @@ def postprocess_voids(voids, tracers, randoms, handle, is_box,
 
         if velocity:
             voids.VoidMatterCCF(kind='los_velocity')
+            voids.VoidMatterCCF(kind='voidcen_velocity')
     
     else:
         voids.VoidGalaxyCCF(kind='monopole', median_cut=median_cut)
@@ -42,6 +43,7 @@ def postprocess_voids(voids, tracers, randoms, handle, is_box,
         
         if velocity:
             voids.VoidGalaxyCCF(kind='los_velocity')
+            voids.VoidGalaxyCCF(kind='voidcen_velocity')
 
 
 if __name__ == '__main__':
