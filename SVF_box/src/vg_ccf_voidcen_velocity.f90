@@ -223,7 +223,7 @@ program vg_ccf_r_mu
     
                 r = (/ disx, disy, disz /)
                 v = (/ velx, vely, velz /)
-                voidcen = (/ xvc, yvc, zvc /)
+                voidcen = (/ disx, disy, disz /)
     
                 dis = norm2(r)! / rv
                 voidcen_vel = dot_product(v, voidcen) / norm2(voidcen)

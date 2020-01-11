@@ -48,6 +48,17 @@ class CaiModel:
         self.beta = self.fs8 / self.bs8
         self.G = (2 * self.beta) / (3 + self.beta)
 
+        eofz = np.sqrt((self.om_m * (1 + self.eff_z) ** 3 + 1 - self.om_m))
+        self.iaH = (1 + self.eff_z) / (100. * eofz)
+
+        print('1/aH = {}'.format(self.iaH))
+        print('f = {}'.format(self.f))
+        print('beta = {}'.format(self.beta))
+        print('G = {}'.format(self.G))
+        print('fs8 = {}'.format(self.fs8))
+        print('bs8 = {}'.format(self.bs8))
+        print('growth = {}'.format(self.growth))
+
         # build covariance matrix
         self.handle_cov = self.handle_obs + '_covmat.npy'
         if os.path.isfile(self.handle_cov):
