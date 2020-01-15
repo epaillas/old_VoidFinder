@@ -9,7 +9,7 @@ from astropy.io import fits
 from python_tools.cosmology import Cosmology
 from python_tools.galaxycat import GalaxyCatalogue
 from scipy.spatial import Delaunay
-from scipy.integrate import quad
+from scipy.integrate import quad, simps
 from scipy.interpolate import RectBivariateSpline, InterpolatedUnivariateSpline, interp1d
 import emcee
 import corner
@@ -90,7 +90,7 @@ class CaiModel:
         # self.get_AP_splines(epsilon_grid)
 
 
-        self.nwalkers = 4
+        self.nwalkers = 64
         self.ndim = 2
         beta_0 = self.fs8 / self.bs8
         epsilon_0 = 1.0
@@ -222,6 +222,9 @@ class CaiModel:
         quadrupole = np.zeros(len(s))
         true_mu = np.zeros(len(mu))
         xi_model = np.zeros(len(mu))
+        monopole2 = np.zeros(len(s))
+        quadrupole2 = np.zeros(len(s))
+        monopole_bar2 = np.zeros(len(s))
 
         for i in range(len(s)):
             for j in range(len(mu)):
@@ -236,20 +239,28 @@ class CaiModel:
             # build interpolating function for xi_smu at true_mu
             mufunc = InterpolatedUnivariateSpline(true_mu[np.argsort(true_mu)],
                                                   xi_model[np.argsort(true_mu)], k=3)
-            
+
             # get multipoles
-            monopole[i] = quad(lambda xx: mufunc(xx) / 2, -1, 1, full_output=1)[0]
-            quadrupole[i] = quad(lambda xx: mufunc(xx) * 5 / 2* (3 * xx ** 2 - 1) / 2., -1, 1, full_output=1)[0]
+            xaxis = np.linspace(-1, 1, 1000)
+
+            yaxis = mufunc(xaxis) / 2
+            monopole[i] = simps(yaxis, xaxis)
+
+            yaxis = mufunc(xaxis) * 5 / 2 * (3 * xaxis**2 - 1) / 2
+            quadrupole[i] = simps(yaxis, xaxis)
+            
             
         monofunc = InterpolatedUnivariateSpline(s, monopole, k=3)
             
         # cumulative monopole
         integral = np.zeros_like(s)
         for i in range(len(integral)):
-           integral[i] = quad(lambda x: monofunc(x) * x ** 2, 0, s[i], full_output=1)[0]
+            xaxis = np.linspace(0, s[i], 1000)
+            yaxis = monofunc(xaxis) * xaxis**2
+            integral[i] = simps(yaxis, xaxis)
         monopole_bar = 3 * integral / s ** 3
 
-        return monopole, monopole_bar, quadrupole
+        return monopole, quadrupole, monopole_bar
 
     def get_AP_splines(self, epsilon_grid):
         xi2_ap = []
