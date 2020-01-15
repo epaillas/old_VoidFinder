@@ -29,10 +29,13 @@ class CaiModel:
 
         self.handle_obs = handle_obs
         self.handle_mocks = handle_mocks
+        self.ncpu = cpu_count()
 
         print("Setting up Cai's void RSD model.")
         print('handle_obs: ' + handle_obs)
         print('handle_mocks: ' + handle_mocks)
+        print('Running in {} CPUs'.format(self.ncpu))
+
 
         # cosmology for Minerva
         self.om_m = 0.285
@@ -133,14 +136,11 @@ class CaiModel:
         if backend_name == '':
             backend_name = self.handle_obs + '_emceeChain.h5'
 
-        ncpu = cpu_count()
-
         print('Running emcee with the following parameters:')
         print('nwalkers: ' + str(self.nwalkers))
         print('ndim: ' + str(self.ndim))
         print('niter: ' + str(niter))
         print('backend: ' + backend_name)
-        print('Running in {} CPUs'.format(ncpu))
 
         backend = emcee.backends.HDFBackend(backend_name)
         backend.reset(self.nwalkers, self.ndim)
