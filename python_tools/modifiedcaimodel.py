@@ -21,7 +21,7 @@ import time
 
 
 
-class NadathurModel:
+class ModifiedCaiModel:
     '''
     Void-galaxy RSD model presented
     in Cai et al. (2016).
@@ -71,6 +71,12 @@ class NadathurModel:
         self.r_for_xi = data[:,0]
         xi_r = data[:,-1]
         self.xi_r = InterpolatedUnivariateSpline(self.r_for_xi, xi_r, k=1, ext=3)
+
+        integral = np.zeros_like(self.r_for_xi)
+        for i in range(len(integral)):
+            integral[i] = quad(lambda x: self.xi_r(x) * x ** 2, 0, self.r_for_xi[i], full_output=1)[0]
+        xibar_r = 3 * integral / self.r_for_xi ** 3
+        self.xibar_r = InterpolatedUnivariateSpline(self.r_for_xi, xibar_r, k=1, ext=3)
 
         # read void-matter correlation function
         data = np.genfromtxt(self.delta_r_file)
@@ -206,6 +212,9 @@ class NadathurModel:
         true_mu = np.zeros(len(mu))
         xi_model = np.zeros(len(mu))
         scaled_fs8 = fs8 / self.s8norm
+        scaled_bs8 = bs8 / self.s8norm
+        beta = scaled_fs8 / scaled_bs8
+        print(beta)
 
         # rescale input monopole functions to account for alpha values
         mus = np.linspace(0, 1., 101)
@@ -220,6 +229,7 @@ class NadathurModel:
         y2 = self.delta_r(r)
         y3 = self.Delta_r(r)
         y4 = self.sv(r)
+        y5 = self.xibar_r(r)
 
         # build rescaled interpolating functions using the relabelled separation vectors
         rescaled_xi_r = InterpolatedUnivariateSpline(x, y1, k=3)
@@ -227,6 +237,7 @@ class NadathurModel:
         rescaled_Delta_r = InterpolatedUnivariateSpline(x, y3, k=3, ext=3)
         rescaled_sv = InterpolatedUnivariateSpline(x, y4, k=3, ext=3)
         sigma_v = alpha_para * sigma_v
+        rescaled_xibar_r = InterpolatedUnivariateSpline(x, y5, k=3, ext=3)
  
 
         for i in range(len(s)):
@@ -236,19 +247,10 @@ class NadathurModel:
                 true_s = np.sqrt(true_spar ** 2. + true_sperp ** 2.)
                 true_mu[j] = true_spar / true_s
 
-                rpar = true_spar + true_s * scaled_fs8 * rescaled_Delta_r(true_s) * true_mu[j] / 3.
-                sy_central = sigma_v * rescaled_sv(np.sqrt(true_sperp**2 + rpar**2)) * self.iaH
-                y = np.linspace(-3 * sy_central, 3 * sy_central, 100)
+                r = true_s * (1 + scaled_fs8 * rescaled_Delta_r(true_s) * true_mu[j]**2 / 3.)
 
-                rpar = true_spar + true_s * scaled_fs8 * rescaled_Delta_r(true_s) * true_mu[j] / 3. - y
-                rr = np.sqrt(true_sperp ** 2 + rpar ** 2)
-                sy = sigma_v * rescaled_sv(rr) * self.iaH
-
-                integrand = (1 + rescaled_xi_r(rr)) * \
-                            (1 + (scaled_fs8 * rescaled_Delta_r(rr) / 3. - y * true_mu[j] / rr) * (1 - true_mu[j]**2) +
-                             scaled_fs8 * (rescaled_delta_r(rr) - 2 * rescaled_Delta_r(rr) / 3.) * true_mu[j]**2)
-                integrand = integrand * np.exp(-(y**2) / (2 * sy**2)) / (np.sqrt(2 * np.pi) * sy)
-                xi_model[j] = np.trapz(integrand, y) - 1
+                xi_model[j] = rescaled_xi_r(r) + scaled_fs8/3 * rescaled_Delta_r(r) \
+                              + scaled_fs8 * true_mu[j]**2 * (rescaled_delta_r(r) - rescaled_Delta_r(r))
 
 
             # build interpolating function for xi_smu at true_mu

@@ -223,10 +223,9 @@ program vg_ccf_r_mu
     
                 r = (/ disx, disy, disz /)
                 v = (/ velx, vely, velz /)
-                voidcen = (/ disx, disy, disz /)
     
                 dis = norm2(r)! / rv
-                voidcen_vel = dot_product(v, voidcen) / norm2(voidcen)
+                voidcen_vel = dot_product(v, r) / norm2(r)
     
                 if (dis .gt. rmin .and. dis .lt. rmax) then
                   rind = int((dis - rmin) / rwidth + 1)

@@ -5,11 +5,11 @@ import glob
 
 handle_mocks = '/Volumes/BlackIce/eboss/minerva_cats/void_stats/\
 real_real/\
-Galaxies_HOD_*_z0.57_Real_Real.SVF_recen_ovl0.5_MedianVoids.VG_CCF_voidcenvel'
+Galaxies_HOD_*_z0.57_Real_Real.SVF_recen_ovl0.5_MedianVoids.VM_CCF_voidcenvel'
 
 handle_obs = '/Volumes/BlackIce/eboss/minerva_cats/void_stats/\
 real_real/\
-Galaxies_HOD_z0.57_Real_Real.SVF_recen_ovl0.5_MedianVoids.VG_CCF_voidcenvel'
+Galaxies_HOD_z0.57_Real_Real.SVF_recen_ovl0.5_MedianVoids.VM_CCF_voidcenvel'
 
 mock_files = sorted(glob.glob(handle_mocks))
 xi_smu_list = []

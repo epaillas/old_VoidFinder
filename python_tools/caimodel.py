@@ -4,6 +4,7 @@ import sys
 import os
 import glob
 import subprocess
+from multiprocessing import Pool, cpu_count
 from astropy.io import fits
 from python_tools.cosmology import Cosmology
 from python_tools.galaxycat import GalaxyCatalogue
@@ -84,11 +85,11 @@ class CaiModel:
 
         # calculate multiples for a finite set of epsilon values,
         # and build splines to use later with mcmc
-        epsilon_grid = np.linspace(0.8, 1.2, 30)
-        self.get_AP_splines(epsilon_grid)
+        # epsilon_grid = np.linspace(0.8, 1.2, 30)
+        # self.get_AP_splines(epsilon_grid)
 
 
-        self.nwalkers = 64
+        self.nwalkers = 4
         self.ndim = 2
         beta_0 = self.fs8 / self.bs8
         epsilon_0 = 1.0
@@ -132,20 +133,24 @@ class CaiModel:
         if backend_name == '':
             backend_name = self.handle_obs + '_emceeChain.h5'
 
+        ncpu = cpu_count()
+
         print('Running emcee with the following parameters:')
         print('nwalkers: ' + str(self.nwalkers))
         print('ndim: ' + str(self.ndim))
         print('niter: ' + str(niter))
         print('backend: ' + backend_name)
-
+        print('Running in {} CPUs'.format(ncpu))
 
         backend = emcee.backends.HDFBackend(backend_name)
         backend.reset(self.nwalkers, self.ndim)
 
-        self.sampler = emcee.EnsembleSampler(self.nwalkers, self.ndim,
-                                             self.log_probability,
-                                             backend=backend)
-        self.sampler.run_mcmc(self.p0, niter, progress=True)
+        with Pool() as pool:
+
+            self.sampler = emcee.EnsembleSampler(self.nwalkers, self.ndim,
+                                                self.log_probability,
+                                                backend=backend, pool=pool)
+            self.sampler.run_mcmc(self.p0, niter, progress=True)
 
     def plot_mcmc_stats(self):
 
@@ -182,10 +187,15 @@ class CaiModel:
     def log_likelihood(self, theta):
         beta, epsilon = theta
         alpha = 1.0
+        alpha_para = alpha * epsilon ** (-2/3)
+        alpha_perp = epsilon * alpha_para
         G = 2 * beta / (3 + beta)
-        xi0 = self.get_AP_multipole(self.xi0_APSpline, epsilon)
-        xibar = self.get_AP_multipole(self.xibar_APSpline, epsilon)
-        xi2 = self.get_AP_multipole(self.xi2_APSpline, epsilon)
+        # xi0 = self.get_AP_multipole(self.xi0_APSpline, epsilon)
+        # xibar = self.get_AP_multipole(self.xibar_APSpline, epsilon)
+        # xi2 = self.get_AP_multipole(self.xi2_APSpline, epsilon)
+
+        xi0, xibar, xi2 = self.theory_multipoles(alpha_perp, alpha_para,
+                                                 self.s_for_xi, self.mu_for_xi)
 
         model = G * (xi0 - xibar)
         chi2 = np.dot(np.dot((xi2 - model), self.icov), xi2 - model)
@@ -225,7 +235,8 @@ class CaiModel:
 
 
             # build interpolating function for xi_smu at true_mu
-            mufunc = InterpolatedUnivariateSpline(true_mu, xi_model, k=3)
+            mufunc = InterpolatedUnivariateSpline(true_mu[np.argsort(true_mu)],
+                                                  xi_model[np.argsort(true_mu)], k=3)
             
             # get multipoles
             monopole[i] = quad(lambda xx: mufunc(xx) / 2, -1, 1, full_output=1)[0]
@@ -236,7 +247,7 @@ class CaiModel:
         # cumulative monopole
         integral = np.zeros_like(s)
         for i in range(len(integral)):
-            integral[i] = quad(lambda x: monofunc(x) * x ** 2, 0, s[i], full_output=1)[0]
+           integral[i] = quad(lambda x: monofunc(x) * x ** 2, 0, s[i], full_output=1)[0]
         monopole_bar = 3 * integral / s ** 3
 
         return monopole, monopole_bar, quadrupole
