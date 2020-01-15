@@ -34,8 +34,6 @@ class CaiModel:
         print("Setting up Cai's void RSD model.")
         print('handle_obs: ' + handle_obs)
         print('handle_mocks: ' + handle_mocks)
-        print('Running in {} CPUs'.format(self.ncpu))
-
 
         # cosmology for Minerva
         self.om_m = 0.285
@@ -132,7 +130,7 @@ class CaiModel:
 
         return cov_dxi0, cov_xi2, cov_xi02, cov_xi20
 
-    def run_mcmc(self, niter=500, backend_name=''):
+    def run_mcmc(self, niter=500, backend_name='', ncpu=1):
         if backend_name == '':
             backend_name = self.handle_obs + '_emceeChain.h5'
 
@@ -141,11 +139,12 @@ class CaiModel:
         print('ndim: ' + str(self.ndim))
         print('niter: ' + str(niter))
         print('backend: ' + backend_name)
+        print('Running in {} CPUs'.format(ncpu))
 
         backend = emcee.backends.HDFBackend(backend_name)
         backend.reset(self.nwalkers, self.ndim)
 
-        with Pool() as pool:
+        with Pool(processes=ncpu) as pool:
 
             self.sampler = emcee.EnsembleSampler(self.nwalkers, self.ndim,
                                                 self.log_probability,
