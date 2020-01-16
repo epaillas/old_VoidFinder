@@ -13,4 +13,4 @@ Galaxies_HOD_*_z0.57_Real_Redshift.SVF_recen_ovl0.5_MedianVoids.VG_CCF_rmu'
 
 model = CaiModel(handle_obs, handle_mocks)
 
-model.run_mcmc(niter=5000, ncpu=3)
+model.run_mcmc(niter=5000, ncpu=3, nwalkers=32)

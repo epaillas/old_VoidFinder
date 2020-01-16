@@ -90,13 +90,6 @@ class CaiModel:
         # self.get_AP_splines(epsilon_grid)
 
 
-        self.nwalkers = 64
-        self.ndim = 2
-        beta_0 = self.fs8 / self.bs8
-        epsilon_0 = 1.0
-        self.p0 = np.asarray([beta_0, epsilon_0]) \
-             + 1e-4*np.random.randn(self.nwalkers, self.ndim)
-
     def getMultipoleCovariance(self):
         files_mocks = sorted(glob.glob(self.handle_mocks))
         mock_dxi0 = []
@@ -130,26 +123,36 @@ class CaiModel:
 
         return cov_dxi0, cov_xi2, cov_xi02, cov_xi20
 
-    def run_mcmc(self, niter=500, backend_name='', ncpu=1):
+    def run_mcmc(self, niter=500, backend_name='', ncpu=1, nwalkers=32):
         if backend_name == '':
             backend_name = self.handle_obs + '_emceeChain.h5'
 
+        ndim = 2
+        beta_0 = self.fs8 / self.bs8
+        epsilon_0 = 1.0
+        p0 = np.asarray([beta_0, epsilon_0]) \
+             + 1e-4*np.random.randn(nwalkers, ndim)
+
         print('Running emcee with the following parameters:')
-        print('nwalkers: ' + str(self.nwalkers))
-        print('ndim: ' + str(self.ndim))
+        print('nwalkers: ' + str(nwalkers))
+        print('ndim: ' + str(ndim))
         print('niter: ' + str(niter))
         print('backend: ' + backend_name)
         print('Running in {} CPUs'.format(ncpu))
 
         backend = emcee.backends.HDFBackend(backend_name)
-        backend.reset(self.nwalkers, self.ndim)
+        backend.reset(nwalkers, ndim)
 
         with Pool(processes=ncpu) as pool:
 
-            self.sampler = emcee.EnsembleSampler(self.nwalkers, self.ndim,
+            self.sampler = emcee.EnsembleSampler(nwalkers, ndim,
                                                 self.log_probability,
                                                 backend=backend, pool=pool)
-            self.sampler.run_mcmc(self.p0, niter, progress=True)
+            self.sampler.run_mcmc(p0, niter, progress=True)
+
+        self.ndim = ndim
+        self.nwalkers = nwalkers
+        self.p0 = p0
 
     def plot_mcmc_stats(self):
 
