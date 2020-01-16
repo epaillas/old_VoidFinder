@@ -127,6 +127,9 @@ class CaiModel:
         if backend_name == '':
             backend_name = self.handle_obs + '_emceeChain.h5'
 
+
+        os.environ["OMP_NUM_THREADS"] = "1"
+
         ndim = 2
         beta_0 = self.fs8 / self.bs8
         epsilon_0 = 1.0
