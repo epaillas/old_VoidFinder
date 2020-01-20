@@ -41,7 +41,7 @@ class CaiModel:
         self.cosmo = Cosmology(om_m=self.om_m, s8=self.s8)
 
         self.eff_z = 0.57 # effective redshift for LRGs
-        self.b = 2.3 # bias for LRGs
+        self.b = 2.01 # bias for LRGs
 
         self.growth = self.cosmo.get_growth(self.eff_z)
         self.f = self.cosmo.get_f(self.eff_z)
@@ -146,12 +146,12 @@ class CaiModel:
         backend = emcee.backends.HDFBackend(backend_name)
         backend.reset(nwalkers, ndim)
 
-        with Pool(processes=ncpu) as pool:
+        #with Pool(processes=ncpu) as pool:
 
-            self.sampler = emcee.EnsembleSampler(nwalkers, ndim,
-                                                self.log_probability,
-                                                backend=backend, pool=pool)
-            self.sampler.run_mcmc(p0, niter, progress=True)
+        self.sampler = emcee.EnsembleSampler(nwalkers, ndim,
+                                            self.log_probability,
+                                            backend=backend)
+        self.sampler.run_mcmc(p0, niter, progress=True)
 
         self.ndim = ndim
         self.nwalkers = nwalkers

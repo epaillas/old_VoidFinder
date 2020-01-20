@@ -51,7 +51,7 @@ class CircularVoids:
         # set cosmology
         self.omega_m = omega_m
         self.h = h
-        self.cosmo = Cosmology(omega_m=omega_m)
+        self.cosmo = Cosmology(om_m=omega_m)
 
         print('handle: ' + self.handle)
         print('tracer_file: ' + self.tracer_file)

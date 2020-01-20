@@ -8,7 +8,7 @@ from astropy.io import fits
 from python_tools.cosmology import Cosmology
 from python_tools.galaxycat import GalaxyCatalogue
 from scipy.spatial import Delaunay
-from scipy.integrate import quad
+from scipy.integrate import quad, simps
 from scipy.interpolate import RectBivariateSpline, InterpolatedUnivariateSpline, interp1d
 import emcee
 import corner
@@ -20,8 +20,7 @@ import time
 
 
 
-
-class ModifiedCaiModel:
+class Model3:
     '''
     Void-galaxy RSD model presented
     in Cai et al. (2016).
@@ -35,7 +34,7 @@ class ModifiedCaiModel:
         self.xi_smu_file = xi_smu_file
 
 
-        print("Setting up Nadathur's void RSD model.")
+        print("Setting up void RSD model #3.")
 
         # cosmology for Minerva
         self.om_m = 0.285
@@ -249,26 +248,25 @@ class ModifiedCaiModel:
 
                 r = true_s * (1 + scaled_fs8 * rescaled_Delta_r(true_s) * true_mu[j]**2 / 3.)
 
-                xi_model[j] = rescaled_xi_r(r) + scaled_fs8/3 * rescaled_Delta_r(r) \
-                              + scaled_fs8 * true_mu[j]**2 * (rescaled_delta_r(r) - rescaled_Delta_r(r))
+                xi_model[j] = rescaled_xi_r(r) + scaled_fs8/3 * rescaled_Delta_r(r) * (1 + rescaled_xi_r(r))\
+                            + scaled_fs8 * true_mu[j]**2 * (rescaled_delta_r(r) - rescaled_Delta_r(r))\
+                            * (1 + rescaled_xi_r(r))
 
 
             # build interpolating function for xi_smu at true_mu
-            mufunc = InterpolatedUnivariateSpline(true_mu, xi_model, k=3)
+            mufunc = InterpolatedUnivariateSpline(true_mu[np.argsort(true_mu)],
+                                                  xi_model[np.argsort(true_mu)], k=3)
             
             # get multipoles
-            monopole[i] = quad(lambda xx: mufunc(xx) / 2, -1, 1, full_output=1)[0]
-            quadrupole[i] = quad(lambda xx: mufunc(xx) * 5 / 2* (3 * xx ** 2 - 1) / 2., -1, 1, full_output=1)[0]
-            
-        monofunc = InterpolatedUnivariateSpline(s, monopole, k=3)
-            
-        # cumulative monopole
-        integral = np.zeros_like(s)
-        for i in range(len(integral)):
-            integral[i] = quad(lambda x: monofunc(x) * x ** 2, 0, s[i], full_output=1)[0]
-        monopole_bar = 3 * integral / s ** 3
+            xaxis = np.linspace(-1, 1, 1000)
 
-        return monopole, monopole_bar, quadrupole
+            yaxis = mufunc(xaxis) / 2
+            monopole[i] = simps(yaxis, xaxis)
+
+            yaxis = mufunc(xaxis) * 5 / 2 * (3 * xaxis**2 - 1) / 2
+            quadrupole[i] = simps(yaxis, xaxis)
+            
+        return monopole, quadrupole
 
 
 
