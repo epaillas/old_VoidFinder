@@ -166,15 +166,15 @@ PROGRAM recentering
   read(10) field
   close(10)
   ngrid = nrows
-  field = field + 1
+  !field = field + 1
 
-  ! find 0.25 quantile of field
-  allocate(flat_field(nrows*ncols))
-  allocate(ind(nrows*ncols))
-  eps = 1e-10
-  flat_field = pack(field, .true.)
-  call hpsort_eps_epw (nrows * ncols, flat_field, ind, eps)
-  quant = flat_field((nrows*ncols)/10)
+  ! ! find 0.25 quantile of field
+  ! allocate(flat_field(nrows*ncols))
+  ! allocate(ind(nrows*ncols))
+  ! eps = 1e-10
+  ! flat_field = pack(field, .true.)
+  ! call hpsort_eps_epw (nrows * ncols, flat_field, ind, eps)
+  ! quant = flat_field((nrows*ncols)/10)
 
   open(11, file=input_centres, status='old')
   nc = 0

@@ -161,17 +161,17 @@ PROGRAM grow_spheres
   allocate(field(ncols, nrows))
   read(10) field
   ngrid = nrows
-  field = field + 1
+  !field = field + 1
 
-  print*, nrows, ncols
+  !print*, nrows, ncols
 
-  ! find 0.25 quantile of field
-  allocate(flat_field(nrows*ncols))
-  allocate(ind(nrows*ncols))
-  eps = 1e-10
-  flat_field = pack(field, .true.)
-  call hpsort_eps_epw (nrows * ncols, flat_field, ind, eps)
-  quant = flat_field((nrows*ncols)/10)
+  ! ! find 0.25 quantile of field
+  ! allocate(flat_field(nrows*ncols))
+  ! allocate(ind(nrows*ncols))
+  ! eps = 1e-10
+  ! flat_field = pack(field, .true.)
+  ! call hpsort_eps_epw (nrows * ncols, flat_field, ind, eps)
+  ! quant = flat_field((nrows*ncols)/10)
 
   open(11, file=input_centres, status='old', form='unformatted')
   read(11) nrows
