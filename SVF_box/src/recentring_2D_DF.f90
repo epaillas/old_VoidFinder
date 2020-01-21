@@ -273,7 +273,7 @@ PROGRAM recentering
           rnd_rvoid = rwidth * ii
           ncells = sum(counter(1:ii))
           rnd_nden = cum_rbin(ii) / ncells
-          if (rnd_nden .lt. quant .and. rnd_rvoid .gt. rvoid &
+          if (rnd_nden .lt. -0.01 .and. rnd_rvoid .gt. rvoid &
           .and. ncells .ge. 1) then
             rvoid = rnd_rvoid
             px = rnd_px
