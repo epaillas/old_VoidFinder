@@ -254,7 +254,7 @@ PROGRAM grow_spheres
           rvoid = rwidth * ii
           ncells = sum(counter(1:ii))
           nden = cum_rbin(ii) / ncells
-          if (nden .lt. quant .and. ncells .ge. 1) then
+          if (nden .lt. -0.01 .and. ncells .ge. 1) then
             nv = nv + 1
             write(filenumber, '(4F10.3)') &
             px, py, rvoid, nden
