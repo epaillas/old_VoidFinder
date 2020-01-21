@@ -163,6 +163,8 @@ PROGRAM grow_spheres
   ngrid = nrows
   field = field + 1
 
+  print*, nrows, ncols
+
   ! find 0.25 quantile of field
   allocate(flat_field(nrows*ncols))
   allocate(ind(nrows*ncols))
