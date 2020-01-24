@@ -1,0 +1,92 @@
+Changes in:
+
+V 1.3.2 (Mar 21, 2009):
+ 1) Added vozisol, a version of voz* designed to work on an isolated
+    bunch of points not in a periodic box.
+ 2) Some changes in zobovpostproc.py to work with current versions of
+    python packages (matplotlib, numpy)
+ 3) Added a void-finding example illustrating vozisol and
+    zobovpostproc.py to /examples, poisson_vloidsters.bash
+ 4) Incorporated the new qhull version 2010.1
+
+V 1.3.1 (Apr 19, 2008):
+ 1) jozov.c edited to work for both voids and clusters.  
+    Alpha version; not extensively tested.
+
+V 1.3 (Feb 29, 2008):
+ By Rick Wagner:
+ 1) voz1b1 now has an MPI version, voz1b1_mpi.
+    The arguments for the parallel version are
+    <pos file> <buffer size> <box size> <prefix> <n div>
+    Usage examples are in examples/*mpi.bash
+ 2) Three Python scripts are added in the bin directory:
+      cull_subhalos--remove subhalos (not the particles, just the groups)
+      writevtkpoints--write a VTK PolyData file of all particle positions
+      writevtkhalos--write VTK PolyData files of all halo particle positions
+      (The last two require the Python VTK bindings.)
+ 3) To reduce their memory footprint, vozinit and voz1b1 now read
+    in the position files in chunks. The size is defined in voz.h
+    via N_CHUNK.
+ 4) Made voz1b1 more flexibly handle period boundary conditions, by
+    duplicating buffer particles when needed. The maximum buffer size
+    is now (1 - 1/ndiv). This is useful for very small (32^3 or less)
+    particle counts. 
+ 5) Made the simulation grid size a command line argument to boz.
+ 6) Corrected print statement in voztie.c 
+ 7) Corrected order of argument to fread and fwrite in several places.
+ 8) Added memory deallocation to voz1b1.c to help parallel version.
+ 9) Changed boz scale factor in posread to boxsize.
+
+ By Mark Neyrinck:
+ 1) Reduced the number of command-line arguments in jozov.c.  Now it
+    assumes that the output of voz1b1, etc. is blabla.adj and
+    blabla.vol; jozov simply takes blabla as an arg.
+ 2) Changed output format for ZOBOV's jozov.c. Now all three output
+    files are in in ASCII format: 
+	.txt: list of voids along with data about them
+	.zone: particles in each zone
+	.void: zones in each void, in order of addition to the void.  Each
+		zone-adding event is also now marked with the density contrast
+		at which it happens
+ 3) Included post-processing Python routines (in bin/zobovpostproc.py)
+    that implement two strategies for determining edges of large
+    voids, described in Sect. 2.5 of arXiv:0712.3049.  These require
+    the new .void format.
+
+V 1.2 (Jan 16, 2008):
+ By Rick Wagner:
+ 1) Voboz now accepts the precision settings of Qhull.
+ 2) Corrected particle indexing in boz.c.*
+ 3) Moved qhull_a.h into voz.h.
+ 4) Moved common defines into voz.h.
+ 5) Fixed first array error in readfiles.c:posread*
+ 6) Makefile changes, including clean and install targets.
+* - these appear to be bugs in v.1.1 or v.1.1.1, but probably not v.1.03.
+
+ By Mark Neyrinck:
+ 7) voztie.c no longer dies if the volumes measured for a particle differ.
+ 8) ZOBOV and VOBOZ are now in a single package.
+
+V 1.1.1: (Jan 5, 2008)
+ A bug in the not-entirely-essential vozinit program fixed.
+
+V 1.1: (Jan 16, 2007)
+ (not well-tested) Many little changes, including decreased memory
+waste, and reporting of the most-bound particles. boz.c also tries
+unbinding with both the velocity centroid of the core zone of a halo,
+and the entire halo.
+
+V 1.03: (Jan 16, 2007)
+ In boz.c, fixed another small bug in the kinetic energy
+estimation. The bug would slightly affect spread-out but unmassive
+small haloes on the edge of a periodic box.
+
+V 1.02: (Dec 31, 2004)
+ In boz.c, fixed a bug in the kinetic energy calculation when using
+the grid (i.e. for the largest haloes). The kinetic energy had been
+somewhat underestimated, in a nonisotropic way.  Also in boz.c, made
+the scale factor a into a command-line parameter.
+
+V 1.01: (Feb 22, 2004)
+ Fixed a couple of minor bugs, made Omega_matter a command-line
+parameter instead of hard-coded.
