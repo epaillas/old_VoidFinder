@@ -37,12 +37,6 @@ class SphericalVoids:
         self.pos_cols = pos_cols
         self.use_guards = True
 
-        print('handle: ' + self.handle)
-        print('tracer_file: ' + self.tracer_file)
-        print('centres_file: ' + self.centres_file)
-        print('box_size: ' + str(self.box_size))
-        print('is_box: ' + str(self.is_box))
-
         # void parameters
         self.delta_voids = delta_voids
         self.rvoidmax = rvoidmax
@@ -59,6 +53,12 @@ class SphericalVoids:
         self.omega_m = omega_m
         self.h = h
         self.cosmo = Cosmology(om_m=omega_m)
+
+        print('handle: ' + self.handle)
+        print('tracer_file: ' + self.tracer_file)
+        print('centres_file: ' + self.centres_file)
+        print('box_size: ' + str(self.box_size))
+        print('is_box: ' + str(self.is_box))
 
         if 1 not in steps:
             if not self.is_box:
