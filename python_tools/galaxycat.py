@@ -9,7 +9,7 @@ class GalaxyCatalogue:
 
     def __init__(self, catalogue_file, is_box=True, box_size=1024.0, randoms=False, boss_like=False,
                 pos_cols=[0, 1, 2], omega_m=0.31, h=0.6777, verbose=True, zmin=0, zmax=10,
-                bin_write=True, output_file=None, has_velocity=False):
+                bin_write=True, output_file=None, has_velocity=False, skip_header=0):
 
         self.is_box = is_box
 
@@ -45,7 +45,7 @@ class GalaxyCatalogue:
                 data = np.load(catalogue_file)
             else:
                 try:
-                    data = np.genfromtxt(catalogue_file)
+                    data = np.genfromtxt(catalogue_file, skip_header=skip_header)
                 except:
                     sys.exit('Data format not recognized. Aborting...')
 
@@ -149,7 +149,7 @@ class ProjectedGalaxyCatalogue:
                 data = np.load(catalogue_file)
             else:
                 try:
-                    data = np.genfromtxt(catalogue_file)
+                    data = np.genfromtxt(catalogue_file, skip_header=skip_header)
                 except:
                     sys.exit('Data format not recognized. Aborting...')
 

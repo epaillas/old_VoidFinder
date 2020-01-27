@@ -17,7 +17,8 @@ class SphericalVoids:
                  boss_like=False, pos_cols='0,1,2', box_size=1024.0,
                  omega_m=0.31, h=0.6777, mask_file='', zmin=0.43, zmax=0.7,
                  verbose=False, handle='', nside=512, delta_voids=0.2,
-                 rvoidmax=100, ncores=1, steps='1,2,3,4', is_periodic=True):
+                 rvoidmax=100, ncores=1, steps='1,2,3,4', is_periodic=True,
+                 skip_header=0):
 
         steps = [int(i) for i in steps.split(',')]
         pos_cols = [int(i) for i in pos_cols.split(',')]

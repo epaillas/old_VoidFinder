@@ -18,15 +18,16 @@ from python_tools.sphericalvoids import SphericalVoids
 @click.option('--zmax', type=float, default=0.7, help='[Survey] High redshift cut')
 @click.option('--omega_m', type=float, default=0.31, help='[Survey] Omega matter.')
 @click.option('--h', type=float, default=67.77, help='[Survey] Little h.')
+@click.option('--skip_header', type=int, default=0, help='Lines to skip at the beginning of tracer file.')
 
 def run_spherical_voids(tracers, handle, is_box, ncores, steps, pos_cols,
                         rvoidmax, box_size, randoms, mask, boss_like,
-                        zmin, zmax, omega_m, h, is_periodic):
+                        zmin, zmax, omega_m, h, is_periodic, skip_header):
     
     voids = SphericalVoids(tracer_file=tracers, random_file=randoms, handle=handle,
                            is_box=is_box, box_size=box_size, steps=steps,
                            ncores=ncores, boss_like=boss_like, mask_file=mask,
-                           pos_cols=pos_cols, omega_m=omega_m, h=h,
+                           pos_cols=pos_cols, omega_m=omega_m, h=h, skip_header=skip_header,
                            rvoidmax=rvoidmax, zmin=zmin, zmax=zmax, is_periodic=is_periodic)
 
 if __name__ == '__main__':
