@@ -18,7 +18,7 @@ class SphericalVoids:
                  omega_m=0.31, h=0.6777, mask_file='', zmin=0.43, zmax=0.7,
                  verbose=False, handle='', nside=512, delta_voids=0.2,
                  rvoidmax=100, ncores=1, steps='1,2,3,4', is_periodic=True,
-                 skip_header=0):
+                 skip_header=0, has_velocity=False):
 
         steps = [int(i) for i in steps.split(',')]
         pos_cols = [int(i) for i in pos_cols.split(',')]
@@ -36,6 +36,7 @@ class SphericalVoids:
         self.steps = steps
         self.pos_cols = pos_cols
         self.use_guards = True
+        self.has_velocity = has_velocity
 
         # void parameters
         self.delta_voids = delta_voids
@@ -71,7 +72,7 @@ class SphericalVoids:
             self.tracers = GalaxyCatalogue(catalogue_file=tracer_file, is_box=is_box,
             box_size=box_size, randoms=False, boss_like=boss_like, omega_m=omega_m,
             h=h, bin_write=True, output_file=self.tracer_unf, pos_cols=pos_cols,
-            zmin=zmin, zmax=zmax)
+            zmin=zmin, zmax=zmax, has_velocity=has_velocity)
             
             if self.is_box == False:
                 if random_file == '':
@@ -80,7 +81,8 @@ class SphericalVoids:
                     self.randoms = GalaxyCatalogue(catalogue_file=random_file, is_box=self.is_box, 
                                                 randoms=True, boss_like=boss_like, omega_m=omega_m,
                                                 h=h, bin_write=True, output_file=self.random_unf,
-                                                pos_cols=pos_cols, zmin=zmin, zmax=zmax)
+                                                pos_cols=pos_cols, zmin=zmin, zmax=zmax,
+                                                has_velocity=has_velocity)
                     
                 if self.mask_file == '':
                     print('No mask file provided. Generating a rough mask...')

@@ -57,9 +57,8 @@ class GalaxyCatalogue:
                 self.y = data[:, pos_cols[1]]
                 self.z = data[:, pos_cols[2]]
 
-                if np.shape(data)[1] > 3:
+                if has_velocity:
                     print('Velocities included in data file...')
-                    has_velocity = True
                     vel_cols=[pos_cols[0] + 3, pos_cols[1] + 3, pos_cols[2] + 3]
                     self.vx = data[:, vel_cols[0]]
                     self.vy = data[:, vel_cols[1]]
