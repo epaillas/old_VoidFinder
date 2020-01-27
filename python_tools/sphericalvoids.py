@@ -72,7 +72,7 @@ class SphericalVoids:
             self.tracers = GalaxyCatalogue(catalogue_file=tracer_file, is_box=is_box,
             box_size=box_size, randoms=False, boss_like=boss_like, omega_m=omega_m,
             h=h, bin_write=True, output_file=self.tracer_unf, pos_cols=pos_cols,
-            zmin=zmin, zmax=zmax, has_velocity=has_velocity)
+            zmin=zmin, zmax=zmax, has_velocity=has_velocity, skip_header=skip_header)
             
             if self.is_box == False:
                 if random_file == '':
@@ -82,7 +82,7 @@ class SphericalVoids:
                                                 randoms=True, boss_like=boss_like, omega_m=omega_m,
                                                 h=h, bin_write=True, output_file=self.random_unf,
                                                 pos_cols=pos_cols, zmin=zmin, zmax=zmax,
-                                                has_velocity=has_velocity)
+                                                has_velocity=has_velocity, skip_header=skip_header)
                     
                 if self.mask_file == '':
                     print('No mask file provided. Generating a rough mask...')
