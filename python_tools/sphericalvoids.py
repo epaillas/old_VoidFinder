@@ -37,6 +37,12 @@ class SphericalVoids:
         self.pos_cols = pos_cols
         self.use_guards = True
 
+        print('handle: ' + self.handle)
+        print('tracer_file: ' + self.tracer_file)
+        print('centres_file: ' + self.centres_file)
+        print('box_size: ' + str(self.box_size))
+        print('is_box: ' + str(self.is_box))
+
         # void parameters
         self.delta_voids = delta_voids
         self.rvoidmax = rvoidmax
