@@ -103,8 +103,9 @@ class GalaxyCatalogue:
                 cout = np.hstack([self.x, self.y, self.z])
 
             print('Dimensions of galaxy catalogue:{}'.format(np.shape(cout)))
-            if sum(sum(np.isnan(cout))) != 0:
-                sys.exit('NaN entries were found in the galaxy catalogue. Aborting...')
+            nans = sum(sum(np.isnan(cout)))
+            if nans != 0:
+                sys.exit('{} NaN entries were found in the galaxy catalogue. Aborting...'.format(nans))
 
             f = FortranFile(output_file, 'w')
             nrows, ncols = np.shape(cout)
