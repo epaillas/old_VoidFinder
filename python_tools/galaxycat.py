@@ -16,11 +16,10 @@ class GalaxyCatalogue:
         if not is_box and randoms and catalogue_file is None:
             sys.exit('Error: randoms file is missing.')
 
-        if verbose:
-            if randoms:
-                print('Loading randoms data from file...')
-            else:
-                print('Loading galaxy data from file...')
+        if randoms:
+            print('Loading randoms data from file...')
+        else:
+            print('Loading galaxy data from file...')
 
         if boss_like:
             if self.is_box:
@@ -118,7 +117,7 @@ class GalaxyCatalogue:
 class ProjectedGalaxyCatalogue:
 
     def __init__(self, catalogue_file, is_box=True, box_size=1024.0, randoms=False, boss_like=False,
-                pos_cols=[0, 1], omega_m=0.31, h=0.6777, verbose=True, zmin=0, zmax=10,
+                pos_cols=[0, 1], omega_m=0.31, h=0.6777, zmin=0, zmax=10,
                 bin_write=True, output_file=None, has_velocity=False, skip_header=0):
 
         self.is_box = is_box
@@ -126,11 +125,10 @@ class ProjectedGalaxyCatalogue:
         if not is_box and randoms and catalogue_file is None:
             sys.exit('Error: randoms file is missing.')
 
-        if verbose:
-            if randoms:
-                print('Loading randoms data from file...')
-            else:
-                print('Loading galaxy data from file...')
+        if randoms:
+            print('Loading randoms data from file...')
+        else:
+            print('Loading galaxy data from file...')
 
         if boss_like:
             if self.is_box:
