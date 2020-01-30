@@ -362,7 +362,8 @@ class CircularVoids:
             fname = self.recentred_file
 
         voids = np.genfromtxt(fname)
-        voids = voids[np.argsort(voids[:, radius_col])]
+        if len(voids) < 1:
+            voids = voids[np.argsort(voids[:, radius_col])]
         voids = voids[::-1]
         
         fmt = 3*'%10.3f ' + '%10i ' + '%10.3f '
