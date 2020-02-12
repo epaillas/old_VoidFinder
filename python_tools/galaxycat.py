@@ -119,7 +119,7 @@ class GalaxyCatalogue:
         Calculates the volume spanned by the
         input catalogue.
         '''
-        points = np.c[self.x, self.y, self.z]
+        points = np.c_[self.x, self.y, self.z]
         hull = ss.ConvexHull(points)
         print('Volume spanned by tracers is {} Mpc^3'.format(hull.volume))
 
