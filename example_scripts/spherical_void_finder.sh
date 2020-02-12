@@ -9,6 +9,8 @@ ncores=1
 steps='1,2,3,4'
 pos_cols='0,1,2'
 rvoidmax=100
+skip_header=0
+has_velocity=False
 
 #-------- Periodic box settings --------
 box_size=1000
@@ -35,4 +37,6 @@ python $HOME/code/void_finder/void_finder.py \
 --mask "$mask" \
 --boss_like "$boss_like" \
 --zmin "$zmin" \
---zmax "$zmax"
+--zmax "$zmax" \
+--skip_header "$skip_header" \
+--has_velocity "$has_velocity"

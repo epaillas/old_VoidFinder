@@ -9,19 +9,18 @@ import scipy.spatial as ss
 class GalaxyCatalogue:
 
     def __init__(self, catalogue_file, is_box=True, box_size=1024.0, randoms=False, boss_like=False,
-                pos_cols=[0, 1, 2], omega_m=0.31, h=0.6777, verbose=True, zmin=0, zmax=10,
-                bin_write=True, output_file=None, has_velocity=False):
+                pos_cols=[0, 1, 2], omega_m=0.31, h=0.6777, zmin=0, zmax=10,
+                bin_write=True, output_file=None, has_velocity=False, skip_header=0):
 
         self.is_box = is_box
 
         if not is_box and randoms and catalogue_file is None:
             sys.exit('Error: randoms file is missing.')
 
-        if verbose:
-            if randoms:
-                print('Loading randoms data from file...')
-            else:
-                print('Loading galaxy data from file...')
+        if randoms:
+            print('Loading randoms data from file...')
+        else:
+            print('Loading galaxy data from file...')
 
         if boss_like:
             if self.is_box:
@@ -46,7 +45,7 @@ class GalaxyCatalogue:
                 data = np.load(catalogue_file)
             else:
                 try:
-                    data = np.genfromtxt(catalogue_file)
+                    data = np.genfromtxt(catalogue_file, skip_header=skip_header)
                 except:
                     sys.exit('Data format not recognized. Aborting...')
 
@@ -58,9 +57,8 @@ class GalaxyCatalogue:
                 self.y = data[:, pos_cols[1]]
                 self.z = data[:, pos_cols[2]]
 
-                if np.shape(data)[1] > 3:
+                if has_velocity:
                     print('Velocities included in data file...')
-                    has_velocity = True
                     vel_cols=[pos_cols[0] + 3, pos_cols[1] + 3, pos_cols[2] + 3]
                     self.vx = data[:, vel_cols[0]]
                     self.vy = data[:, vel_cols[1]]
@@ -104,6 +102,11 @@ class GalaxyCatalogue:
             else:
                 cout = np.hstack([self.x, self.y, self.z])
 
+            print('Dimensions of galaxy catalogue:{}'.format(np.shape(cout)))
+            nans = sum(sum(np.isnan(cout)))
+            if nans != 0:
+                sys.exit('{} NaN entries were found in the galaxy catalogue. Aborting...'.format(nans))
+
             f = FortranFile(output_file, 'w')
             nrows, ncols = np.shape(cout)
             f.write_record(nrows)
@@ -111,6 +114,7 @@ class GalaxyCatalogue:
             f.write_record(cout)
             f.close()
 
+<<<<<<< HEAD
     def getSurveyVolume(self):
         '''
         Calculates the volume spanned by the
@@ -119,23 +123,24 @@ class GalaxyCatalogue:
         points = np.c[self.x, self.y, self.z]
         hull = ss.ConvexHull(points)
         print('Volume spanned by tracers is {} Mpc^3'.format(hull.volume))
+=======
+>>>>>>> e59553dccb9c09be05b0183688c3b989d4259398
 
 class ProjectedGalaxyCatalogue:
 
     def __init__(self, catalogue_file, is_box=True, box_size=1024.0, randoms=False, boss_like=False,
-                pos_cols=[0, 1], omega_m=0.31, h=0.6777, verbose=True, zmin=0, zmax=10,
-                bin_write=True, output_file=None):
+                pos_cols=[0, 1], omega_m=0.31, h=0.6777, zmin=0, zmax=10,
+                bin_write=True, output_file=None, has_velocity=False, skip_header=0):
 
         self.is_box = is_box
 
         if not is_box and randoms and catalogue_file is None:
             sys.exit('Error: randoms file is missing.')
 
-        if verbose:
-            if randoms:
-                print('Loading randoms data from file...')
-            else:
-                print('Loading galaxy data from file...')
+        if randoms:
+            print('Loading randoms data from file...')
+        else:
+            print('Loading galaxy data from file...')
 
         if boss_like:
             if self.is_box:
@@ -159,7 +164,7 @@ class ProjectedGalaxyCatalogue:
                 data = np.load(catalogue_file)
             else:
                 try:
-                    data = np.genfromtxt(catalogue_file)
+                    data = np.genfromtxt(catalogue_file, skip_header=skip_header)
                 except:
                     sys.exit('Data format not recognized. Aborting...')
 
