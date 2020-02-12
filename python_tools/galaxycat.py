@@ -85,7 +85,7 @@ class GalaxyCatalogue:
             self.vy = self.vy.reshape(len(self.vy), 1)
             self.vz = self.vz.reshape(len(self.vz), 1)
 
-        rint('zmin: {}'.format(self.redshift.min()))
+        print('zmin: {}'.format(self.redshift.min()))
         print('zmax: {}'.format(self.redshift.max()))
 
         # redshift cut
