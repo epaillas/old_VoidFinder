@@ -114,7 +114,6 @@ class GalaxyCatalogue:
             f.write_record(cout)
             f.close()
 
-<<<<<<< HEAD
     def getSurveyVolume(self):
         '''
         Calculates the volume spanned by the
@@ -123,8 +122,6 @@ class GalaxyCatalogue:
         points = np.c[self.x, self.y, self.z]
         hull = ss.ConvexHull(points)
         print('Volume spanned by tracers is {} Mpc^3'.format(hull.volume))
-=======
->>>>>>> e59553dccb9c09be05b0183688c3b989d4259398
 
 class ProjectedGalaxyCatalogue:
 
