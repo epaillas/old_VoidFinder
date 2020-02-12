@@ -95,6 +95,9 @@ class GalaxyCatalogue:
             self.dec = self.dec[ind]
             self.redshift = self.redshift[ind]
 
+        print('zmin: {}'.format(self.redshift.min()))
+        print('zmax: {}'.format(self.redshift.max()))
+
         if bin_write:
             if has_velocity:
                 cout = np.hstack([self.x, self.y, self.z,
@@ -121,7 +124,7 @@ class GalaxyCatalogue:
         '''
         points = np.c_[self.x, self.y, self.z] / 1e3 # Mpc to Gpc
         hull = ss.ConvexHull(points)
-        print('Volume spanned by tracers is {} Mpc^3'.format(hull.volume))
+        print('Volume spanned by tracers is {} Gpc^3'.format(hull.volume))
 
 class ProjectedGalaxyCatalogue:
 
