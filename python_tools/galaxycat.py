@@ -85,6 +85,9 @@ class GalaxyCatalogue:
             self.vy = self.vy.reshape(len(self.vy), 1)
             self.vz = self.vz.reshape(len(self.vz), 1)
 
+        rint('zmin: {}'.format(self.redshift.min()))
+        print('zmax: {}'.format(self.redshift.max()))
+
         # redshift cut
         if not self.is_box:
             ind = (self.redshift >= zmin) & (self.redshift <= zmax)
@@ -95,8 +98,6 @@ class GalaxyCatalogue:
             self.dec = self.dec[ind]
             self.redshift = self.redshift[ind]
 
-        print('zmin: {}'.format(self.redshift.min()))
-        print('zmax: {}'.format(self.redshift.max()))
 
         if bin_write:
             if has_velocity:
