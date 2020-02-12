@@ -71,7 +71,7 @@ class CaiModel:
             print('Building covariance matrix...')
             cov_list = self.getMultipoleCovariance()
 
-        cov_dxi0, cov_xi2, cov_xi02, cov_xi20 = cov_list
+        cov_xi0, cov_dxi0, cov_xi2, cov_xi02, cov_xi20 = cov_list
 
         self.cov = cov_xi2 + self.G**2 * cov_dxi0 - self.G*cov_xi02 - self.G*cov_xi20
         self.icov = np.linalg.inv(self.cov)
@@ -92,6 +92,7 @@ class CaiModel:
 
     def getMultipoleCovariance(self):
         files_mocks = sorted(glob.glob(self.handle_mocks))
+        mock_xi0 = []
         mock_dxi0 = []
         mock_xi2 = []
         for fname in files_mocks:
@@ -107,21 +108,24 @@ class CaiModel:
 
             dxi0 = xi0 - xibar
 
+            mock_xi0.append(xi0)
             mock_dxi0.append(dxi0)
             mock_xi2.append(xi2)
 
+        mock_xi0 = np.asarray(mock_xi0)
         mock_dxi0 = np.asarray(mock_dxi0)
         mock_xi2 = np.asarray(mock_xi2)
 
+        cov_xi0 = self.getCovarianceMatrix(mock_xi0)
         cov_dxi0 = self.getCovarianceMatrix(mock_dxi0)
         cov_xi2 = self.getCovarianceMatrix(mock_xi2)
         cov_xi02 = self.getCrossCovarianceMatrix(mock_dxi0, mock_xi2)
         cov_xi20 = self.getCrossCovarianceMatrix(mock_xi2, mock_dxi0)
 
-        cout = [cov_dxi0, cov_xi2, cov_xi02, cov_xi20]
+        cout = [cov_xi0, cov_dxi0, cov_xi2, cov_xi02, cov_xi20]
         np.save(self.handle_cov, cout)
 
-        return cov_dxi0, cov_xi2, cov_xi02, cov_xi20
+        return cov_xi0, cov_dxi0, cov_xi2, cov_xi02, cov_xi20
 
     def run_mcmc(self, niter=500, backend_name='', ncpu=1, nwalkers=32):
         if backend_name == '':

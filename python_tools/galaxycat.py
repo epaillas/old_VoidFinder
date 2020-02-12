@@ -3,6 +3,7 @@ import sys
 from astropy.io import fits
 from python_tools.cosmology import Cosmology
 from scipy.io import FortranFile
+import scipy.spatial as ss
 
 
 class GalaxyCatalogue:
@@ -34,7 +35,7 @@ class GalaxyCatalogue:
             self.redshift = self.z
 
             # initialize Cartesian positions and observer distance
-            cosmo = Cosmology(omega_m=omega_m, h=h)
+            cosmo = Cosmology(om_m=omega_m, h=h)
             self.dist = cosmo.get_comoving_distance(self.redshift)
             self.x = self.dist * np.sin(self.dec * np.pi / 180) * np.cos(self.ra * np.pi / 180)
             self.y = self.dist * np.sin(self.dec * np.pi / 180) * np.sin(self.ra * np.pi / 180)
@@ -109,6 +110,15 @@ class GalaxyCatalogue:
             f.write_record(ncols)
             f.write_record(cout)
             f.close()
+
+    def getSurveyVolume(self):
+        '''
+        Calculates the volume spanned by the
+        input catalogue.
+        '''
+        points = np.c[self.x, self.y, self.z]
+        hull = ss.ConvexHull(points)
+        print('Volume spanned by tracers is {} Mpc^3'.format(hull.volume))
 
 class ProjectedGalaxyCatalogue:
 
