@@ -225,7 +225,7 @@ PROGRAM grow_spheres
           rvoid = rwidth * ii
           nden = cum_rbin(ii) / (pi * rvoid ** 2)
           ng = int(cum_rbin(ii))
-          if (nden .lt. delta * rho_mean .and. ng .gt. 0) then
+          if (nden .lt. delta * rho_mean .and. rvoid .gt. 0) then
             nv = nv + 1
             write(filenumber, '(3F10.3, 1I10, 1F10.3)') &
             px, py, rvoid, ng, nden / rho_mean
