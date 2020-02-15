@@ -11,6 +11,7 @@ pos_cols='0,1,2'
 rvoidmax=100
 skip_header=0
 has_velocity=False
+delete_files=False
 
 #-------- Periodic box settings --------
 box_size=1000
@@ -39,4 +40,5 @@ python $HOME/code/void_finder/void_finder.py \
 --zmin "$zmin" \
 --zmax "$zmax" \
 --skip_header "$skip_header" \
---has_velocity "$has_velocity"
+--has_velocity "$has_velocity" \
+--delete_files "$delete_files"
