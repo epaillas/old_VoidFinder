@@ -17,7 +17,8 @@ class CircularVoids:
                  boss_like=False, pos_cols='0,1,2', box_size=1024.0,
                  omega_m=0.31, h=0.6777, mask_file='', zmin=0.43, zmax=0.7,
                  verbose=False, handle='', nside=512, delta_voids=0.2,
-                 rvoidmax=50, ncores=1, steps='1,2,3,4', is_periodic=True):
+                 rvoidmax=50, ncores=1, steps='1,2,3,4', is_periodic=True,
+                 delete_files=False):
 
         steps = [int(i) for i in steps.split(',')]
         pos_cols = [int(i) for i in pos_cols.split(',')]
@@ -117,6 +118,13 @@ class CircularVoids:
             # save a catalog with sky coordinates
             if not self.is_box:
                 self.get_void_skycoords()
+
+        if delete_files:
+            os.remove(self.tracer_unf)
+            os.remove(self.random_unf)
+            os.remove(self.centres_file)
+            os.remove(self.voids_file)
+            os.remove(self.recentred_file)
             
 
     def concat_files(self, input_files, output_file):

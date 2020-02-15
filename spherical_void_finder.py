@@ -20,18 +20,19 @@ from python_tools.sphericalvoids import SphericalVoids
 @click.option('--h', type=float, default=67.77, help='[Survey] Little h.')
 @click.option('--skip_header', type=int, default=0, help='Lines to skip at the beginning of tracer file.')
 @click.option('--has_velocity', type=bool, default=False, help='Does the tracer file include velocities?')
+@click.option('--delete_files', type=bool, default=False, help='Delete intermediate files.')
 
 def run_spherical_voids(tracers, handle, is_box, ncores, steps, pos_cols,
                         rvoidmax, box_size, randoms, mask, boss_like,
                         zmin, zmax, omega_m, h, is_periodic, skip_header,
-                        has_velocity):
+                        has_velocity, delete_files):
     
     voids = SphericalVoids(tracer_file=tracers, random_file=randoms, handle=handle,
                            is_box=is_box, box_size=box_size, steps=steps,
                            ncores=ncores, boss_like=boss_like, mask_file=mask,
                            pos_cols=pos_cols, omega_m=omega_m, h=h, skip_header=skip_header,
                            rvoidmax=rvoidmax, zmin=zmin, zmax=zmax, is_periodic=is_periodic,
-                           has_velocity=has_velocity)
+                           has_velocity=has_velocity, delete_files=delete_files)
 
 if __name__ == '__main__':
     run_spherical_voids()

@@ -19,16 +19,19 @@ from python_tools.circularvoids import CircularVoids
 @click.option('--zmax', type=float, default=0.7, help='[Survey] High redshift cut')
 @click.option('--omega_m', type=float, default=0.31, help='[Survey] Omega matter.')
 @click.option('--h', type=float, default=67.77, help='[Survey] Little h.')
+@click.option('--delete_files', type=bool, default=False, help='Delete intermediate files.')
 
 def run_circular_voids(tracers, handle, is_box, ncores, steps, pos_cols,
                         rvoidmax, box_size, randoms, mask, boss_like,
-                        zmin, zmax, omega_m, h, is_periodic, delta_voids):
+                        zmin, zmax, omega_m, h, is_periodic, delta_voids,
+                        delete_files):
     
     voids = CircularVoids(tracer_file=tracers, random_file=randoms, handle=handle,
                            is_box=is_box, box_size=box_size, steps=steps,
                            ncores=ncores, boss_like=boss_like, mask_file=mask,
                            pos_cols=pos_cols, omega_m=omega_m, h=h, delta_voids=delta_voids,
-                           rvoidmax=rvoidmax, zmin=zmin, zmax=zmax, is_periodic=is_periodic)
+                           rvoidmax=rvoidmax, zmin=zmin, zmax=zmax, is_periodic=is_periodic,
+                           delete_files=delete_files)
 
 if __name__ == '__main__':
     run_circular_voids()

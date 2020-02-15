@@ -18,7 +18,7 @@ class SphericalVoids:
                  omega_m=0.31, h=0.6777, mask_file='', zmin=0.43, zmax=0.7,
                  verbose=False, handle='', nside=512, delta_voids=0.2,
                  rvoidmax=100, ncores=1, steps='1,2,3,4', is_periodic=True,
-                 skip_header=0, has_velocity=False):
+                 skip_header=0, has_velocity=False, delete_files=False):
 
         steps = [int(i) for i in steps.split(',')]
         pos_cols = [int(i) for i in pos_cols.split(',')]
@@ -120,6 +120,13 @@ class SphericalVoids:
             # save a catalog with sky coordinates
             if not self.is_box:
                 self.get_void_skycoords()
+
+        if delete_files:
+            os.remove(self.tracer_unf)
+            os.remove(self.random_unf)
+            os.remove(self.centres_file)
+            os.remove(self.voids_file)
+            os.remove(self.recentred_file)
             
 
     def concat_files(self, input_files, output_file):
