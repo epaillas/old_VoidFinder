@@ -121,10 +121,12 @@ class CircularVoids:
 
         if delete_files:
             os.remove(self.tracer_unf)
-            os.remove(self.random_unf)
             os.remove(self.centres_file)
             os.remove(self.voids_file)
             os.remove(self.recentred_file)
+
+            if not self.is_box:
+                os.remove(self.random_unf)
             
 
     def concat_files(self, input_files, output_file):
