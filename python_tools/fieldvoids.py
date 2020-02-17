@@ -63,8 +63,8 @@ class FieldVoids:
             voids = self.grow_circles(ncores=ncores)
 
         # Find better void centres by shifting the original positions
-        if 3 in steps:
-            voids = self.recentre_circles(ncores=ncores)
+        #if 3 in steps:
+        #    voids = self.recentre_circles(ncores=ncores)
 
         # Sort spheres in decreasing order of radius
         # and remove overlapping spheres
@@ -90,7 +90,7 @@ class FieldVoids:
     def remove_edge_voids(self, fname=''):
         print('Removing edge voids...')
         if fname == '':
-            fname = self.recentred_file
+            fname = self.voids_file
 
         voids = np.genfromtxt(fname)
         x = voids[:,0]
@@ -200,7 +200,7 @@ class FieldVoids:
         print('Sorting circles by decreasing radius...')
 
         if fname == '':
-            fname = self.recentred_file
+            fname = self.voids_file
 
         voids = np.genfromtxt(fname)
         voids = voids[np.argsort(voids[:, radius_col])]
@@ -213,12 +213,12 @@ class FieldVoids:
 
     def overlap_filter(self, overlap=0.0):
 
-        self.filtered_file = self.recentred_file + '_ovl{}'.format(str(overlap))
+        self.filtered_file = self.voids_file + '_ovl{}'.format(str(overlap))
 
         if self.is_box:
             binpath = sys.path[0] + '/SVF_box/bin/'
             self.ngrid = 100
-            cmd = [binpath + 'overlapping_2D.exe', self.recentred_file, self.filtered_file,
+            cmd = [binpath + 'overlapping_2D.exe', self.voids_file, self.filtered_file,
                    str(self.box_size), str(overlap), str(self.ngrid)]
         else:
             sys.exit('Not implemented!')
