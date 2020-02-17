@@ -206,7 +206,7 @@ class FieldVoids:
         voids = voids[np.argsort(voids[:, radius_col])]
         voids = voids[::-1]
         
-        fmt = 4*'%10.3f'
+        fmt = 3*'%10.3f ' + '%10i ' + '%10.3f '
         np.savetxt(fname, voids, fmt=fmt)
 
         return voids

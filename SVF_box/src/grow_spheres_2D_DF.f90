@@ -258,8 +258,8 @@ PROGRAM grow_spheres
           nden = cum_rbin(ii) / ncells
           if (nden .lt. -0.01 .and. ncells .ge. 1) then
             nv = nv + 1
-            write(filenumber, '(4F10.3)') &
-            px, py, rvoid, nden
+            write(filenumber, '(3F10.3, 1I10, 1F10.3)') &
+            px, py, rvoid, 0, nden
             exit
           end if
         end do
