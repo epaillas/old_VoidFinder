@@ -35,8 +35,8 @@ if args.model_number == 5:
 
     backend_name = args.xi_smu_obs + '_Model5_emceeChain.h5'
     ndim = 4
-    nwalkers = 16
-    niter = 1000
+    nwalkers = 64
+    niter = 5000
 
     fs8 = 0.5
     bs8 = 0.5
