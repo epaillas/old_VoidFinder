@@ -21,29 +21,32 @@ import time
 
 
 
-class NadathurModel:
+class Model5:
     '''
     Void-galaxy RSD model presented
     in Cai et al. (2016).
     '''
 
-    def __init__(self, delta_r_file, xi_r_file, sv_file, xi_smu_file):
+    def __init__(self, delta_r_file, xi_r_file, sv_file, xi_smu_file,
+                 covmat_file, xi_smu_mocks=''):
 
         self.delta_r_file = delta_r_file
         self.xi_r_file = xi_r_file
         self.sv_file = sv_file
         self.xi_smu_file = xi_smu_file
+        self.covmat_file = covmat_file
+        self.xi_smu_mocks = xi_smu_mocks
 
 
-        print("Setting up Nadathur's void RSD model.")
+        print("Setting up Void RSD model #5 .")
 
         # cosmology for Minerva
         self.om_m = 0.285
         self.s8 = 0.828
         self.cosmo = Cosmology(om_m=self.om_m, s8=self.s8)
 
-        self.eff_z = 0.57 # effective redshift for LRGs
-        self.b = 2.3 # bias for LRGs
+        self.eff_z = 0.57
+        self.b = 2.01 
 
         self.growth = self.cosmo.get_growth(self.eff_z)
         self.f = self.cosmo.get_f(self.eff_z)
@@ -53,18 +56,15 @@ class NadathurModel:
         self.iaH = (1 + self.eff_z) / (100. * eofz) 
 
         # build covariance matrix
-        # self.handle_cov = self.handle_real_redshift_mocks + '_covmat.npy'
-        # if os.path.isfile(self.handle_cov):
-        #     cov_list = np.load(self.handle_cov)
-        
-        # else:
-        #     cov_list = self.getMultipoleCovariance()
+        if os.path.isfile(self.covmat_file):
+            print('Reading covariance matrix: ' + self.covmat_file)
+            self.cov = np.load(self.covmat_file)
+        else:
+            print('Computing covariance matrix...')
+            self.cov = self.MultipoleCovariance()
+            np.save(self.covmat_file, self.cov)
 
-        # cov_dxi0, cov_xi2, cov_xi02, cov_xi20 = cov_list
-
-        # self.cov = cov_xi2 + self.G**2 * cov_dxi0 - self.G*cov_xi02 - self.G*cov_xi20
-        # self.icov = np.linalg.inv(self.cov)
-
+        self.icov = np.linalg.inv(self.cov)
 
         # read real-space monopole
         data = np.genfromtxt(self.xi_r_file)
@@ -92,111 +92,40 @@ class NadathurModel:
 
         # read redshift-space correlation function
         s, mu, xi_smu_obs = self.readCorrFile(self.xi_smu_file)
-        s, self.xi0 = self._getMonopole(s, mu, xi_smu_obs)
-        s, self.xi2 = self._getQuadrupole(s, mu, xi_smu_obs)
+        s, self.xi0_s = self._getMonopole(s, mu, xi_smu_obs)
+        s, self.xi2_s = self._getQuadrupole(s, mu, xi_smu_obs)
 
-        monofunc = InterpolatedUnivariateSpline(s, self.xi0, k=3)
-        integral = np.zeros_like(s)
-        for i in range(len(integral)):
-            integral[i] = quad(lambda x: monofunc(x) * x ** 2, 0, s[i], full_output=1)[0]
-        self.xibar = 3 * integral / s ** 3
+        self.datavec = np.concatenate((self.xi0_s, self.xi2_s))
 
         self.s_for_xi = s
         self.mu_for_xi = mu
 
-        # build an interpolating bivariate spline for 
-        # the correlation functions
-        # self.xi_smu = RectBivariateSpline(self.s_for_xi, self.mu_for_xi,
-        #                                   xi_smu_obs, kx=3, ky=3)
-
-
-
-        #self.nwalkers = 64
-        #self.ndim = 2
-        #beta_0 = self.fs8 / self.bs8
-        #epsilon_0 = 1.0
-        #self.p0 = np.asarray([beta_0, epsilon_0]) \
-        #     + 1e-4*np.random.randn(self.nwalkers, self.ndim)
-
     
-
-    def run_mcmc(self, niter=500, backend_name=''):
-        if backend_name == '':
-            backend_name = self.handle_obs + '_emceeChain.h5'
-
-        print('Running emcee with the following parameters:')
-        print('nwalkers: ' + str(self.nwalkers))
-        print('ndim: ' + str(self.ndim))
-        print('niter: ' + str(niter))
-        print('backend: ' + backend_name)
-
-
-        backend = emcee.backends.HDFBackend(backend_name)
-        backend.reset(self.nwalkers, self.ndim)
-
-        self.sampler = emcee.EnsembleSampler(self.nwalkers, self.ndim,
-                                             self.log_probability,
-                                             backend=backend)
-        self.sampler.run_mcmc(self.p0, niter, progress=True)
-
-    def plot_mcmc_stats(self):
-
-        print('Saving emcee statistics...')
-
-        fig, axes = plt.subplots(self.ndim, figsize=(10, 3.5*self.ndim),
-                                 sharex=True)
-        samples = self.sampler.get_chain()
-        labels = [r"$\beta$", r"$\epsilon$"]
-        for i in range(self.ndim):
-            ax = axes[i]
-            ax.plot(samples[:, :, i], "r", alpha=0.3)
-            ax.set_xlim(0, len(samples))
-            ax.set_ylabel(labels[i])
-            ax.yaxis.set_label_coords(-0.1, 0.5)
-
-        axes[-1].set_xlabel("Step number")
-
-        fout = self.handle_obs + '_emceeFlatChains.png'
-        print('Saving chains: ' + fout)
-        plt.savefig(fout)
-
-        flat_samples = self.sampler.get_chain(discard=100, thin=15, flat=True)
-        fig = corner.corner(flat_samples, labels=[r"$\beta$", r"$\epsilon$"],
-                    show_titles=True, quantiles=[0.16, 0.84],
-                    truths=[self.fs8/self.bs8, 1.0], truth_color='r')
-        fout = self.handle_obs + '_emceeCorner.png'
-        print('Saving corner: ' + fout)
-        plt.savefig(fout)
-
-
-
-
     def log_likelihood(self, theta):
-        fs8, bs8, sigmav, alpha, epsilon = theta
+        fs8, bs8, sigma_v, epsilon = theta
         alpha = 1.0
-        G = 2 * beta / (3 + beta)
-        xi0 = self.get_AP_multipole(self.xi0_APSpline, epsilon)
-        xibar = self.get_AP_multipole(self.xibar_APSpline, epsilon)
-        xi2 = self.get_AP_multipole(self.xi2_APSpline, epsilon)
+        alpha_para = alpha * epsilon ** (-2/3)
+        alpha_perp = epsilon * alpha_para
 
-        model = G * (xi0 - xibar)
-        chi2 = np.dot(np.dot((xi2 - model), self.icov), xi2 - model)
+        xi0, xibar, xi2 = self.theory_multipoles(fs8, bs8, sigma_v,
+                                                 alpha_perp, alpha_para,
+                                                 self.s_for_xi, self.mu_for_xi)
+
+        datavec = np.concatenate((xi0, xi2))
+
+        chi2 = np.dot(np.dot((self.datavec - datavec), self.icov), self.datavec - datavec)
         loglike = -1/2 * chi2 - np.log((2*np.pi)**(len(self.cov)/2)) * np.sum(np.linalg.eig(self.cov)[0])
         return loglike
 
     def log_prior(self, theta):
-        beta, epsilon = theta
+        fs8, bs8, sigma_v, epsilon = theta
+        beta = fs8 / bs8
 
-        if  0.1 < beta < 1.0 and 0.8 < epsilon < 1.2:
+        if 0.1 < fs8 < 0.8 and 0.2 < bs8 < 1.5 and 250 < sigma_v < 500 \
+        and 0.8 < epsilon < 1.2:
             return 0.0
         else:
             return -np.inf
-
-    def log_probability(self, theta):
-        lp = self.log_prior(theta)
-        if not np.isfinite(lp):
-            return -np.inf
-        return lp + self.log_likelihood(theta)
 
 
     def theory_multipoles(self, fs8, bs8, sigma_v, alpha_perp, alpha_para, s, mu):
@@ -268,28 +197,27 @@ class NadathurModel:
 
         return monopole, monopole_bar, quadrupole
 
+    
+    def MultipoleCovariance(self):
+        if self.xi_smu_mocks == '':
+            sys.exit('Could not find mock files to build covariance. Aborting...')
 
+        files_mocks = sorted(glob.glob(self.xi_smu_mocks))
+        mock_datavec = []
+        for fname in files_mocks:
+            s, mu, xi_smu_mock = self.readCorrFile(fname)
+            s, xi0 = self._getMonopole(s, mu, xi_smu_mock)
+            s, xi2 = self._getQuadrupole(s, mu, xi_smu_mock)
 
-    def readCorrFileList(self, fnames):
-        xi_smu_list = []
-        for fname in fnames:
-            data = np.genfromtxt(fname)
-            data[np.isnan(data)] = -1 # Set invalid values to -1
-            data[data == np.inf] = -1 # Set invalid values to -1 
-            s = np.unique(data[:,0])
-            mu = np.unique(data[:,3])
+            datavec = np.concatenate((xi0, xi2))
 
-            xi_smu = np.zeros([len(s), len(mu)])
-            counter = 0
-            for i in range(len(s)):
-                for j in range(len(mu)):
-                    xi_smu[i, j] = data[counter, -1]
-                    counter += 1
+            mock_datavec.append(datavec)
 
-            xi_smu_list.append(xi_smu)
+        mock_datavec = np.asarray(mock_datavec)
+        cov = self.CovarianceMatrix(mock_datavec)
+        
+        return cov
 
-        xi_smu_list = np.asarray(xi_smu_list)
-        return s, mu, xi_smu_list
 
     def readCorrFile(self, fname):
         data = np.genfromtxt(fname)
@@ -336,6 +264,31 @@ class NadathurModel:
             quadr[j] = quad(lambda x: mufunc(x) * 5 / 2 * (3. * x ** 2 - 1) / 2., -1, 1, full_output=1)[0]
 
         return s, quadr
+
+    def CovarianceMatrix(self, data, norm=False):
+        """
+        Assumes rows are observations,
+        columns are variables
+        """
+        nobs, nbins = np.shape(data)
+        mean = np.mean(data, axis=0)
+        cov = np.zeros([nbins, nbins])
+
+        for k in range(nobs):
+            for i in range(nbins):
+                for j in range(nbins):
+                    cov[i, j] += (data[k, i] - mean[i])*(data[k, j] - mean[j])
+
+        cov /= nobs - 1
+        
+        if norm:
+            corr = np.zeros_like(cov)
+            for i in range(nbins):
+                for j in range(nbins):
+                    corr[i, j] = cov[i, j] / np.sqrt(cov[i, i] * cov[j, j])
+            return corr
+        else:
+            return cov
 
 
             
