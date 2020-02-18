@@ -61,4 +61,4 @@ if args.model_number == 5:
                                         log_probability,
                                         backend=backend,
                                         pool=pool)
-        sampler.run_mcmc(p0, niter, progress=True)
+        sampler.run_mcmc(p0, niter, progress=False)
