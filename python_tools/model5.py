@@ -114,7 +114,7 @@ class Model5:
 
         datavec = np.concatenate((xi0, xi2))
 
-        chi2 = np.dot(np.dot((self.datavec - datavec), self.icov), self.datavec - datavec)
+        chi2 = np.dot(np.dot((datavec - self.datavec), self.icov), datavec - self.datavec)
         loglike = -self.nmocks/2 * np.log(1 + chi2/(self.nmocks-1))
         return loglike
 
