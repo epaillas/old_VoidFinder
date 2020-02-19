@@ -55,16 +55,16 @@ class Model5:
         eofz = np.sqrt((self.om_m * (1 + self.eff_z) ** 3 + 1 - self.om_m))
         self.iaH = (1 + self.eff_z) / (100. * eofz) 
 
-        # # build covariance matrix
-        # if os.path.isfile(self.covmat_file):
-        #     print('Reading covariance matrix: ' + self.covmat_file)
-        #     self.cov = np.load(self.covmat_file)
-        # else:
-        #     print('Computing covariance matrix...')
-        #     self.cov = self.MultipoleCovariance()
-        #     np.save(self.covmat_file, self.cov)
+        # build covariance matrix
+        if os.path.isfile(self.covmat_file):
+            print('Reading covariance matrix: ' + self.covmat_file)
+            self.cov = np.load(self.covmat_file)
+        else:
+            print('Computing covariance matrix...')
+            self.cov = self.MultipoleCovariance()
+            np.save(self.covmat_file, self.cov)
 
-        # self.icov = np.linalg.inv(self.cov)
+        self.icov = np.linalg.inv(self.cov)
 
         # read real-space monopole
         data = np.genfromtxt(self.xi_r_file)
