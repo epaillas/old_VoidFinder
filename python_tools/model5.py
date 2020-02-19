@@ -122,10 +122,10 @@ class Model5:
         beta = fs8 / bs8
 
         if 0.1 < fs8 < 0.8 and 0.45 < bs8 < 1.9 and 250 < sigma_v < 500 \
-        and 0.8 < epsilon < 1.2 and 0.1 < beta < 0.8:
+        and 0.8 < epsilon < 1.2:
             return 0.0
-        else:
-            return -np.inf
+        
+        return -np.inf
 
 
     def theory_multipoles(self, fs8, bs8, sigma_v, alpha_perp, alpha_para, s, mu):
