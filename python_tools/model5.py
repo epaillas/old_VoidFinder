@@ -121,8 +121,8 @@ class Model5:
         fs8, bs8, sigma_v, epsilon = theta
         beta = fs8 / bs8
 
-        if 0.1 < fs8 < 0.8 and 0.2 < bs8 < 1.5 and 250 < sigma_v < 500 \
-        and 0.8 < epsilon < 1.2:
+        if 0.1 < fs8 < 0.8 and 0.45 < bs8 < 1.9 and 250 < sigma_v < 500 \
+        and 0.8 < epsilon < 1.2 and 0.1 < beta < 0.8:
             return 0.0
         else:
             return -np.inf
