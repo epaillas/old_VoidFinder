@@ -38,8 +38,8 @@ if args.model_number == 5:
     nwalkers = 64
     niter = 5000
 
-    fs8 = 0.5
-    bs8 = 0.5
+    fs8 = 0.4727
+    bs8 = 1.2507
     sigma_v = 300
     epsilon = 1
 
