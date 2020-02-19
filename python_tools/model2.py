@@ -21,30 +21,28 @@ import time
 
 
 
-class Model5:
+class Model2:
     '''
     Void-galaxy RSD model presented
     in Cai et al. (2016).
     '''
 
-    def __init__(self, delta_r_file, xi_r_file, sv_file, xi_smu_file,
+    def __init__(self, delta_r_file, xi_r_file, xi_smu_file,
                  covmat_file, xi_smu_mocks=''):
 
         self.delta_r_file = delta_r_file
         self.xi_r_file = xi_r_file
-        self.sv_file = sv_file
         self.xi_smu_file = xi_smu_file
         self.covmat_file = covmat_file
         self.xi_smu_mocks = xi_smu_mocks
 
 
-        print("Setting up Void RSD model #5 .")
+        print("Setting up Void RSD model #2 .")
 
         # cosmology for Minerva
         self.om_m = 0.285
         self.s8 = 0.828
         self.cosmo = Cosmology(om_m=self.om_m, s8=self.s8)
-        self.nmocks = 120
 
         self.eff_z = 0.57
         self.b = 2.01 
@@ -85,12 +83,6 @@ class Model5:
         Delta_r = 3 * integral / self.r_for_delta ** 3
         self.Delta_r = InterpolatedUnivariateSpline(self.r_for_delta, Delta_r, k=3, ext=3)
 
-        # read los velocity dispersion profile
-        data = np.genfromtxt(self.sv_file)
-        self.r_for_sv = data[:,0]
-        sv = data[:,-1] / data[-1, -1]
-        self.sv = InterpolatedUnivariateSpline(self.r_for_sv, sv, k=3, ext=3)
-
         # read redshift-space correlation function
         s, mu, xi_smu_obs = self.readCorrFile(self.xi_smu_file)
         s, self.xi0_s = self._getMonopole(s, mu, xi_smu_obs)
@@ -115,7 +107,7 @@ class Model5:
         datavec = np.concatenate((xi0, xi2))
 
         chi2 = np.dot(np.dot((self.datavec - datavec), self.icov), self.datavec - datavec)
-        loglike = -self.nmocks/2 * np.log(1 + chi2/(self.nmocks-1))
+        loglike = -1/2 * chi2 - np.log((2*np.pi)**(len(self.cov)/2)) * np.sum(np.linalg.eig(self.cov)[0])
         return loglike
 
     def log_prior(self, theta):
@@ -129,7 +121,7 @@ class Model5:
         return -np.inf
 
 
-    def theory_multipoles(self, fs8, bs8, sigma_v, alpha_perp, alpha_para, s, mu):
+    def theory_multipoles(self, fs8, bs8, alpha_perp, alpha_para, s, mu):
 
         monopole = np.zeros(len(s))
         quadrupole = np.zeros(len(s))
@@ -149,15 +141,11 @@ class Model5:
         y1 = self.xi_r(r)
         y2 = self.delta_r(r)
         y3 = self.Delta_r(r)
-        y4 = self.sv(r)
 
         # build rescaled interpolating functions using the relabelled separation vectors
         rescaled_xi_r = InterpolatedUnivariateSpline(x, y1, k=3)
         rescaled_delta_r = InterpolatedUnivariateSpline(x, y2, k=3, ext=3)
         rescaled_Delta_r = InterpolatedUnivariateSpline(x, y3, k=3, ext=3)
-        rescaled_sv = InterpolatedUnivariateSpline(x, y4, k=3, ext=3)
-        sigma_v = alpha_para * sigma_v
- 
 
         for i in range(len(s)):
             for j in range(len(mu)):
@@ -166,19 +154,10 @@ class Model5:
                 true_s = np.sqrt(true_spar ** 2. + true_sperp ** 2.)
                 true_mu[j] = true_spar / true_s
 
-                rpar = true_spar + true_s * scaled_fs8 * rescaled_Delta_r(true_s) * true_mu[j] / 3.
-                sy_central = sigma_v * rescaled_sv(np.sqrt(true_sperp**2 + rpar**2)) * self.iaH
-                y = np.linspace(-3 * sy_central, 3 * sy_central, 100)
+                r = true_s * (1 + scaled_fs8/3 * rescaled_Delta_r(true_s) * true_mu[j]**2)
 
-                rpar = true_spar + true_s * scaled_fs8 * rescaled_Delta_r(true_s) * true_mu[j] / 3. - y
-                rr = np.sqrt(true_sperp ** 2 + rpar ** 2)
-                sy = sigma_v * rescaled_sv(rr) * self.iaH
-
-                integrand = (1 + rescaled_xi_r(rr)) * \
-                            (1 + (scaled_fs8 * rescaled_Delta_r(rr) / 3. - y * true_mu[j] / rr) * (1 - true_mu[j]**2) +
-                             scaled_fs8 * (rescaled_delta_r(rr) - 2 * rescaled_Delta_r(rr) / 3.) * true_mu[j]**2)
-                integrand = integrand * np.exp(-(y**2) / (2 * sy**2)) / (np.sqrt(2 * np.pi) * sy)
-                xi_model[j] = np.trapz(integrand, y) - 1
+                xi_model[j] = (1 + rescaled_xi_r(r)) * (1 - scaled_fs8 /3*rescaled_Delta_r(r) - scaled_fs8  * true_mu[j]**2*
+                                            (rescaled_delta_r(r) - rescaled_Delta_r(r)))**(-1) - 1
 
 
             # build interpolating function for xi_smu at true_mu

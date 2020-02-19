@@ -40,7 +40,7 @@ if args.model_number == 5:
 
     fs8 = 0.4727
     bs8 = 1.2507
-    sigma_v = 300
+    sigma_v = 280
     epsilon = 1
 
     p0 =  np.asarray([fs8, bs8, sigma_v, epsilon]) + 1e-4*np.random.randn(nwalkers, ndim)
