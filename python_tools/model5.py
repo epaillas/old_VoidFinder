@@ -103,12 +103,12 @@ class Model5:
 
     
     def log_likelihood(self, theta):
-        fs8, bs8, sigma_v, epsilon = theta
+        fs8, sigma_v, epsilon = theta
         alpha = 1.0
         alpha_para = alpha * epsilon ** (-2/3)
         alpha_perp = epsilon * alpha_para
 
-        xi0, xibar, xi2 = self.theory_multipoles(fs8, bs8, sigma_v,
+        xi0, xibar, xi2 = self.theory_multipoles(fs8, sigma_v,
                                                  alpha_perp, alpha_para,
                                                  self.s_for_xi, self.mu_for_xi)
 
@@ -119,16 +119,16 @@ class Model5:
         return loglike
 
     def log_prior(self, theta):
-        fs8, bs8, sigma_v, epsilon = theta
+        fs8, sigma_v, epsilon = theta
 
-        if -2 < fs8 < 2 and -2 < bs8 < 2 and 0 < sigma_v < 1000 \
-        and 0.5 < epsilon < 1.5:
+
+        if 0.1 < fs8 < 0.5 and 100 < sigma_v < 500 and 0.8 < epsilon < 1.2:
             return 0.0
         
         return -np.inf
 
 
-    def theory_multipoles(self, fs8, bs8, sigma_v, alpha_perp, alpha_para, s, mu):
+    def theory_multipoles(self, fs8, sigma_v, alpha_perp, alpha_para, s, mu):
 
         monopole = np.zeros(len(s))
         quadrupole = np.zeros(len(s))

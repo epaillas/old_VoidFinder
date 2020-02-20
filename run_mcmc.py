@@ -33,17 +33,16 @@ if args.model_number == 5:
     model = Model5(delta_r_file=args.delta_r, xi_r_file=args.xi_r, sv_file=args.sv_r,
                    xi_smu_file=args.xi_smu_obs, xi_smu_mocks=args.xi_smu_mocks, covmat_file=args.covmat)
 
-    backend_name = args.xi_smu_obs + '_Model5_emceeChain.h5'
-    ndim = 4
-    nwalkers = 56
+    backend_name = args.xi_smu_obs + '_Model5_emceeChain_test.h5'
+    ndim = 3
+    nwalkers = 16
     niter = 5000
 
     fs8 = 0.5
-    bs8 = 0.5
     sigma_v = 200
-    epsilon = 0.8
+    epsilon = 1.0
 
-    p0 =  np.asarray([fs8, bs8, sigma_v, epsilon]) + 1e-4*np.random.randn(nwalkers, ndim)
+    p0 =  np.asarray([fs8, sigma_v, epsilon]) + 1e-4*np.random.randn(nwalkers, ndim)
 
     print('Running emcee with the following parameters:')
     print('nwalkers: ' + str(nwalkers))
@@ -61,4 +60,4 @@ if args.model_number == 5:
                                         log_probability,
                                         backend=backend,
                                         pool=pool)
-        sampler.run_mcmc(p0, niter, progress=False)
+        sampler.run_mcmc(p0, niter, progress=True)
