@@ -8,7 +8,7 @@ from astropy.io import fits
 from python_tools.cosmology import Cosmology
 from python_tools.galaxycat import GalaxyCatalogue
 from scipy.spatial import Delaunay
-from scipy.integrate import quad
+from scipy.integrate import quad, simps
 from scipy.interpolate import RectBivariateSpline, InterpolatedUnivariateSpline, interp1d
 import emcee
 import corner
@@ -108,7 +108,7 @@ class Model5:
         alpha_para = alpha * epsilon ** (-2/3)
         alpha_perp = epsilon * alpha_para
 
-        xi0, xibar, xi2 = self.theory_multipoles(fs8, sigma_v,
+        xi0, xi2 = self.theory_multipoles(fs8, sigma_v,
                                                  alpha_perp, alpha_para,
                                                  self.s_for_xi, self.mu_for_xi)
 
@@ -184,18 +184,17 @@ class Model5:
             mufunc = InterpolatedUnivariateSpline(true_mu, xi_model, k=3)
             
             # get multipoles
-            monopole[i] = quad(lambda xx: mufunc(xx) / 2, -1, 1, full_output=1)[0]
-            quadrupole[i] = quad(lambda xx: mufunc(xx) * 5 / 2* (3 * xx ** 2 - 1) / 2., -1, 1, full_output=1)[0]
+            xaxis = np.linspace(-1, 1, 1000)
+
+            yaxis = mufunc(xaxis) / 2
+            monopole[i] = simps(yaxis, xaxis)
+
+            yaxis = mufunc(xaxis) * 5 / 2 * (3 * xaxis**2 - 1) / 2
+            quadrupole[i] = simps(yaxis, xaxis)
             
         monofunc = InterpolatedUnivariateSpline(s, monopole, k=3)
             
-        # cumulative monopole
-        integral = np.zeros_like(s)
-        for i in range(len(integral)):
-            integral[i] = quad(lambda x: monofunc(x) * x ** 2, 0, s[i], full_output=1)[0]
-        monopole_bar = 3 * integral / s ** 3
-
-        return monopole, monopole_bar, quadrupole
+        return monopole, quadrupole
 
     
     def MultipoleCovariance(self):

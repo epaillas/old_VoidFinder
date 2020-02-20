@@ -2,7 +2,7 @@
 
 #-------- Universal settings --------
 
-ncores=2
+ncores=3
 model_number=5
 
 root_real=/Volumes/BlackIce/eboss/minerva_cats/void_stats/real_real/

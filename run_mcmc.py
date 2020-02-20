@@ -35,14 +35,17 @@ if args.model_number == 5:
 
     backend_name = args.xi_smu_obs + '_Model5_emceeChain_test.h5'
     ndim = 3
-    nwalkers = 16
+    nwalkers = 32
     niter = 5000
 
-    fs8 = 0.5
-    sigma_v = 200
+    fs8 = 0.472
+    sigma_v = 300
     epsilon = 1.0
 
-    p0 =  np.asarray([fs8, sigma_v, epsilon]) + 1e-4*np.random.randn(nwalkers, ndim)
+    start_params = np.array([fs8, sigma_v, epsilon])
+    scales = [1, 1000, 1]
+
+    p0 = [start_params + 1e-2 * np.random.randn(ndim) * scales for i in range(nwalkers)]
 
     print('Running emcee with the following parameters:')
     print('nwalkers: ' + str(nwalkers))
