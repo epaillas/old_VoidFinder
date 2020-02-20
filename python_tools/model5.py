@@ -47,7 +47,7 @@ class Model5:
         self.nmocks = 120
 
         self.eff_z = 0.57
-        self.b = 2.01 
+        self.b = 2.05
 
         self.growth = self.cosmo.get_growth(self.eff_z)
         self.f = self.cosmo.get_f(self.eff_z)
@@ -120,10 +120,9 @@ class Model5:
 
     def log_prior(self, theta):
         fs8, bs8, sigma_v, epsilon = theta
-        beta = fs8 / bs8
 
-        if 0.1 < fs8 < 0.8 and 0.45 < bs8 < 1.9 and 250 < sigma_v < 500 \
-        and 0.8 < epsilon < 1.2:
+        if -2 < fs8 < 2 and -2 < bs8 < 2 and 0 < sigma_v < 1000 \
+        and 0.5 < epsilon < 1.5:
             return 0.0
         
         return -np.inf

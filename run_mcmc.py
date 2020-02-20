@@ -35,13 +35,13 @@ if args.model_number == 5:
 
     backend_name = args.xi_smu_obs + '_Model5_emceeChain.h5'
     ndim = 4
-    nwalkers = 64
+    nwalkers = 56
     niter = 5000
 
-    fs8 = 0.4727
-    bs8 = 1.2507
-    sigma_v = 280
-    epsilon = 1
+    fs8 = 0.5
+    bs8 = 0.5
+    sigma_v = 200
+    epsilon = 0.8
 
     p0 =  np.asarray([fs8, bs8, sigma_v, epsilon]) + 1e-4*np.random.randn(nwalkers, ndim)
 
