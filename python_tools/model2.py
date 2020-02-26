@@ -45,7 +45,7 @@ class Model2:
         self.cosmo = Cosmology(om_m=self.om_m, s8=self.s8)
 
         self.eff_z = 0.57
-        self.b = 2.01 
+        self.b = 2.05
 
         self.growth = self.cosmo.get_growth(self.eff_z)
         self.f = self.cosmo.get_f(self.eff_z)
@@ -88,40 +88,42 @@ class Model2:
         s, self.xi0_s = self._getMonopole(s, mu, xi_smu_obs)
         s, self.xi2_s = self._getQuadrupole(s, mu, xi_smu_obs)
 
-        self.datavec = np.concatenate((self.xi0_s, self.xi2_s))
+        #self.datavec = np.concatenate((self.xi0_s, self.xi2_s))
+        self.datavec = self.xi2_s
 
         self.s_for_xi = s
         self.mu_for_xi = mu
 
     
     def log_likelihood(self, theta):
-        fs8, bs8, sigma_v, epsilon = theta
+        fs8, epsilon = theta
         alpha = 1.0
         alpha_para = alpha * epsilon ** (-2/3)
         alpha_perp = epsilon * alpha_para
 
-        xi0, xibar, xi2 = self.theory_multipoles(fs8, bs8, sigma_v,
+        xi0, xibar, xi2 = self.theory_multipoles(fs8,
                                                  alpha_perp, alpha_para,
                                                  self.s_for_xi, self.mu_for_xi)
 
-        datavec = np.concatenate((xi0, xi2))
+        #datavec = np.concatenate((xi0, xi2))
+        datavec = xi2
 
         chi2 = np.dot(np.dot((self.datavec - datavec), self.icov), self.datavec - datavec)
         loglike = -1/2 * chi2 - np.log((2*np.pi)**(len(self.cov)/2)) * np.sum(np.linalg.eig(self.cov)[0])
         return loglike
 
     def log_prior(self, theta):
-        fs8, bs8, sigma_v, epsilon = theta
-        beta = fs8 / bs8
+        fs8, epsilon = theta
 
-        if 0.1 < fs8 < 0.8 and 0.45 < bs8 < 1.9 and 250 < sigma_v < 500 \
-        and 0.8 < epsilon < 1.2:
+        beta = fs8 / self.b * self.s8norm
+
+        if 0.1 < fs8 < 0.8 and 0.8 < epsilon < 1.2:
             return 0.0
         
         return -np.inf
 
 
-    def theory_multipoles(self, fs8, bs8, alpha_perp, alpha_para, s, mu):
+    def theory_multipoles(self, fs8, alpha_perp, alpha_para, s, mu):
 
         monopole = np.zeros(len(s))
         quadrupole = np.zeros(len(s))
@@ -189,7 +191,8 @@ class Model2:
             s, xi0 = self._getMonopole(s, mu, xi_smu_mock)
             s, xi2 = self._getQuadrupole(s, mu, xi_smu_mock)
 
-            datavec = np.concatenate((xi0, xi2))
+            #datavec = np.concatenate((xi0, xi2))
+            datavec = xi2
 
             mock_datavec.append(datavec)
 

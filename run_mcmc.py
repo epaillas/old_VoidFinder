@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from python_tools.model5 import Model5
+from python_tools.model2 import Model2
 import os
 import sys
 import argparse
@@ -27,6 +28,44 @@ parser.add_argument('--covmat', type=str)
 args = parser.parse_args()  
 
 os.environ["OMP_NUM_THREADS"] = "1"
+
+if args.model_number == 2:
+
+    model = Model2(delta_r_file=args.delta_r, xi_r_file=args.xi_r,
+                   xi_smu_file=args.xi_smu_obs, xi_smu_mocks=args.xi_smu_mocks, covmat_file=args.covmat)
+
+    backend_name = args.xi_smu_obs + '_Model2_emceeChain_test.h5'
+    ndim = 2
+    nwalkers = 64
+    niter = 5000
+
+    fs8 = 0.472
+    epsilon = 1.0
+
+    start_params = np.array([fs8, epsilon])
+    scales = [1, 1]
+
+    p0 = [start_params + 1e-2 * np.random.randn(ndim) * scales for i in range(nwalkers)]
+
+    print('Running emcee with the following parameters:')
+    print('nwalkers: ' + str(nwalkers))
+    print('ndim: ' + str(ndim))
+    print('niter: ' + str(niter))
+    print('backend: ' + backend_name)
+    print('Running in {} CPUs'.format(args.ncores))
+
+    backend = emcee.backends.HDFBackend(backend_name)
+    backend.reset(nwalkers, ndim)
+
+    with Pool(processes=args.ncores) as pool:
+
+        sampler = emcee.EnsembleSampler(nwalkers, ndim,
+                                        log_probability,
+                                        backend=backend,
+                                        pool=pool)
+        sampler.run_mcmc(p0, niter, progress=True)
+
+
 
 if args.model_number == 5:
 
