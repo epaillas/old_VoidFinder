@@ -37,6 +37,8 @@ class Model5:
         self.covmat_file = covmat_file
         self.xi_smu_mocks = xi_smu_mocks
 
+        self.full_fit = False
+
 
         print("Setting up Void RSD model #5 .")
 
@@ -96,7 +98,10 @@ class Model5:
         s, self.xi0_s = self._getMonopole(s, mu, xi_smu_obs)
         s, self.xi2_s = self._getQuadrupole(s, mu, xi_smu_obs)
 
-        self.datavec = np.concatenate((self.xi0_s, self.xi2_s))
+        if self.full_fit:
+            self.datavec = np.concatenate((self.xi0_s, self.xi2_s))
+        else:
+            self.datavec = self.xi2_s
 
         self.s_for_xi = s
         self.mu_for_xi = mu
@@ -109,12 +114,15 @@ class Model5:
         alpha_perp = epsilon * alpha_para
 
         xi0, xi2 = self.theory_multipoles(fs8, sigma_v,
-                                                 alpha_perp, alpha_para,
-                                                 self.s_for_xi, self.mu_for_xi)
+                                          alpha_perp, alpha_para,
+                                          self.s_for_xi, self.mu_for_xi)
 
-        datavec = np.concatenate((xi0, xi2))
+        if self.full_fit:
+            modelvec = np.concatenate((xi0, xi2))
+        else:
+            modelvec = xi2
 
-        chi2 = np.dot(np.dot((datavec - self.datavec), self.icov), datavec - self.datavec)
+        chi2 = np.dot(np.dot((modelvec - self.datavec), self.icov), modelvec - self.datavec)
         loglike = -self.nmocks/2 * np.log(1 + chi2/(self.nmocks-1))
         return loglike
 
@@ -208,7 +216,10 @@ class Model5:
             s, xi0 = self._getMonopole(s, mu, xi_smu_mock)
             s, xi2 = self._getQuadrupole(s, mu, xi_smu_mock)
 
-            datavec = np.concatenate((xi0, xi2))
+            if self.full_fit:
+                datavec = np.concatenate((xi0, xi2))
+            else:
+                datavec = xi2
 
             mock_datavec.append(datavec)
 
