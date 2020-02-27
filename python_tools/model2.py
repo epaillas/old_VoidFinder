@@ -8,7 +8,7 @@ from astropy.io import fits
 from python_tools.cosmology import Cosmology
 from python_tools.galaxycat import GalaxyCatalogue
 from scipy.spatial import Delaunay
-from scipy.integrate import quad
+from scipy.integrate import quad, simps
 from scipy.interpolate import RectBivariateSpline, InterpolatedUnivariateSpline, interp1d
 import emcee
 import corner
