@@ -276,6 +276,8 @@ class Model5:
             yaxis = mufunc(xaxis) * 5 / 2 * (3 * xaxis**2 - 1) / 2
             quadrupole[i] = simps(yaxis, xaxis)
 
+        return s, quadrupole
+
     def CovarianceMatrix(self, data, norm=False):
         """
         Assumes rows are observations,
