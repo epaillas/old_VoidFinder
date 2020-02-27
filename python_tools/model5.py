@@ -260,20 +260,21 @@ class Model5:
         return r, quadrupole
 
     def _getMonopole(self, s, mu, xi_smu):
-        mono = np.zeros(xi_smu.shape[0])
-        for j in range(xi_smu.shape[0]):
-            mufunc = InterpolatedUnivariateSpline(mu, xi_smu[j, :], k=3)
-            mono[j] = quad(lambda x: mufunc(x) / 2, -1, 1, full_output=1)[0]
-
-        return s, mono
+        monopole = np.zeros(xi_smu.shape[0])
+        for i in range(xi_smu.shape[0]):
+            mufunc = InterpolatedUnivariateSpline(mu, xi_smu[i, :], k=3)
+            xaxis = np.linspace(-1, 1, 1000)
+            yaxis = mufunc(xaxis) / 2
+            monopole[i] = simps(yaxis, xaxis)
+        return s, monopole
 
     def _getQuadrupole(self, s, mu, xi_smu):
-        quadr = np.zeros(xi_smu.shape[0])
-        for j in range(xi_smu.shape[0]):
-            mufunc = InterpolatedUnivariateSpline(mu, xi_smu[j, :], k=3)
-            quadr[j] = quad(lambda x: mufunc(x) * 5 / 2 * (3. * x ** 2 - 1) / 2., -1, 1, full_output=1)[0]
-
-        return s, quadr
+        quadrupole = np.zeros(xi_smu.shape[0])
+        for i in range(xi_smu.shape[0]):
+            mufunc = InterpolatedUnivariateSpline(mu, xi_smu[i, :], k=3)
+            xaxis = np.linspace(-1, 1, 1000)
+            yaxis = mufunc(xaxis) * 5 / 2 * (3 * xaxis**2 - 1) / 2
+            quadrupole[i] = simps(yaxis, xaxis)
 
     def CovarianceMatrix(self, data, norm=False):
         """
