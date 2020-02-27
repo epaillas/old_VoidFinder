@@ -130,7 +130,7 @@ class Model5:
         fs8, sigma_v, epsilon = theta
 
 
-        if 0.1 < fs8 < 0.5 and 100 < sigma_v < 500 and 0.8 < epsilon < 1.2:
+        if 0.1 < fs8 < 2.0 and 50 < sigma_v < 500 and 0.8 < epsilon < 1.2:
             return 0.0
         
         return -np.inf
