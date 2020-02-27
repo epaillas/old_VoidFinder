@@ -30,6 +30,8 @@ class Model2:
     def __init__(self, delta_r_file, xi_r_file, xi_smu_file,
                  covmat_file, xi_smu_mocks=''):
 
+        self.full_fit = False
+
         self.delta_r_file = delta_r_file
         self.xi_r_file = xi_r_file
         self.xi_smu_file = xi_smu_file
@@ -89,7 +91,10 @@ class Model2:
         s, self.xi0_s = self._getMonopole(s, mu, xi_smu_obs)
         s, self.xi2_s = self._getQuadrupole(s, mu, xi_smu_obs)
 
-        self.datavec = np.concatenate((self.xi0_s, self.xi2_s))
+        if self.full_fit:
+            self.datavec = np.concatenate((self.xi0_s, self.xi2_s))
+        else:
+            self.datavec = self.xi2_s
 
         self.s_for_xi = s
         self.mu_for_xi = mu
@@ -105,7 +110,10 @@ class Model2:
                                           alpha_perp, alpha_para,
                                           self.s_for_xi, self.mu_for_xi)
 
-        modelvec = np.concatenate((xi0, xi2))
+        if self.full_fit:
+            modelvec = np.concatenate((xi0, xi2))
+        else:
+            modelvec = xi2
 
         chi2 = np.dot(np.dot((modelvec - self.datavec), self.icov), modelvec - self.datavec)
         loglike = -self.nmocks/2 * np.log(1 + chi2/(self.nmocks-1))
@@ -185,7 +193,10 @@ class Model2:
             s, xi0 = self._getMonopole(s, mu, xi_smu_mock)
             s, xi2 = self._getQuadrupole(s, mu, xi_smu_mock)
 
-            datavec = np.concatenate((xi0, xi2))
+            if self.full_fit:
+                datavec = np.concatenate((xi0, xi2))
+            else:
+                datavec = xi2
 
             mock_datavec.append(datavec)
 
