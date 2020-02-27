@@ -19,20 +19,20 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import time
 
-class CaiModel:
+class Model3:
     '''
     Void-galaxy RSD model presented
     in Cai et al. (2016).
     '''
 
-    def __init__(self, handle_obs, handle_mocks):
+    def __init__(self, xi_smu_file, covmat_file, xi_smu_mocks=''):
 
-        self.handle_obs = handle_obs
-        self.handle_mocks = handle_mocks
+        self.xi_smu_file = xi_smu_file
+        self.xi_smu_mocks = xi_smu_mocks
+        self.covmat_file = covmat_file
+        self.nmocks = 120
 
-        print("Setting up Cai's void RSD model.")
-        print('handle_obs: ' + handle_obs)
-        print('handle_mocks: ' + handle_mocks)
+        print("Setting up void RSD model #2.")
 
         # cosmology for Minerva
         self.om_m = 0.285
@@ -40,7 +40,7 @@ class CaiModel:
         self.cosmo = Cosmology(om_m=self.om_m, s8=self.s8)
 
         self.eff_z = 0.57 # effective redshift for LRGs
-        self.b = 2.01 # bias for LRGs
+        self.b = 2.05 # bias for LRGs
 
         self.growth = self.cosmo.get_growth(self.eff_z)
         self.f = self.cosmo.get_f(self.eff_z)
@@ -61,24 +61,18 @@ class CaiModel:
         print('growth = {}'.format(self.growth))
 
         # build covariance matrix
-        self.handle_cov = self.handle_obs + '_Model3_CovMat.npy'
-        if os.path.isfile(self.handle_cov):
-            print('Reading covariance matrix: ' + self.handle_cov)
-            cov_list = np.load(self.handle_cov)
+        if os.path.isfile(self.covmat_file):
+            print('Reading covariance matrix: ' + self.covmat_file)
+            self.cov = np.load(self.covmat_file)
         else:
-            cov_list = self.MultipoleCovariance()
-            np.save(self.handle_cov, cov_list)
-
-        self.cov_xi0, self.cov_dxi0, self.cov_xi2, self.cov_xi02, self.cov_xi20 = cov_list
-
-
-        self.cov = cov_xi2 + self.G**2 * cov_dxi0 - self.G*cov_xi02 - self.G*cov_xi20
+            print('Computing covariance matrix...')
+            self.cov = self.MultipoleCovariance()
+            np.save(self.covmat_file, self.cov)
 
         self.icov = np.linalg.inv(self.cov)
 
-
         # build an interpolating spline for xi_smu
-        self.s_for_xi, self.mu_for_xi, xi_smu_obs = self.readCorrFile(handle_obs)
+        self.s_for_xi, self.mu_for_xi, xi_smu_obs = self.readCorrFile(self.xi_smu_file)
         self.xi_smu = RectBivariateSpline(self.s_for_xi, self.mu_for_xi,
                                           xi_smu_obs, kx=3, ky=3)
 
@@ -91,14 +85,12 @@ class CaiModel:
         alpha_perp = epsilon * alpha_para
         G = 2 * beta / (3 + beta)
 
-        cov = self.cov_xi2 + G**2 * self.cov_dxi0 - G * self.cov_xi02 - G * self.cov_xi20
-
         xi0, xibar, xi2 = self.theory_multipoles(alpha_perp, alpha_para,
                                                  self.s_for_xi, self.mu_for_xi)
 
         model = G * (xi0 - xibar)
         chi2 = np.dot(np.dot((xi2 - model), self.icov), xi2 - model)
-        loglike = -1/2 * chi2 - np.log((2*np.pi)**(len(self.cov)/2)) * np.sum(np.linalg.eig(self.cov)[0])
+        loglike = -self.nmocks/2 * np.log(1 + chi2/(self.nmocks-1))
         return loglike
 
     def log_prior(self, theta):
@@ -116,9 +108,6 @@ class CaiModel:
         quadrupole = np.zeros(len(s))
         true_mu = np.zeros(len(mu))
         xi_model = np.zeros(len(mu))
-        monopole2 = np.zeros(len(s))
-        quadrupole2 = np.zeros(len(s))
-        monopole_bar2 = np.zeros(len(s))
 
         for i in range(len(s)):
             for j in range(len(mu)):
@@ -154,43 +143,32 @@ class CaiModel:
             integral[i] = simps(yaxis, xaxis)
         monopole_bar = 3 * integral / s ** 3
 
-        return monopole, quadrupole, monopole_bar
+        return monopole, monopole_bar, quadrupole
 
     def MultipoleCovariance(self):
-        files_mocks = sorted(glob.glob(self.handle_mocks))
+        files_mocks = sorted(glob.glob(self.xi_smu_mocks))
         mock_xi0 = []
-        mock_dxi0 = []
         mock_xi2 = []
         for fname in files_mocks:
-            s, mu, xi_smu_mock = readCorrFile(fname)
-            s, xi0 = _getMonopole(s, mu, xi_smu_mock)
-            s, xi2 = _getQuadrupole(s, mu, xi_smu_mock)
-
-            monofunc = InterpolatedUnivariateSpline(s, xi0, k=3)
-            integral = np.zeros_like(s)
-            for i in range(len(integral)):
-                integral[i] = quad(lambda x: monofunc(x) * x ** 2, 0, s[i], full_output=1)[0]
-            xibar = 3 * integral / s ** 3
-
-            dxi0 = xi0 - xibar
+            s, mu, xi_smu_mock = self.readCorrFile(fname)
+            s, xi0 = self._getMonopole(s, mu, xi_smu_mock)
+            s, xi2 = self._getQuadrupole(s, mu, xi_smu_mock)
 
             mock_xi0.append(xi0)
-            mock_dxi0.append(dxi0)
             mock_xi2.append(xi2)
 
         mock_xi0 = np.asarray(mock_xi0)
-        mock_dxi0 = np.asarray(mock_dxi0)
         mock_xi2 = np.asarray(mock_xi2)
 
-        cov_xi0 = CovarianceMatrix(mock_xi0)
-        cov_dxi0 = CovarianceMatrix(mock_dxi0)
-        cov_xi2 = CovarianceMatrix(mock_xi2)
-        cov_xi02 = CrossCovarianceMatrix(mock_dxi0, mock_xi2)
-        cov_xi20 = CrossCovarianceMatrix(mock_xi2, mock_dxi0)
+        cov_xi0 = self.CovarianceMatrix(mock_xi0)
+        cov_xi2 = self.CovarianceMatrix(mock_xi2)
+        cov_xi02 = self.CrossCovarianceMatrix(mock_xi0, mock_xi2)
+        cov_xi20 = self.CrossCovarianceMatrix(mock_xi2, mock_xi0)
 
-        cov_list = [cov_xi0, cov_dxi0, cov_xi2, cov_xi02, cov_xi20]
+        cov = cov_xi2 + self.G**2 * cov_xi0 -\
+              self.G * cov_xi02 - self.G * cov_xi20
 
-        return cov_list
+        return cov
 
 
     def readCorrFile(self, fname):

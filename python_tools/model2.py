@@ -43,6 +43,7 @@ class Model2:
         self.om_m = 0.285
         self.s8 = 0.828
         self.cosmo = Cosmology(om_m=self.om_m, s8=self.s8)
+        self.nmocks = 120
 
         self.eff_z = 0.57
         self.b = 2.05
@@ -88,8 +89,7 @@ class Model2:
         s, self.xi0_s = self._getMonopole(s, mu, xi_smu_obs)
         s, self.xi2_s = self._getQuadrupole(s, mu, xi_smu_obs)
 
-        #self.datavec = np.concatenate((self.xi0_s, self.xi2_s))
-        self.datavec = self.xi2_s
+        self.datavec = np.concatenate((self.xi0_s, self.xi2_s))
 
         self.s_for_xi = s
         self.mu_for_xi = mu
@@ -101,21 +101,18 @@ class Model2:
         alpha_para = alpha * epsilon ** (-2/3)
         alpha_perp = epsilon * alpha_para
 
-        xi0, xibar, xi2 = self.theory_multipoles(fs8,
-                                                 alpha_perp, alpha_para,
-                                                 self.s_for_xi, self.mu_for_xi)
+        xi0, xi2 = self.theory_multipoles(fs8,
+                                          alpha_perp, alpha_para,
+                                          self.s_for_xi, self.mu_for_xi)
 
-        #datavec = np.concatenate((xi0, xi2))
-        datavec = xi2
+        modelvec = np.concatenate((xi0, xi2))
 
-        chi2 = np.dot(np.dot((self.datavec - datavec), self.icov), self.datavec - datavec)
-        loglike = -1/2 * chi2 - np.log((2*np.pi)**(len(self.cov)/2)) * np.sum(np.linalg.eig(self.cov)[0])
+        chi2 = np.dot(np.dot((modelvec - self.datavec), self.icov), modelvec - self.datavec)
+        loglike = -self.nmocks/2 * np.log(1 + chi2/(self.nmocks-1))
         return loglike
 
     def log_prior(self, theta):
         fs8, epsilon = theta
-
-        beta = fs8 / self.b * self.s8norm
 
         if 0.1 < fs8 < 0.8 and 0.8 < epsilon < 1.2:
             return 0.0
@@ -166,18 +163,15 @@ class Model2:
             mufunc = InterpolatedUnivariateSpline(true_mu, xi_model, k=3)
             
             # get multipoles
-            monopole[i] = quad(lambda xx: mufunc(xx) / 2, -1, 1, full_output=1)[0]
-            quadrupole[i] = quad(lambda xx: mufunc(xx) * 5 / 2* (3 * xx ** 2 - 1) / 2., -1, 1, full_output=1)[0]
-            
-        monofunc = InterpolatedUnivariateSpline(s, monopole, k=3)
-            
-        # cumulative monopole
-        integral = np.zeros_like(s)
-        for i in range(len(integral)):
-            integral[i] = quad(lambda x: monofunc(x) * x ** 2, 0, s[i], full_output=1)[0]
-        monopole_bar = 3 * integral / s ** 3
+            xaxis = np.linspace(-1, 1, 1000)
 
-        return monopole, monopole_bar, quadrupole
+            yaxis = mufunc(xaxis) / 2
+            monopole[i] = simps(yaxis, xaxis)
+
+            yaxis = mufunc(xaxis) * 5 / 2 * (3 * xaxis**2 - 1) / 2
+            quadrupole[i] = simps(yaxis, xaxis)
+
+        return monopole, quadrupole
 
     
     def MultipoleCovariance(self):
@@ -191,8 +185,7 @@ class Model2:
             s, xi0 = self._getMonopole(s, mu, xi_smu_mock)
             s, xi2 = self._getQuadrupole(s, mu, xi_smu_mock)
 
-            #datavec = np.concatenate((xi0, xi2))
-            datavec = xi2
+            datavec = np.concatenate((xi0, xi2))
 
             mock_datavec.append(datavec)
 
@@ -233,20 +226,23 @@ class Model2:
         return r, quadrupole
 
     def _getMonopole(self, s, mu, xi_smu):
-        mono = np.zeros(xi_smu.shape[0])
-        for j in range(xi_smu.shape[0]):
-            mufunc = InterpolatedUnivariateSpline(mu, xi_smu[j, :], k=3)
-            mono[j] = quad(lambda x: mufunc(x) / 2, -1, 1, full_output=1)[0]
-
-        return s, mono
+        monopole = np.zeros(xi_smu.shape[0])
+        for i in range(xi_smu.shape[0]):
+            mufunc = InterpolatedUnivariateSpline(mu, xi_smu[i, :], k=3)
+            xaxis = np.linspace(-1, 1, 1000)
+            yaxis = mufunc(xaxis) / 2
+            monopole[i] = simps(yaxis, xaxis)
+        return s, monopole
 
     def _getQuadrupole(self, s, mu, xi_smu):
-        quadr = np.zeros(xi_smu.shape[0])
-        for j in range(xi_smu.shape[0]):
-            mufunc = InterpolatedUnivariateSpline(mu, xi_smu[j, :], k=3)
-            quadr[j] = quad(lambda x: mufunc(x) * 5 / 2 * (3. * x ** 2 - 1) / 2., -1, 1, full_output=1)[0]
+        quadrupole = np.zeros(xi_smu.shape[0])
+        for i in range(xi_smu.shape[0]):
+            mufunc = InterpolatedUnivariateSpline(mu, xi_smu[i, :], k=3)
+            xaxis = np.linspace(-1, 1, 1000)
+            yaxis = mufunc(xaxis) * 5 / 2 * (3 * xaxis**2 - 1) / 2
+            quadrupole[i] = simps(yaxis, xaxis)
 
-        return s, quadr
+        return s, quadrupole
 
     def CovarianceMatrix(self, data, norm=False):
         """
