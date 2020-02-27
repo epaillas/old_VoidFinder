@@ -34,7 +34,7 @@ if args.model_number == 2:
     model = Model2(delta_r_file=args.delta_r, xi_r_file=args.xi_r,
                    xi_smu_file=args.xi_smu_obs, xi_smu_mocks=args.xi_smu_mocks, covmat_file=args.covmat)
 
-    backend_name = args.xi_smu_obs + '_Model2_emceeChain_test.h5'
+    backend_name = args.xi_smu_obs + '_Model2_emceeChain.h5'
     ndim = 2
     nwalkers = 64
     niter = 5000
@@ -72,7 +72,7 @@ if args.model_number == 5:
     model = Model5(delta_r_file=args.delta_r, xi_r_file=args.xi_r, sv_file=args.sv_r,
                    xi_smu_file=args.xi_smu_obs, xi_smu_mocks=args.xi_smu_mocks, covmat_file=args.covmat)
 
-    backend_name = args.xi_smu_obs + '_Model5_emceeChain_test.h5'
+    backend_name = args.xi_smu_obs + '_Model5_emceeChain.h5'
     ndim = 3
     nwalkers = 32
     niter = 5000
