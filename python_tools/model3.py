@@ -32,8 +32,10 @@ class Model3:
         self.covmat_file = covmat_file
         self.nmocks = 120
 
-        print("Setting up void RSD model #2.")
-
+        print("Setting up void RSD model #3.")
+        print('xi_smu_file: {}'.format(self.xi_smu_file))
+        print('xi_smu_mocks: {}'.format(self.xi_smu_mocks))
+        
         # cosmology for Minerva
         self.om_m = 0.285
         self.s8 = 0.828
