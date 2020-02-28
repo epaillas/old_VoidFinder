@@ -1,0 +1,49 @@
+# Compiler choice
+
+FC = gfortran
+MPIFC = mpif90
+
+MLIBS = -lm
+
+#################
+
+EXES = grow_spheres_2D.exe grow_spheres_2D_DF.exe recentring_2D.exe recentring_2D_DF.exe overlapping_2D.exe
+
+all: $(EXES)
+
+grow_spheres_2D.exe: grow_spheres_2D.o
+	$(MPIFC) grow_spheres_2D.o -o grow_spheres_2D.exe $(MLIBS)
+
+grow_spheres_2D_DF.exe: grow_spheres_2D_DF.o
+	$(MPIFC) grow_spheres_2D_DF.o -o grow_spheres_2D_DF.exe $(MLIBS)
+
+recentring_2D.exe: recentring_2D.o
+	$(MPIFC) recentring_2D.o -o recentring_2D.exe $(MLIBS)
+
+recentring_2D_DF.exe: recentring_2D_DF.o
+	$(MPIFC) recentring_2D_DF.o -o recentring_2D_DF.exe $(MLIBS)
+
+overlapping_2D.exe: overlapping_2D.o
+	$(MPIFC) overlapping_2D.o -o overlapping_2D.exe $(MLIBS)
+
+grow_spheres_2D.o: grow_spheres_2D.f90
+	$(MPIFC) -c grow_spheres_2D.f90
+
+recentring_2D.o: recentring_2D.f90
+	$(MPIFC) -c recentring_2D.f90
+
+grow_spheres_2D_DF.o: grow_spheres_2D_DF.f90
+	$(MPIFC) -c grow_spheres_2D_DF.f90
+
+recentring_2D_DF.o: recentring_2D_DF.f90
+	$(MPIFC) -c recentring_2D_DF.f90
+
+overlapping_2D.o: overlapping_2D.f90
+	$(MPIFC) -c overlapping_2D.f90
+
+
+install: $(EXES)
+	mv $(EXES) ../bin
+
+clean:
+	rm -f $(EXES) *.o *~ *.mod

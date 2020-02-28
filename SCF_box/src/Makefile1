@@ -1,0 +1,60 @@
+# Compiler choice
+
+FC = gfortran
+MPIFC = mpif90
+
+MLIBS = -lm
+
+#################
+
+EXES = grow_spheres.exe recentring.exe overlapping.exe vg_ccf_monopole.exe vg_ccf_r_mu.exe vg_ccf_los_velocity.exe vg_ccf_voidcen_velocity.exe
+
+all: $(EXES)
+
+grow_spheres.exe: grow_spheres.o
+	$(MPIFC) grow_spheres.o -o grow_spheres.exe $(MLIBS)
+
+recentring.exe: recentring.o
+	$(MPIFC) recentring.o -o recentring.exe $(MLIBS)
+
+overlapping.exe: overlapping.o
+	$(MPIFC) overlapping.o -o overlapping.exe $(MLIBS)
+
+vg_ccf_monopole.exe: vg_ccf_monopole.o
+	$(MPIFC) vg_ccf_monopole.o -o vg_ccf_monopole.exe $(MLIBS)
+
+vg_ccf_r_mu.exe: vg_ccf_r_mu.o
+	$(MPIFC) vg_ccf_r_mu.o -o vg_ccf_r_mu.exe $(MLIBS)
+
+vg_ccf_los_velocity.exe: vg_ccf_los_velocity.o
+	$(MPIFC) vg_ccf_los_velocity.o -o vg_ccf_los_velocity.exe $(MLIBS)
+
+vg_ccf_voidcen_velocity.exe: vg_ccf_voidcen_velocity.o
+	$(MPIFC) vg_ccf_voidcen_velocity.o -o vg_ccf_voidcen_velocity.exe $(MLIBS)
+
+grow_spheres.o: grow_spheres.f90
+	$(MPIFC) -c grow_spheres.f90
+
+recentring.o: recentring.f90
+	$(MPIFC) -c recentring.f90
+
+overlapping.o: overlapping.f90
+	$(MPIFC) -c overlapping.f90
+
+vg_ccf_monopole.o: vg_ccf_monopole.f90
+	$(MPIFC) -c vg_ccf_monopole.f90
+
+vg_ccf_r_mu.o: vg_ccf_r_mu.f90
+	$(MPIFC) -c vg_ccf_r_mu.f90
+
+vg_ccf_los_velocity.o: vg_ccf_los_velocity.f90
+	$(MPIFC) -c vg_ccf_los_velocity.f90
+
+vg_ccf_voidcen_velocity.o: vg_ccf_voidcen_velocity.f90
+	$(MPIFC) -c vg_ccf_voidcen_velocity.f90
+
+install: $(EXES)
+	mv $(EXES) ../bin
+
+clean:
+	rm -f $(EXES) *.o *~ *.mod
