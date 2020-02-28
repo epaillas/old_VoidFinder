@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from python_tools.model5 import Model5
 from python_tools.model2 import Model2
+from python_tools.model3 import Model3
 import os
 import sys
 import argparse
