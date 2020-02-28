@@ -69,7 +69,7 @@ if args.model_number == 2:
 
 if args.model_number == 3:
 
-    model = Model2(xi_smu_file=args.xi_smu_obs, xi_smu_mocks=args.xi_smu_mocks,
+    model = Model3(xi_smu_file=args.xi_smu_obs, xi_smu_mocks=args.xi_smu_mocks,
                    covmat_file=args.covmat)
 
     backend_name = args.xi_smu_obs + '_Model3_emceeChain.h5'
