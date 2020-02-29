@@ -203,14 +203,6 @@ class Model3:
         quadrupole = np.asarray(quadrupole)
         return r, quadrupole
 
-    def getQuadrupole(self, s, mu, xi_smu_list):
-        quadrupole = []
-        for xi_smu in xi_smu_list:
-            r, xi2 = self._getQuadrupole(s, mu, xi_smu)
-            quadrupole.append(xi2)
-        quadrupole = np.asarray(quadrupole)
-        return r, quadrupole
-
     def _getMonopole(self, s, mu, xi_smu):
         monopole = np.zeros(xi_smu.shape[0])
         for i in range(xi_smu.shape[0]):
@@ -219,6 +211,16 @@ class Model3:
             yaxis = mufunc(xaxis) / 2
             monopole[i] = simps(yaxis, xaxis)
         return s, monopole
+
+    def _getQuadrupole(self, s, mu, xi_smu):
+        quadrupole = np.zeros(xi_smu.shape[0])
+        for i in range(xi_smu.shape[0]):
+            mufunc = InterpolatedUnivariateSpline(mu, xi_smu[i, :], k=3)
+            xaxis = np.linspace(-1, 1, 1000)
+            yaxis = mufunc(xaxis) * 5 / 2 * (3 * xaxis**2 - 1) / 2
+            quadrupole[i] = simps(yaxis, xaxis)
+
+        return s, quadrupole
 
     def CovarianceMatrix(self, data, norm=False):
         """
