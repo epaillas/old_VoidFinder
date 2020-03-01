@@ -16,7 +16,7 @@ class SphericalClusters:
     def __init__(self, tracer_file, is_box=True, random_file='',
                  boss_like=False, pos_cols='0,1,2', box_size=1024.0,
                  omega_m=0.31, h=0.6777, mask_file='', zmin=0.43, zmax=0.7,
-                 verbose=False, handle='', nside=512, delta_clusters=1,
+                 verbose=False, handle='', nside=512, delta_clusters=10,
                  rvoidmax=100, ncores=1, steps='1,2,3,4', is_periodic=True,
                  skip_header=0, has_velocity=False, delete_files=False):
 
