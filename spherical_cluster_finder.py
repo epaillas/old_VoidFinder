@@ -1,5 +1,5 @@
 import click
-from python_tools.sphericalclusters import SphericalClsuster
+from python_tools.sphericalclusters import SphericalClusters
 
 @click.command()
 @click.option('--tracers', type=str, help='File containing tracers.')
