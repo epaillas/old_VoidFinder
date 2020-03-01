@@ -16,7 +16,7 @@ class SphericalClusters:
     def __init__(self, tracer_file, is_box=True, random_file='',
                  boss_like=False, pos_cols='0,1,2', box_size=1024.0,
                  omega_m=0.31, h=0.6777, mask_file='', zmin=0.43, zmax=0.7,
-                 verbose=False, handle='', nside=512, delta_voids=0.2,
+                 verbose=False, handle='', nside=512, delta_clusters=1,
                  rvoidmax=100, ncores=1, steps='1,2,3,4', is_periodic=True,
                  skip_header=0, has_velocity=False, delete_files=False):
 
@@ -39,7 +39,7 @@ class SphericalClusters:
         self.has_velocity = has_velocity
 
         # void parameters
-        self.delta_voids = delta_voids
+        self.delta_clusters = delta_clusters
         self.rvoidmax = rvoidmax
 
         # catalog data
@@ -342,14 +342,14 @@ class SphericalClusters:
             self.ngrid = 100
             cmd = ['mpirun', '-np', str(ncores), binpath + 'grow_spheres.exe',
                 self.tracer_unf, self.centres_file, self.voids_file, str(self.box_size),
-                str(self.delta_voids), str(self.rvoidmax), str(self.ngrid)]
+                str(self.delta_clusters), str(self.rvoidmax), str(self.ngrid)]
         else:
             binpath = sys.path[0] + '/SCF_survey/bin/'
             self.gridmin = -5000
             self.gridmax = 5000
             cmd = ['mpirun', '-np', str(ncores), binpath + 'grow_spheres.exe',
                 self.tracer_unf, self.random_unf, self.centres_file, self.voids_file,
-                str(self.delta_voids), str(self.rvoidmax), str(self.gridmin),
+                str(self.delta_clusters), str(self.rvoidmax), str(self.gridmin),
                 str(self.gridmax)]
         logfile = self.handle + '_grow_spheres.log'
         log = open(logfile, "w+")
@@ -376,7 +376,7 @@ class SphericalClusters:
             self.ngrid = 100
             cmd = ['mpirun', '-np', str(ncores), binpath + 'recentring.exe',
                 self.tracer_unf, self.voids_file, self.recentred_file,
-                str(self.box_size), str(self.delta_voids), str(self.rvoidmax),
+                str(self.box_size), str(self.delta_clusters), str(self.rvoidmax),
                 str(self.ngrid)]
         else:
             binpath = sys.path[0] + '/SCF_survey/bin/'
@@ -384,7 +384,7 @@ class SphericalClusters:
             self.gridmax = 5000
             cmd = ['mpirun', '-np', str(ncores), binpath + 'recentring.exe',
                 self.tracer_unf, self.random_unf, self.voids_file,
-                self.recentred_file, str(self.delta_voids), str(self.rvoidmax),
+                self.recentred_file, str(self.delta_clusters), str(self.rvoidmax),
                 str(self.gridmin), str(self.gridmax)]
         logfile = self.handle + '_recentring.log'
         log = open(logfile, "w+")
