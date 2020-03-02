@@ -261,7 +261,8 @@ PROGRAM recentering
           rnd_rvoid = rwidth * ii
           rnd_ng = int(cum_rbin(ii))
           rnd_nden = cum_rbin(ii) / (4.e0/3.e0 * pi * rvoid ** 3)
-          if (rnd_nden .gt. delta * rho_mean .and. rnd_rvoid .gt. rvoid) then
+          if (rnd_nden .gt. delta * rho_mean .and. nden .lt. delta * rho_mean + 10 &
+          &.and. rnd_rvoid .gt. rvoid) then
             rvoid = rnd_rvoid
             px = rnd_px
             py = rnd_py
