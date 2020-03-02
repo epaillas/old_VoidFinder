@@ -236,6 +236,8 @@ PROGRAM grow_spheres
         do ii = nrbin, 1, -1
           rvoid = rwidth * ii
           nden = cum_rbin(ii) / (4.e0/3.e0 * pi * rvoid ** 3)
+          write(*,*) nden
+          call sleep(1)
           ng = int(cum_rbin(ii))
           if (nden .gt. delta * rho_mean .and. nden .lt. delta * rho_mean + 10) then
             nv = nv + 1
