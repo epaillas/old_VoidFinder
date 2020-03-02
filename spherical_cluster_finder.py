@@ -29,7 +29,7 @@ def run_spherical_clusters(tracers, handle, is_box, ncores, steps, pos_cols,
                         has_velocity, delete_files, delta_clusters):
     
     voids = SphericalClusters(tracer_file=tracers, random_file=randoms, handle=handle,
-                           is_box=is_box, box_size=box_size, steps=steps, delta_clusters=delta_clusters
+                           is_box=is_box, box_size=box_size, steps=steps, delta_clusters=delta_clusters,
                            ncores=ncores, boss_like=boss_like, mask_file=mask,
                            pos_cols=pos_cols, omega_m=omega_m, h=h, skip_header=skip_header,
                            rvoidmax=rvoidmax, zmin=zmin, zmax=zmax, is_periodic=is_periodic,
