@@ -236,10 +236,8 @@ PROGRAM grow_spheres
         do ii = nrbin, 1, -1
           rvoid = rwidth * ii
           nden = cum_rbin(ii) / (4.e0/3.e0 * pi * rvoid ** 3)
-          write(*,*) nden
-          call sleep(1)
           ng = int(cum_rbin(ii))
-          if (nden .gt. delta * rho_mean .and. nden .lt. delta * rho_mean + 10) then
+          if (nden .gt. delta * rho_mean .and. nden .lt. delta * rho_mean + 100) then
             nv = nv + 1
             write(filenumber, '(4F10.3, 1I10, 1F10.3)') &
             px, py, pz, rvoid, ng, nden / rho_mean
