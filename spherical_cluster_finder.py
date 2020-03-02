@@ -11,6 +11,7 @@ from python_tools.sphericalclusters import SphericalClusters
 @click.option('--pos_cols', type=str, default='0,1,2', help='Indices of columns where tracer positions are stored.')
 @click.option('--rvoidmax', type=float, default=100, help='Maximum void radius to search.')
 @click.option('--box_size', type=float, default=1024, help='[Periodic box] Size of the simulation box')
+@click.option('--delta_clusters', type=float, default=100, help='[Integrated density constrast]')
 @click.option('--randoms', type=str, default='', help='[Survey] File containing randoms.')
 @click.option('--mask', type=str, default='', help='[Survey] File containing mask of survey footprint.')
 @click.option('--boss_like', type=bool, default=False, help='[Survey] Is the data from BOSS/eBOSS?')
@@ -25,10 +26,10 @@ from python_tools.sphericalclusters import SphericalClusters
 def run_spherical_clusters(tracers, handle, is_box, ncores, steps, pos_cols,
                         rvoidmax, box_size, randoms, mask, boss_like,
                         zmin, zmax, omega_m, h, is_periodic, skip_header,
-                        has_velocity, delete_files):
+                        has_velocity, delete_files, delta_clusters):
     
     voids = SphericalClusters(tracer_file=tracers, random_file=randoms, handle=handle,
-                           is_box=is_box, box_size=box_size, steps=steps,
+                           is_box=is_box, box_size=box_size, steps=steps, delta_clusters=delta_clusters
                            ncores=ncores, boss_like=boss_like, mask_file=mask,
                            pos_cols=pos_cols, omega_m=omega_m, h=h, skip_header=skip_header,
                            rvoidmax=rvoidmax, zmin=zmin, zmax=zmax, is_periodic=is_periodic,
