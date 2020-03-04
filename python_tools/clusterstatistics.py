@@ -11,7 +11,7 @@ import healpy as hp
 from scipy.io import FortranFile
 import matplotlib.pyplot as plt
 
-class VoidStatistics:
+class ClusterStatistics:
 
     def __init__(self, cluster_file, tracer_file, is_box=True, random_file=None,
                  boss_like=False, pos_cols='0,1,2', box_size=1024.0,
@@ -44,7 +44,7 @@ class VoidStatistics:
         pos_cols = [int(i) for i in pos_cols.split(',')]
 
    
-    def VoidMatterCCF(self, kind='monopole', median_cut=False):
+    def ClusterMatterCCF(self, kind='monopole', median_cut=False):
         self.is_matter = True
 
         if median_cut:
@@ -67,7 +67,7 @@ class VoidStatistics:
             sys.exit('Correlation kind not recognized. Aborting...')
 
 
-    def VoidGalaxyCCF(self, kind='monopole', median_cut=False):
+    def ClusterGalaxyCCF(self, kind='monopole', median_cut=False):
 
         if median_cut:
             data = np.genfromtxt(self.cluster_file)
@@ -272,7 +272,7 @@ class VoidStatistics:
         return np.asarray([(bin_edges[i] + bin_edges[i + 1])/2
         for i in range(len(bin_edges) - 1)])
 
-    def VoidAbundance(self):
+    def ClusterAbundance(self):
 
         fout = self.handle + '.cluster_abundance'
 
