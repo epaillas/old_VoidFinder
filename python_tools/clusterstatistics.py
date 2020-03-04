@@ -99,11 +99,11 @@ class ClusterStatistics:
             logfile = self.handle + '_cm_ccf_monopole.log'
         else:
             fout = self.handle + '.CG_CCF_monopole'
-            logfile = self.handle + '_cf_ccf_monopole.log'
+            logfile = self.handle + '_cg_ccf_monopole.log'
 
         if self.is_box:
             binpath = sys.path[0] + '/SCF_box/bin/'
-            cmd = [binpath + 'cf_ccf_monopole.exe',
+            cmd = [binpath + 'cg_ccf_monopole.exe',
                    self.tracer_file,
                    self.cluster_file,
                    fout,
@@ -133,12 +133,12 @@ class ClusterStatistics:
             logfile = self.handle + '_cm_ccf_rmu.log'
 
         else:
-            logfile = self.handle + '_cf_ccf_rmu.log'
+            logfile = self.handle + '_cg_ccf_rmu.log'
             fout = self.handle + '.CG_CCF_rmu'
 
         if self.is_box:
             binpath = sys.path[0] + '/SCF_box/bin/'
-            cmd = [binpath + 'cf_ccf_r_mu.exe',
+            cmd = [binpath + 'cg_ccf_r_mu.exe',
                    self.tracer_file,
                    self.cluster_file,
                    fout,
@@ -151,7 +151,7 @@ class ClusterStatistics:
                    str(self.ngrid)]
         else:
             binpath = sys.path[0] + '/SCF_survey/bin/'
-            cmd = [binpath + 'cf_ccf_r_mu.exe',
+            cmd = [binpath + 'cg_ccf_r_mu.exe',
                    self.tracer_file,
                    self.random_file,
                    self.cluster_file,
@@ -180,7 +180,7 @@ class ClusterStatistics:
             sys.exit('Not implemented!')
         else:
             binpath = sys.path[0] + '/SCF_survey/bin/'
-            cmd = [binpath + 'cf_ccf_sigma_pi.exe',
+            cmd = [binpath + 'cg_ccf_sigma_pi.exe',
                    self.tracer_file,
                    self.random_file,
                    self.cluster_file,
@@ -193,7 +193,7 @@ class ClusterStatistics:
                    str(self.rcluster_min),
                    str(self.rcluster_max)]
 
-        logfile = self.handle + '_cf_ccf_spi.log'
+        logfile = self.handle + '_cg_ccf_spi.log'
         log = open(logfile, "w+")
         subprocess.call(cmd, stdout=log, stderr=log)
 
@@ -208,11 +208,11 @@ class ClusterStatistics:
             logfile = self.handle + '_cm_ccf_losvel.log'
         else:
             fout = self.handle + '.CG_CCF_losvel'
-            logfile = self.handle + '_cf_ccf_losvel.log'
+            logfile = self.handle + '_cg_ccf_losvel.log'
 
         if self.is_box:
             binpath = sys.path[0] + '/SCF_box/bin/'
-            cmd = [binpath + 'cf_ccf_los_velocity.exe',
+            cmd = [binpath + 'cg_ccf_los_velocity.exe',
                    self.tracer_file,
                    self.cluster_file,
                    fout,
@@ -238,14 +238,14 @@ class ClusterStatistics:
 
         if self.is_matter: 
             fout = self.handle + '.CM_CCF_clustercenvel'
-            logfile = self.handle + '_cm_ccf_clustercenvel.log'
+            logfile = self.handle + '_cm_ccg_clustercenvel.log'
         else:
             fout = self.handle + '.CG_CCF_clustercenvel'
-            logfile = self.handle + '_cf_ccf_clustercenvel.log'
+            logfile = self.handle + '_cg_ccg_clustercenvel.log'
 
         if self.is_box:
             binpath = sys.path[0] + '/SCF_box/bin/'
-            cmd = [binpath + 'cf_ccf_clustercen_velocity.exe',
+            cmd = [binpath + 'cg_ccg_clustercen_velocity.exe',
                    self.tracer_file,
                    self.cluster_file,
                    fout,
