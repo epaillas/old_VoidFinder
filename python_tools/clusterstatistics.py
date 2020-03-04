@@ -238,14 +238,14 @@ class ClusterStatistics:
 
         if self.is_matter: 
             fout = self.handle + '.CM_CCF_clustercenvel'
-            logfile = self.handle + '_cm_ccg_clustercenvel.log'
+            logfile = self.handle + '_cm_ccf_clustercenvel.log'
         else:
             fout = self.handle + '.CG_CCF_clustercenvel'
-            logfile = self.handle + '_cg_ccg_clustercenvel.log'
+            logfile = self.handle + '_cg_ccf_clustercenvel.log'
 
         if self.is_box:
             binpath = sys.path[0] + '/SCF_box/bin/'
-            cmd = [binpath + 'cg_ccg_clustercen_velocity.exe',
+            cmd = [binpath + 'cg_ccf_clustercen_velocity.exe',
                    self.tracer_file,
                    self.cluster_file,
                    fout,
