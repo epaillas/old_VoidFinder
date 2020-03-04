@@ -203,7 +203,7 @@ program vg_ccf_monopole
               r = (/ disx, disy, disz /)
               dis = norm2(r)
   
-              if (dis .lt. rmax) then
+              if (dis .lt. 10**rmax) then
                 do jj = 1, nrbin
                   if (dis .gt. rbin_edges(jj) .and. dis .lt. rbin_edges(jj+1)) then
                     rind = jj
