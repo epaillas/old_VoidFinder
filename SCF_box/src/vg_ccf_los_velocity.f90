@@ -109,10 +109,10 @@ program vg_ccf_r_mu
     
     rwidth = (rmax - rmin) / nrbin
     do i = 1, nrbin + 1
-      rbin_edges(i) = rmin+(i-1)*rwidth
+      rbin_edges(i) = 10**(rmin+(i-1)*rwidth)
     end do
     do i = 1, nrbin
-      rbin(i) = rbin_edges(i+1)-rwidth/2.
+      rbin(i) = 10**(rmin+(i)*rwidth -rwidth/2.)
     end do
     
     ! Construct linked list for tracers

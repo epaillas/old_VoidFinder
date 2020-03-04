@@ -238,7 +238,7 @@ PROGRAM recentering
         do ii = nrbin, 1, -1
           rnd_rvoid = rwidth * ii
           rnd_ng = int(cum_rbin(ii))
-          rnd_nden = cum_rbin(ii) / (pi * rvoid ** 2)
+          rnd_nden = cum_rbin(ii) / (pi * rnd_rvoid ** 2)
           if (rnd_nden .lt. delta * rho_mean .and. rnd_rvoid .gt. rvoid) then
             rvoid = rnd_rvoid
             px = rnd_px

@@ -30,7 +30,7 @@ class SphericalClusters:
         self.tracer_unf = self.handle + '.dat.unf'
         self.random_unf = self.handle + '.ran.unf'
         self.centres_file = self.tracer_unf
-        self.voids_file = self.handle + '.SVF'
+        self.voids_file = self.handle + '.SCF'
         self.recentred_file = self.voids_file + '_recen'
         self.mask_file = mask_file
         self.steps = steps
