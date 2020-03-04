@@ -204,7 +204,12 @@ program vg_ccf_monopole
               dis = norm2(r)
   
               if (dis .lt. rmax) then
-                rind = int((dis - rmin) / rwidth + 1)
+                do jj = 1, nrbin
+                  if (dis .gt. rbin_edges(jj) .and. dis .lt. rbin_edges(jj+1)) then
+                    rind = jj
+                    exit
+                  end if
+                end do
                 VG(rind) = VG(rind) + 1
               end if
   
