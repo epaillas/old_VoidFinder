@@ -207,7 +207,7 @@ program cg_ccf_monopole
               r = (/ disx, disy, disz /)
               dis = norm2(r)
   
-              if (dis .lt. 10**rmax) then
+              if (dis .lt. 10**rmax .and. dis .gt. 10**rmin) then
                 rind = int((log10(dis) - rmin)/ rwidth + 1)
                 VG(rind) = VG(rind) + 1
               end if
