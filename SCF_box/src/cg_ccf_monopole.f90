@@ -112,6 +112,9 @@ program vg_ccf_monopole
   do i = 1, nrbin
     rbin(i) = rbin_edges(i+1)-rwidth/2.
   end do
+
+  rbin_edges = 10**rbin_edges
+  rbin = 10**rbin
   
   ! Mean density inside the box
   rhomed = ng / (boxsize ** 3)
@@ -203,8 +206,8 @@ program vg_ccf_monopole
               r = (/ disx, disy, disz /)
               dis = norm2(r)
   
-              if (dis .lt. rmax) then
-                rind = int((dis - rmin) / rwidth + 1)
+              if (dis .lt. 10**rmax) then
+                rind = int((log10(dis) - rmin)/ rwidth + 1)
                 VG(rind) = VG(rind) + 1
               end if
   
@@ -215,13 +218,17 @@ program vg_ccf_monopole
         end do
       end do
     end do
-  
-    do ii = 1, nrbin
-      vol = 4./3 * pi * ((rbin(ii) + rwidth/2.) ** 3 - &
-      & (rbin(ii) - rwidth/2.) ** 3)
 
-      VR(ii) = VR(ii) + rhomed * vol
+    do ii = 1, nrbin
+      vol = 4./3 * pi * (rbin_edges(ii+1)**3 - rbin_edges(ii)**3)
     end do
+  
+    ! do ii = 1, nrbin
+    !   vol = 4./3 * pi * ((rbin(ii) + rwidth/2.) ** 3 - &
+    !   & (rbin(ii) - rwidth/2.) ** 3)
+
+    !   VR(ii) = VR(ii) + rhomed * vol
+    ! end do
   
   end do
   
