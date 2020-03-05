@@ -172,7 +172,7 @@ program vg_ccf_monopole
     ipz = int((zvc) / rgrid + 1.)
   
     !ndif = int((rmax * rv / rgrid + 1.))
-    ndif = int(rmax / rgrid + 1.)
+    ndif = int(10**rmax / rgrid + 1.)
   
     do ix = ipx - ndif, ipx + ndif
       do iy = ipy - ndif, ipy + ndif
