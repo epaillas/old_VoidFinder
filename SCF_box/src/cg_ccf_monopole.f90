@@ -9,15 +9,15 @@ program vg_ccf_monopole
   real(dp) :: rwidth, rmax, rmin
   real(dp) :: pi = 4.*atan(1.)
   
-  integer*4 :: ng, nc, nrbin, rind
-  integer*4 :: id, iargc
-  integer*4 :: i, j, ii, jj, ix, iy, iz, ix2, iy2, iz2
-  integer*4 :: indx, indy, indz, nrows, ncols
-  integer*4 :: ipx, ipy, ipz, ndif
-  integer*4 :: ngrid
+  integer*8 :: ng, nc, nrbin, rind
+  integer*8 :: id, iargc
+  integer*8 :: i, j, ii, jj, ix, iy, iz, ix2, iy2, iz2
+  integer*8 :: indx, indy, indz, nrows, ncols
+  integer*8 :: ipx, ipy, ipz, ndif
+  integer*8 :: ngrid
   
-  integer*4, dimension(:, :, :), allocatable :: lirst, nlirst
-  integer*4, dimension(:), allocatable :: ll
+  integer*8, dimension(:, :, :), allocatable :: lirst, nlirst
+  integer*8, dimension(:), allocatable :: ll
   
   real(dp), dimension(3) :: r
   real(dp), allocatable, dimension(:,:)  :: pos_data
