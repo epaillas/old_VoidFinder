@@ -1,13 +1,11 @@
 program vg_ccf_monopole
   implicit none
   
-  integer, parameter:: dp=kind(0.d0)
-  
-  real(dp) :: rgrid, boxsize, vol, rhomed
-  real(dp) :: posx, posy, posz, disx, disy, disz, dis
-  real(dp) :: xvc, yvc, zvc, rv, min_rv, max_rv, median_rv
-  real(dp) :: rwidth, rmax, rmin
-  real(dp) :: pi = 4.*atan(1.)
+  real*8 :: rgrid, boxsize, vol, rhomed
+  real*8 :: posx, posy, posz, disx, disy, disz, dis
+  real*8 :: xvc, yvc, zvc, rv, min_rv, max_rv, median_rv
+  real*8 :: rwidth, rmax, rmin
+  real*8 :: pi = 4.*atan(1.)
   
   integer*8 :: ng, nc, nrbin, rind
   integer*8 :: id, iargc
@@ -19,10 +17,10 @@ program vg_ccf_monopole
   integer*8, dimension(:, :, :), allocatable :: lirst, nlirst
   integer*8, dimension(:), allocatable :: ll
   
-  real(dp), dimension(3) :: r
-  real(dp), allocatable, dimension(:,:)  :: pos_data
-  real(dp), dimension(:), allocatable :: rbin, rbin_edges
-  real(dp), dimension(:), allocatable :: VG, VR, xi
+  real*8, dimension(3) :: r
+  real*8, allocatable, dimension(:,:)  :: pos_data
+  real*8, dimension(:), allocatable :: rbin, rbin_edges
+  real*8, dimension(:), allocatable :: VG, VR, xi
   
   character(20), external :: str
   character(len=500) :: input_tracers, input_centres, output_den
