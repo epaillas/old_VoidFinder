@@ -258,7 +258,7 @@ program vg_ccf_r_mu
   
     do ii = 1, nrbin
       do jj = 1, nmubin
-          vol = 4./3 * pi * (rbin_edges(i+1)**3 - rbin_edges(i)**3) / (nmubin)
+          vol = 4./3 * pi * (rbin_edges(ii+1)**3 - rbin_edges(ii)**3) / (nmubin)
   
           VR(ii, jj) = VR(ii, jj) + rhomed * vol
       end do
