@@ -1,4 +1,4 @@
-program vg_ccf_monopole
+program cg_ccf_monopole
   implicit none
   
   real*8 :: rgrid, boxsize, vol, rhomed
@@ -105,14 +105,14 @@ program vg_ccf_monopole
   
   rwidth = (rmax - rmin) / nrbin
   do i = 1, nrbin + 1
-    rbin_edges(i) = rmin+(i-1)*rwidth
+    rbin_edges(i) = 10**(rmin+(i-1)*rwidth)
   end do
   do i = 1, nrbin
-    rbin(i) = rbin_edges(i+1)-rwidth/2.
+    rbin(i) = 10**((rmin+(i)*rwidth)-rwidth/2.)
   end do
 
-  rbin_edges = 10**rbin_edges
-  rbin = 10**rbin
+  !rbin_edges = 10**rbin_edges
+  !rbin = 10**rbin
 
   ! Mean density inside the box
   rhomed = ng / (boxsize ** 3)
@@ -244,7 +244,6 @@ program vg_ccf_monopole
     write(12, fmt='(4f10.5)') rbin(i), rbin_edges(i), rbin_edges(i + 1), xi(i)
   end do
   
-  stop
   
-  end program vg_ccf_monopole
+  end program cg_ccf_monopole
   
