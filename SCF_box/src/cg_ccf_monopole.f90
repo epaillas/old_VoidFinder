@@ -114,6 +114,9 @@ program vg_ccf_monopole
   rbin_edges = 10**rbin_edges
   rbin = 10**rbin
 
+  write(*,*) rbin_edges
+  write(*,*)
+
   ! Mean density inside the box
   rhomed = ng / (boxsize ** 3)
   
