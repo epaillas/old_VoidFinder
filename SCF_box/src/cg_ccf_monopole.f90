@@ -114,9 +114,6 @@ program vg_ccf_monopole
   rbin_edges = 10**rbin_edges
   rbin = 10**rbin
 
-  write(*,*) rbin_edges
-  write(*,*)
-
   ! Mean density inside the box
   rhomed = ng / (boxsize ** 3)
   
@@ -154,6 +151,9 @@ program vg_ccf_monopole
       lirst(indx,indy,indz) = i
     endif
   end do
+
+  write(*,*) rbin_edges
+  write(*,*)
   
   write(*,*) 'Linked list successfully constructed'
   write(*,*) ''
