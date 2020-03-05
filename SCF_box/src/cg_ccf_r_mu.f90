@@ -274,7 +274,7 @@ program vg_ccf_r_mu
   open(13, file=output_den, status='unknown')
   do i = 1, nrbin
     do j = 1, nmubin
-      write(13, fmt='(7f10.5)') rbin(i), rbin_edges(i), rbin_edges(i + 1),&
+      write(13, fmt='(7f15.5)') rbin(i), rbin_edges(i), rbin_edges(i + 1),&
       & mubin(j), mubin_edges(j), mubin_edges(j + 1), xi(i, j)
     end do
   end do
