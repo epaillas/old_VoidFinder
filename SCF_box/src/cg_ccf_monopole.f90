@@ -173,8 +173,6 @@ program vg_ccf_monopole
   
     !ndif = int((rmax * rv / rgrid + 1.))
     ndif = int(10**rmax / rgrid + 1.)
-    write(*,*) ndif
-    stop
   
     do ix = ipx - ndif, ipx + ndif
       do iy = ipy - ndif, ipy + ndif
@@ -224,9 +222,8 @@ program vg_ccf_monopole
   
   end do
 
-  write(*,*) rind
-  write(*,*) rbin_edges
-  write(*,*) ii
+  write(*,*) VG
+  stop
 
   do i = 1, nrbin
 
