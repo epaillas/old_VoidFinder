@@ -105,14 +105,14 @@ program cg_ccf_monopole
   
   rwidth = (rmax - rmin) / nrbin
   do i = 1, nrbin + 1
-    rbin_edges(i) = 10**(rmin+(i-1)*rwidth)
+    rbin_edges(i) = rmin+(i-1)*rwidth
   end do
   do i = 1, nrbin
-    rbin(i) = 10**((rmin+(i)*rwidth)-rwidth/2.)
+    rbin(i) = rbin_edges(i+1)-rwidth/2.
   end do
 
-  !rbin_edges = 10**rbin_edges
-  !rbin = 10**rbin
+  rbin_edges = 10**rbin_edges
+  rbin = 10**rbin
 
   ! Mean density inside the box
   rhomed = ng / (boxsize ** 3)
@@ -151,9 +151,6 @@ program cg_ccf_monopole
       lirst(indx,indy,indz) = i
     endif
   end do
-
-  write(*,*) rbin_edges
-  write(*,*)
   
   write(*,*) 'Linked list successfully constructed'
   write(*,*) ''
@@ -222,11 +219,7 @@ program cg_ccf_monopole
   
   end do
 
-  write(*,*) VG
-  stop
-
   do i = 1, nrbin
-
     vol = 4./3 * pi * (rbin_edges(i+1)**3 - rbin_edges(i)**3)
     write(*,*) i, vol, rbin_edges(i+1)
     VR(i) = VR(i) + rhomed * vol
