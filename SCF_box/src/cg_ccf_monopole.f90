@@ -2,14 +2,14 @@ program vg_ccf_monopole
   implicit none
   
   real*8 :: rgrid, boxsize, vol, rhomed
-  real*8 :: posx, posy, posz, disx, disy, disz, dis
-  real*8 :: xvc, yvc, zvc, rv, min_rv, max_rv, median_rv
+  real*8 :: disx, disy, disz, dis
+  real*8 :: xvc, yvc, zvc, rv, min_rv, max_rv
   real*8 :: rwidth, rmax, rmin
   real*8 :: pi = 4.*atan(1.)
   
   integer*8 :: ng, nc, nrbin, rind
   integer*8 :: id, iargc
-  integer*8 :: i, j, ii, jj, ix, iy, iz, ix2, iy2, iz2
+  integer*8 :: i, ii, ix, iy, iz, ix2, iy2, iz2
   integer*8 :: indx, indy, indz, nrows, ncols
   integer*8 :: ipx, ipy, ipz, ndif
   integer*8 :: ngrid
@@ -26,7 +26,7 @@ program vg_ccf_monopole
   character(len=500) :: input_tracers, input_centres, output_den
   character(len=10) :: rmax_char, rmin_char, nrbin_char, ngrid_char
   character(len=100) :: min_rv_char, max_rv_char, box_char
-  character(len=1)  :: creturn = achar(13)
+  !character(len=1)  :: creturn = achar(13)
   
   if (iargc() .ne. 10) then
       write(*,*) 'Some arguments are missing.'
@@ -222,13 +222,15 @@ program vg_ccf_monopole
   
   end do
 
+  write(*,*) rind
   write(*,*) rbin_edges
   write(*,*) ii
 
-  do ii = 1, nrbin
-    vol = 4./3 * pi * (rbin_edges(ii+1)**3 - rbin_edges(ii)**3)
-    write(*,*) vol
-    VR(ii) = VR(ii) + rhomed * vol
+  do i = 1, nrbin
+
+    vol = 4./3 * pi * (rbin_edges(i+1)**3 - rbin_edges(i)**3)
+    write(*,*) i, vol, rbin_edges(i+1)
+    VR(i) = VR(i) + rhomed * vol
   end do
 
   VR = nc * VR
