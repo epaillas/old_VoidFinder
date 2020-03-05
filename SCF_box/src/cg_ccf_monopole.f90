@@ -218,21 +218,16 @@ program vg_ccf_monopole
         end do
       end do
     end do
-
-    do ii = 1, nrbin
-      vol = 4./3 * pi * (rbin_edges(ii+1)**3 - rbin_edges(ii)**3)
-      write(*,*) vol
-      VR(ii) = VR(ii) + rhomed * vol
-    end do
-  
-    ! do ii = 1, nrbin
-    !   vol = 4./3 * pi * ((rbin(ii) + rwidth/2.) ** 3 - &
-    !   & (rbin(ii) - rwidth/2.) ** 3)
-
-    !   VR(ii) = VR(ii) + rhomed * vol
-    ! end do
   
   end do
+
+  do ii = 1, nrbin
+    vol = 4./3 * pi * (rbin_edges(ii+1)**3 - rbin_edges(ii)**3)
+    write(*,*) vol
+    VR(ii) = VR(ii) + rhomed * vol
+  end do
+
+  VR = nc * VR
   
   write(*,*) ''
   write(*,*) 'Calculation finished. Writing output...'
