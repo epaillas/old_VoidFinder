@@ -219,6 +219,9 @@ program vg_ccf_monopole
   
   end do
 
+  write(*,*) rbin_edges
+  write(*,*) ii
+
   do ii = 1, nrbin
     vol = 4./3 * pi * (rbin_edges(ii+1)**3 - rbin_edges(ii)**3)
     write(*,*) vol
