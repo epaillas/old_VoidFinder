@@ -116,6 +116,9 @@ program vg_ccf_r_mu
   do i = 1, nrbin
     rbin(i) = rbin_edges(i+1)-rwidth/2.
   end do
+
+  rbin_edges = 10**rbin_edges
+  rbin = 10**rbin
   
   mumin = -1
   mumax = 1
@@ -188,7 +191,7 @@ program vg_ccf_r_mu
     ipz = int((zvc) / rgrid + 1.)
   
     !ndif = int((rmax * rv / rgrid + 1.))
-    ndif = int(rmax / rgrid + 1.)
+    ndif = int(10**rmax / rgrid + 1.)
   
     do ix = ipx - ndif, ipx + ndif
       do iy = ipy - ndif, ipy + ndif
@@ -239,8 +242,8 @@ program vg_ccf_r_mu
               mu = dot_product(r, com) / (norm2(r) * norm2(com))
               dis = norm2(r)! / rv
   
-              if (dis .lt. rmax) then
-                rind = int((dis - rmin) / rwidth + 1)
+              if (dis .lt. 10**rmax .and. dis .gt. 10**rmin) then
+                rind = int((log10(dis) - rmin)/ rwidth + 1)
                 muind = int((mu - mumin) / muwidth + 1)
                 VG(rind, muind) = VG(rind, muind) + 1
               end if
@@ -255,8 +258,7 @@ program vg_ccf_r_mu
   
     do ii = 1, nrbin
       do jj = 1, nmubin
-          vol = 4./3 * pi * ((rbin(ii) + rwidth/2.) ** 3 - &
-          & (rbin(ii) - rwidth/2.) ** 3) / (nmubin)
+          vol = 4./3 * pi * (rbin_edges(i+1)**3 - rbin_edges(i)**3) / (nmubin)
   
           VR(ii, jj) = VR(ii, jj) + rhomed * vol
       end do

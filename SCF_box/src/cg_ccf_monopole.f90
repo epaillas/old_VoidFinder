@@ -221,10 +221,8 @@ program cg_ccf_monopole
 
   do i = 1, nrbin
     vol = 4./3 * pi * (rbin_edges(i+1)**3 - rbin_edges(i)**3)
-    write(*,*) i, vol, rbin_edges(i+1)
     VR(i) = VR(i) + rhomed * vol
   end do
-
   VR = nc * VR
   
   write(*,*) ''

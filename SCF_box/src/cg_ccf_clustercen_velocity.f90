@@ -114,6 +114,9 @@ program vg_ccf_r_mu
   do i = 1, nrbin
     rbin(i) = rbin_edges(i+1)-rwidth/2.
   end do
+
+  rbin_edges = 10**rbin_edges
+  rbin = 10**rbin
   
   ! Construct linked list for tracers
   write(*,*) ''
@@ -172,7 +175,7 @@ program vg_ccf_r_mu
     ipz = int((zvc) / rgrid + 1.)
   
     !ndif = int((rmax * rv / rgrid + 1.))
-    ndif = int(rmax / rgrid + 1.)
+    ndif = int(10**rmax / rgrid + 1.)
   
     do ix = ipx - ndif, ipx + ndif
       do iy = ipy - ndif, ipy + ndif
@@ -227,8 +230,8 @@ program vg_ccf_r_mu
               dis = norm2(r)! / rv
               voidcen_vel = dot_product(v, r) / norm2(r)
   
-              if (dis .gt. rmin .and. dis .lt. rmax) then
-                rind = int((dis - rmin) / rwidth + 1)
+              if (dis .gt. 10**rmin .and. dis .lt. 10**rmax) then
+                rind = int((log10(dis) - rmin)/ rwidth + 1)
                 vel(rind) = vel(rind) + voidcen_vel
                 vel2(rind) = vel2(rind) + voidcen_vel ** 2
                 counter(rind) = counter(rind) + 1
