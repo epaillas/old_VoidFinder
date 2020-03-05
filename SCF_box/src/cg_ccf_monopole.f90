@@ -235,6 +235,9 @@ program vg_ccf_monopole
   
   write(*,*) ''
   write(*,*) 'Calculation finished. Writing output...'
+
+  write(*,*) VR
+  stop
   
   xi = (VG * 1./VR) - 1
   
