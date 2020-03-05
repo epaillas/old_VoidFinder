@@ -222,7 +222,6 @@ program vg_ccf_monopole
     do ii = 1, nrbin
       vol = 4./3 * pi * (rbin_edges(ii+1)**3 - rbin_edges(ii)**3)
       write(*,*) vol
-      stop
       VR(ii) = VR(ii) + rhomed * vol
     end do
   
@@ -238,9 +237,6 @@ program vg_ccf_monopole
   write(*,*) ''
   write(*,*) 'Calculation finished. Writing output...'
 
-  write(*,*) VR
-  stop
-  
   xi = (VG * 1./VR) - 1
   
   open(12, file=output_den, status='unknown')
